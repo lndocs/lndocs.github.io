@@ -24,6 +24,7 @@ const sidebars: SidebarsConfig = {
         'architecture/users',
         'architecture/funding-sources',
         'architecture/ledger',
+        'architecture/ledger-spec',
       ],
     },
     {

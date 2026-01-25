@@ -287,6 +287,7 @@ flowchart LR
 
 ## See Also
 
+- [Ledger Specification](/docs/architecture/ledger-spec) - Formal standardization proposal
 - [Architecture Overview](/docs/architecture/overview)
 - [Payments](/docs/architecture/payments)
 - [API: Payments](/docs/api/payments)
