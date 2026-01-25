@@ -78,9 +78,10 @@ The [official LNbits YouTube channel](https://youtube.com/@lnbits) features:
 
 | Library | Language | Repository |
 |---------|----------|------------|
-| LNbits Python API | Python | [lightningames/pylnbits](https://github.com/lightningames/pylnbits) |
-| LNbits JS API | JavaScript | [lnbits/lnbits-js](https://github.com/lnbits/lnbits-js) |
-| LNbits Rust API | Rust | Community maintained |
+| lnbits (npm) | JavaScript | [MiguelMedeiros/lnbits-js](https://github.com/MiguelMedeiros/lnbits-js) |
+| pylnbits | Python | [lightningames/pylnbits](https://github.com/lightningames/pylnbits) |
+
+See the [SDKs & Libraries](/docs/api/sdks) page for usage examples.
 
 ### API Documentation
 

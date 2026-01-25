@@ -76,6 +76,7 @@ const sidebars: SidebarsConfig = {
         'api/users',
         'api/lnurl',
         'api/webhooks',
+        'api/sdks',
       ],
     },
     {
