@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="50%" style="stop-color:#2d1f4e"/>
+      <stop offset="100%" style="stop-color:#1a1a2e"/>
+    </linearGradient>
+    <linearGradient id="bolt-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fbb040"/>
+      <stop offset="100%" style="stop-color:#f7931a"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="text-glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg-gradient)"/>
+
+  <!-- Decorative circles -->
+  <circle cx="200" cy="500" r="300" fill="rgba(247, 147, 26, 0.05)"/>
+  <circle cx="1000" cy="130" r="250" fill="rgba(124, 58, 237, 0.05)"/>
+
+  <!-- Lightning bolt icon -->
+  <g transform="translate(150, 180)">
+    <circle cx="80" cy="80" r="75" fill="#1a1a2e" stroke="url(#bolt-gradient)" stroke-width="4"/>
+    <path d="M90 20 L50 90 L75 90 L70 140 L110 70 L85 70 Z" fill="url(#bolt-gradient)" filter="url(#glow)"/>
+  </g>
+
+  <!-- Title -->
+  <text x="280" y="240" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="800" fill="#fbb040" filter="url(#text-glow)">LNbits</text>
+
+  <!-- Tagline -->
+  <text x="280" y="310" font-family="system-ui, -apple-system, sans-serif" font-size="32" fill="#e0e0e0">Free &amp; Open-Source Lightning Network</text>
+  <text x="280" y="355" font-family="system-ui, -apple-system, sans-serif" font-size="32" fill="#e0e0e0">Wallet &amp; Accounts System</text>
+
+  <!-- Features -->
+  <g font-family="system-ui, -apple-system, sans-serif" font-size="22" fill="#a0a0a0">
+    <text x="280" y="440">24+ Funding Sources</text>
+    <text x="540" y="440">100+ Extensions</text>
+    <text x="780" y="440">REST API</text>
+    <text x="950" y="440">MIT License</text>
+  </g>
+
+  <!-- Bottom bar -->
+  <rect x="0" y="580" width="1200" height="50" fill="rgba(247, 147, 26, 0.1)"/>
+  <text x="600" y="612" font-family="system-ui, sans-serif" font-size="20" fill="#fbb040" text-anchor="middle">docs.lnbits.org</text>
+</svg>
