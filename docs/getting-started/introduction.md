@@ -8,6 +8,10 @@ description: Learn what LNbits is and how it can power your Lightning Network ap
 
 LNbits is a free, open-source Lightning Network accounts system with a powerful extension framework. It acts as a layer on top of your Lightning funding source, providing isolated wallet accounts, a clean REST API, and modular extensions.
 
+:::tip LNbits v1.0.0 Released
+After five years and 6,000+ commits, LNbits reached v1.0.0 in April 2025. The software is now **stable, hardened, and production-ready** with Vue 3, WebSocket payments, Nostr login, and Access Control Lists.
+:::
+
 ## What is LNbits?
 
 Think of LNbits as a **Lightning wallet multiplexer**. You connect it to a single Lightning node or custodial service (the "funding source"), and LNbits creates multiple isolated wallet accounts on top. Each wallet has:

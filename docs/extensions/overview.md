@@ -34,36 +34,100 @@ flowchart TB
 
 ### Payment & Commerce
 
-| Extension | Purpose |
-|-----------|---------|
-| **TPoS** | Point of Sale terminal |
-| **SatsPay** | Payment processor |
-| **Paywall** | Content monetization |
-| **Invoices** | Invoice management |
+| Extension | Purpose | Repository |
+|-----------|---------|------------|
+| **TPoS** | Point of Sale terminal | [lnbits/tpos](https://github.com/lnbits/tpos) |
+| **SatsPay** | Payment processor with webhooks | [lnbits/satspay](https://github.com/lnbits/satspay) |
+| **Paywall** | Content monetization | [lnbits/paywall](https://github.com/lnbits/paywall) |
+| **Invoices** | Invoice management | [lnbits/invoices](https://github.com/lnbits/invoices) |
+| **Offline Shop** | Receive payments offline | [lnbits/offlineshop](https://github.com/lnbits/offlineshop) |
+| **TipJar** | Accept tips | [lnbits/tipjar](https://github.com/lnbits/tipjar) |
 
 ### LNURL Protocol
 
-| Extension | Purpose |
-|-----------|---------|
-| **LNURL-pay** | Static payment links |
-| **LNURL-withdraw** | Vouchers and withdrawals |
-| **LNURLdevice** | Hardware integration |
+| Extension | Purpose | Repository |
+|-----------|---------|------------|
+| **LNURL-pay** | Static payment links | [lnbits/lnurlp](https://github.com/lnbits/lnurlp) |
+| **LNURL-withdraw** | Vouchers and faucets | [lnbits/withdraw](https://github.com/lnbits/withdraw) |
+| **LNURLdevice** | Hardware integration | [lnbits/lnurldevice](https://github.com/lnbits/lnurldevice) |
+| **Lightning Address** | LN addresses on your domain | [lnbits/lnaddress](https://github.com/lnbits/lnaddress) |
+| **LNDhub** | BlueWallet/Zeus compatibility | [lnbits/lndhub](https://github.com/lnbits/lndhub) |
 
-### Tools & Utilities
+### Swaps & Liquidity
 
-| Extension | Purpose |
-|-----------|---------|
-| **Boltz** | Submarine swaps |
-| **Watch Only** | Balance monitoring |
-| **Scheduler** | Automated payments |
+| Extension | Purpose | Repository |
+|-----------|---------|------------|
+| **Boltz** | Submarine swaps (LN ↔ onchain) | [lnbits/boltz](https://github.com/lnbits/boltz-extension) |
+| **Deezy** | LN to onchain swaps | [lnbits/deezy](https://github.com/lnbits/deezy) |
+| **Onchain Wallet** | Watch-only BTC wallet | [lnbits/watchonly](https://github.com/lnbits/watchonly) |
 
-### Fun & Social
+### Nostr Integration
 
-| Extension | Purpose |
-|-----------|---------|
-| **Jukebox** | Music jukebox |
-| **LNticket** | Event ticketing |
-| **Gerty** | Bitcoin display |
+| Extension | Purpose | Repository |
+|-----------|---------|------------|
+| **NOSTR Market** | Decentralized marketplace | [lnbits/nostrmarket](https://github.com/lnbits/nostrmarket) |
+| **NOSTR NIP-5** | Sell NIP-05 verification | [lnbits/nostrnip5](https://github.com/lnbits/nostrnip5) |
+| **NOSTR Client** | Multi-relay connections | [lnbits/nostrclient](https://github.com/lnbits/nostrclient) |
+| **NOSTR Relay** | Run your own relay | [lnbits/nostr-relay](https://github.com/lnbits/nostr-relay-extension) |
+
+### Ecash & Privacy
+
+| Extension | Purpose | Repository |
+|-----------|---------|------------|
+| **Cashu** | Ecash mint (peg in/out) | [lnbits/cashu](https://github.com/lnbits/cashu) |
+
+### NFC & Hardware
+
+| Extension | Purpose | Repository |
+|-----------|---------|------------|
+| **BoltCard** | NFC card payments | [lnbits/boltcards](https://github.com/lnbits/boltcards) |
+| **Bleskomat** | ATM integration | [lnbits/bleskomat](https://github.com/lnbits/bleskomat) |
+| **Gerty** | Bitcoin display device | [lnbits/gerty](https://github.com/lnbits/gerty) |
+
+### Streaming & Content
+
+| Extension | Purpose | Repository |
+|-----------|---------|------------|
+| **Streamer Copilot** | Streaming tips with animations | [lnbits/copilot](https://github.com/lnbits/copilot) |
+| **Stream Alerts** | OBS/streaming integration | [lnbits/livestream](https://github.com/lnbits/livestream) |
+| **DJ Livestream** | DJ tips with producer splits | [lnbits/livestream](https://github.com/lnbits/livestream-extension) |
+| **Jukebox** | Spotify-powered jukebox | [lnbits/jukebox](https://github.com/lnbits/jukebox) |
+
+### Events & Ticketing
+
+| Extension | Purpose | Repository |
+|-----------|---------|------------|
+| **Events** | Event ticket sales | [lnbits/events](https://github.com/lnbits/events) |
+| **LNticket** | Pay-per-word tickets | [lnbits/lnticket](https://github.com/lnbits/lnticket) |
+
+### Automation & Splitting
+
+| Extension | Purpose | Repository |
+|-----------|---------|------------|
+| **Split Payments** | Distribute to multiple wallets | [lnbits/splitpayments](https://github.com/lnbits/splitpayments) |
+| **Scrub** | Auto-forward to LNURL/wallet | [lnbits/scrub](https://github.com/lnbits/scrub) |
+
+### Bots & Integrations
+
+| Extension | Purpose | Repository |
+|-----------|---------|------------|
+| **Discord Bot** | Discord wallet integration | [lnbits/discordbot](https://github.com/lnbits/discordbot) |
+| **UserManager** | User/wallet management | [lnbits/usermanager](https://github.com/lnbits/usermanager) |
+
+### Gaming & Fun
+
+| Extension | Purpose | Repository |
+|-----------|---------|------------|
+| **Satsdice** | LNURL-powered dice game | [lnbits/satsdice](https://github.com/lnbits/satsdice) |
+| **Hivemind** | Prediction markets | [lnbits/hivemind](https://github.com/lnbits/hivemind) |
+
+### Other
+
+| Extension | Purpose | Repository |
+|-----------|---------|------------|
+| **Subdomains** | Sell subdomains | [lnbits/subdomains](https://github.com/lnbits/subdomains) |
+| **SMTP** | Paid email sending | Built-in |
+| **Diagon Alley** | Shop-in-shop system | [lnbits/Diagon-Alley](https://github.com/lnbits/Diagon-Alley) |
 
 ## Extension Architecture
 

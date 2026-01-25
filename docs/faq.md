@@ -61,6 +61,21 @@ Check your funding source status and logs.
 
 Lightning payments are near-instant. Internal payments (same instance) are even faster.
 
+### Can I deposit on-chain BTC to LNbits?
+
+Yes, through:
+- **Boltz/Deezy extensions**: Submarine swaps (on-chain → Lightning)
+- **External services**: FixedFloat, DiamondHands, ZigZag
+- **Onchain Wallet extension**: Watch-only addresses
+
+### Where can I see payment details?
+
+Click the transaction arrows (green = received, red = sent) to view details including attached messages.
+
+### How do I enable comments on LNURL-p payments?
+
+In the LNURL-pay extension, set the comment field character length (1-250) to enable the comment box during payment.
+
 ## Extensions
 
 ### What extensions are available?
@@ -113,6 +128,71 @@ docker pull lnbits/lnbits && docker compose up -d
 git pull && uv sync
 ```
 
+## Connectivity
+
+### What if my funding source is only available via Tor?
+
+Only apps, PoS terminals, and wallets with Tor activated can communicate with your wallets. Consider setting up hybrid mode (Tor + clearnet) for broader compatibility.
+
+### How do I fund my LNbits wallet from my own node?
+
+Edit your `lnd.conf` to include:
+```
+allow-circular-route=1
+allow-self-payment=1
+```
+
+Then restart LND and pay an invoice from your LNbits wallet.
+
+### Can I prevent others from creating wallets on my instance?
+
+Yes, two methods:
+1. **Environment**: Set allowed users in `.env`
+2. **Admin UI**: Use the UserManager extension
+
+## Mobile Wallets
+
+### How do I use LNbits with BlueWallet or Zeus?
+
+1. Enable the **LNDhub** extension
+2. Select your wallet
+3. Scan the appropriate QR code:
+   - **Admin QR**: Full access (send + receive)
+   - **Invoice QR**: Receive only
+
+Both Zeus and BlueWallet support LNDhub accounts.
+
+### Are my funds safe if I lose my wallet URL?
+
+On demo/public servers, LNbits cannot recover lost wallets. Always save:
+- Wallet URL
+- Export2phone QR
+- LNDhub connection string
+
+On your own instance, wallet data is in the database (`/data/` folder).
+
+## Hardware
+
+### What hardware projects can I build with LNbits?
+
+- **Point of Sale**: TPoS terminals, beertaps
+- **ATMs**: Fossa ATM, LightningATM
+- **NFC**: BoltCards, PlebTags, NFC rings
+- **Vending**: Candy dispensers, coffee machines
+- **Displays**: Gerty, BTClock, Nerdminer
+- **Switches**: LED controllers, pet feeders
+
+See [Resources](/docs/resources) for tutorials and the [MakerBits Telegram](https://t.me/makerbits) for community support.
+
+### How do I create NFC BoltCards?
+
+1. Install the **BoltCard** extension
+2. Get NXP NTAG 424 DNA cards
+3. Use an NFC writer to program credentials
+4. Cards work at any LNbits TPoS terminal
+
+See [plebtag.com](https://plebtag.com/write) for detailed guides.
+
 ## Getting Help
 
 ### Where can I get support?
@@ -124,3 +204,9 @@ git pull && uv sync
 ### How can I contribute?
 
 See our [Contributing](/docs/development/contributing) guide. We welcome code, documentation, translations, and community support.
+
+## See Also
+
+- [Resources](/docs/resources) - Tutorials, podcasts, and community guides
+- [Use Cases](/docs/guides/use-cases) - Real-world applications
+- [Troubleshooting](/docs/guides/troubleshooting) - Common issues and solutions

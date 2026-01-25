@@ -23,6 +23,7 @@ const sidebars: SidebarsConfig = {
         'architecture/payments',
         'architecture/users',
         'architecture/funding-sources',
+        'architecture/ledger',
       ],
     },
     {
@@ -104,6 +105,7 @@ const sidebars: SidebarsConfig = {
       label: 'Guides',
       collapsed: true,
       items: [
+        'guides/use-cases',
         'guides/shared-wallets',
         'guides/service-fees',
         'guides/backup-restore',
@@ -112,6 +114,7 @@ const sidebars: SidebarsConfig = {
       ],
     },
     'faq',
+    'resources',
   ],
 };
 
