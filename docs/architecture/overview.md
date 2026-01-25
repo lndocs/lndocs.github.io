@@ -10,37 +10,47 @@ LNbits is a modular Lightning Network accounts system built with modern Python a
 
 ## High-Level Architecture
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        Clients                               │
-│     (Web UI, Mobile Apps, REST API, Webhooks)               │
-└─────────────────────────┬───────────────────────────────────┘
-                          │
-┌─────────────────────────▼───────────────────────────────────┐
-│                      LNbits Core                             │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐       │
-│  │   FastAPI    │  │   Vue.js     │  │  Extensions  │       │
-│  │   Backend    │  │   Frontend   │  │   System     │       │
-│  └──────────────┘  └──────────────┘  └──────────────┘       │
-│                          │                                   │
-│  ┌──────────────────────▼──────────────────────────────┐    │
-│  │                 Core Services                        │    │
-│  │  • Wallet Management  • Payment Processing           │    │
-│  │  • User Authentication • Extension Loading           │    │
-│  └──────────────────────────────────────────────────────┘    │
-│                          │                                   │
-│  ┌──────────────────────▼──────────────────────────────┐    │
-│  │                   Database Layer                     │    │
-│  │        (SQLite / PostgreSQL / CockroachDB)          │    │
-│  └──────────────────────────────────────────────────────┘    │
-└─────────────────────────┬───────────────────────────────────┘
-                          │
-┌─────────────────────────▼───────────────────────────────────┐
-│                   Funding Source Layer                       │
-│  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐        │
-│  │   LND   │  │   CLN   │  │Phoenixd │  │ Alby... │        │
-│  └─────────┘  └─────────┘  └─────────┘  └─────────┘        │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph Clients["Clients"]
+        WebUI["Web UI"]
+        Mobile["Mobile Apps"]
+        API["REST API"]
+        WH["Webhooks"]
+    end
+
+    subgraph Core["LNbits Core"]
+        subgraph Components["Components"]
+            FastAPI["FastAPI<br/>Backend"]
+            Vue["Vue.js<br/>Frontend"]
+            Ext["Extensions<br/>System"]
+        end
+
+        subgraph Services["Core Services"]
+            Wallet["Wallet Management"]
+            Pay["Payment Processing"]
+            Auth["User Authentication"]
+            ExtLoad["Extension Loading"]
+        end
+
+        subgraph DB["Database Layer"]
+            SQLite["SQLite"]
+            Postgres["PostgreSQL"]
+            Cockroach["CockroachDB"]
+        end
+    end
+
+    subgraph Funding["Funding Source Layer"]
+        LND["LND"]
+        CLN["CLN"]
+        Phoenixd["Phoenixd"]
+        Alby["Alby..."]
+    end
+
+    Clients --> Components
+    Components --> Services
+    Services --> DB
+    DB --> Funding
 ```
 
 ## Technology Stack
@@ -152,25 +162,30 @@ extension/
 
 ### Core Entities
 
-```
-┌─────────────┐
-│   Account   │──────────────┐
-│  (User)     │              │
-└─────────────┘              │
-       │                     │
-       │ 1:n                 │
-       ▼                     │
-┌─────────────┐              │
-│   Wallet    │◄─────────────┘
-│             │    shared access
-└─────────────┘
-       │
-       │ 1:n
-       ▼
-┌─────────────┐
-│  Payment    │
-│             │
-└─────────────┘
+```mermaid
+erDiagram
+    Account ||--o{ Wallet : "owns (1:n)"
+    Account ||--o{ Wallet : "shared access"
+    Wallet ||--o{ Payment : "has (1:n)"
+
+    Account {
+        string id PK
+        string email
+        string pubkey
+    }
+    Wallet {
+        string id PK
+        string name
+        string admin_key
+        string invoice_key
+        int balance
+    }
+    Payment {
+        string checking_id PK
+        string payment_hash
+        int amount
+        string status
+    }
 ```
 
 ### Wallet Types
@@ -195,23 +210,26 @@ extension/
 
 ### Authorization Model
 
-```
-Super User
-    │
-    ├── Full instance control
-    ├── Funding source changes
-    └── Server restart
+```mermaid
+flowchart TB
+    subgraph SuperUser["🔑 Super User"]
+        SU1["Full instance control"]
+        SU2["Funding source changes"]
+        SU3["Server restart"]
+    end
 
-Admin
-    │
-    ├── User management
-    ├── Extension management
-    └── Instance settings
+    subgraph Admin["👤 Admin"]
+        A1["User management"]
+        A2["Extension management"]
+        A3["Instance settings"]
+    end
 
-User
-    │
-    ├── Own wallets only
-    └── Enabled extensions
+    subgraph User["👥 User"]
+        U1["Own wallets only"]
+        U2["Enabled extensions"]
+    end
+
+    SuperUser --> Admin --> User
 ```
 
 ## Performance Characteristics

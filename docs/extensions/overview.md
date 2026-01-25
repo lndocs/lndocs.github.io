@@ -16,17 +16,18 @@ Extensions are self-contained modules that:
 - Store data in dedicated tables
 - Integrate with the wallet system
 
-```
-┌─────────────────────────────────────────┐
-│              LNbits Core                 │
-│  (Wallets, Payments, Authentication)    │
-└──────────────────┬──────────────────────┘
-                   │
-    ┌──────────────┼──────────────┐
-    ▼              ▼              ▼
-┌────────┐   ┌──────────┐   ┌──────────┐
-│  TPoS  │   │ LNURL-p  │   │ Paywall  │
-└────────┘   └──────────┘   └──────────┘
+```mermaid
+flowchart TB
+    subgraph Core["⚡ LNbits Core"]
+        C1["Wallets"]
+        C2["Payments"]
+        C3["Authentication"]
+    end
+
+    Core --> TPoS["🏪 TPoS"]
+    Core --> LNURL["🔗 LNURL-pay"]
+    Core --> Paywall["🔒 Paywall"]
+    Core --> More["...100+ more"]
 ```
 
 ## Popular Extensions

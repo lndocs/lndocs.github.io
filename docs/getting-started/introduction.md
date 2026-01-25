@@ -17,19 +17,20 @@ Think of LNbits as a **Lightning wallet multiplexer**. You connect it to a singl
 - Independent permissions
 - Custom extensions enabled/disabled per wallet
 
-```
-┌─────────────────────────────────────────────────────┐
-│                      LNbits                          │
-│  ┌─────────┐  ┌─────────┐  ┌─────────┐             │
-│  │ Wallet 1│  │ Wallet 2│  │ Wallet 3│  ...        │
-│  │ 50k sats│  │ 10k sats│  │ 100 sats│             │
-│  └─────────┘  └─────────┘  └─────────┘             │
-│                      │                               │
-│              ┌───────▼───────┐                      │
-│              │  Funding Source │                     │
-│              │  (LND, CLN, etc)│                     │
-│              └───────────────┘                      │
-└─────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph LNbits["⚡ LNbits"]
+        W1["Wallet 1<br/>50k sats"]
+        W2["Wallet 2<br/>10k sats"]
+        W3["Wallet 3<br/>100 sats"]
+        Wn["..."]
+    end
+
+    subgraph FS["Funding Source"]
+        Node["LND / CLN / Phoenixd / etc."]
+    end
+
+    W1 & W2 & W3 & Wn --> Node
 ```
 
 ## Key Features

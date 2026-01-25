@@ -12,17 +12,20 @@ A funding source is the Lightning Network backend that powers your LNbits wallet
 
 LNbits doesn't process Lightning payments directly. Instead, it connects to a "funding source" - a Lightning node or service that handles the actual payment routing.
 
-```
-┌───────────────────────────────────────┐
-│              LNbits                    │
-│  (Wallet accounting, API, Extensions) │
-└───────────────┬───────────────────────┘
-                │
-                ▼
-┌───────────────────────────────────────┐
-│          Funding Source               │
-│  (Lightning payments, routing)        │
-└───────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph LNbits["⚡ LNbits"]
+        L1["Wallet accounting"]
+        L2["REST API"]
+        L3["Extensions"]
+    end
+
+    subgraph FS["Funding Source"]
+        F1["Lightning payments"]
+        F2["Payment routing"]
+    end
+
+    LNbits --> FS
 ```
 
 ## Available Funding Sources
@@ -166,12 +169,13 @@ Switching funding sources affects all wallets. LNbits tracks internal balances -
 
 LNbits maintains internal wallet balances. These should never exceed your funding source balance:
 
-```
-Funding Source: 1,000,000 sats
-├── Wallet A:     400,000 sats
-├── Wallet B:     350,000 sats
-├── Wallet C:     200,000 sats
-└── Unallocated:   50,000 sats
+```mermaid
+flowchart LR
+    FS["Funding Source<br/>1,000,000 sats"]
+    FS --> A["Wallet A<br/>400,000 sats"]
+    FS --> B["Wallet B<br/>350,000 sats"]
+    FS --> C["Wallet C<br/>200,000 sats"]
+    FS --> U["Unallocated<br/>50,000 sats"]
 ```
 
 Monitor for discrepancies and investigate immediately.

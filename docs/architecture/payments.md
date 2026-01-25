@@ -50,17 +50,19 @@ When you send sats, the amount is stored as negative.
 
 ## Payment States
 
-```
-┌─────────┐
-│ PENDING │ ──► Invoice created, awaiting payment
-└────┬────┘
-     │
-     ├─────────────────┐
-     ▼                 ▼
-┌─────────┐      ┌────────┐
-│ SUCCESS │      │ FAILED │
-│ (paid)  │      │(expired)│
-└─────────┘      └────────┘
+```mermaid
+stateDiagram-v2
+    [*] --> PENDING: Invoice created
+
+    PENDING --> SUCCESS: Payment received
+    PENDING --> FAILED: Expired or rejected
+
+    SUCCESS --> [*]
+    FAILED --> [*]
+
+    note right of PENDING: Awaiting payment
+    note right of SUCCESS: Payment confirmed
+    note right of FAILED: Expired or error
 ```
 
 ### State Transitions
