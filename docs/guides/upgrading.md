@@ -68,7 +68,7 @@ The callback URL rules (`LNBITS_CALLBACK_URL_RULES`) only accept host names with
 
 ### Expired invoices become failed {#expired-invoices}
 
-Unpaid incoming invoices are now marked **failed**, with the label `expired`, once they expire, and pending ones are cleaned up periodically ([#3867](https://github.com/lnbits/lnbits/pull/3867)). If your code waits for `pending` or filters on it, handle `failed` as well.
+Unpaid incoming invoices are now marked **failed**, with the label `expired`, when the periodic pending check (every 30 minutes by default) or a status request finds them expired ([#3867](https://github.com/lnbits/lnbits/pull/3867)). If your code waits for `pending` or filters on it, handle `failed` as well.
 
 ### WASM extensions {#wasm-extensions}
 
@@ -93,6 +93,8 @@ These are fixed on the `dev` branch but not in any release yet. See [Unreleased]
 - The `webhook` field on outgoing payments is silently ignored ([#4113](https://github.com/lnbits/lnbits/pull/4113)).
 - Internal payments can notify the receiver's webhook and websocket twice ([#4148](https://github.com/lnbits/lnbits/pull/4148)). Make webhook handlers idempotent.
 - The service fee is credited before the payment succeeds ([#4193](https://github.com/lnbits/lnbits/pull/4193)).
+- Paying an invoice that was created on LNbits' own LND node leaves the payment pending forever ([#4241](https://github.com/lnbits/lnbits/pull/4241)).
+- The background pending check handles only the 10 newest pending payments per run, so expired invoices and old pending payments clear slowly ([#4197](https://github.com/lnbits/lnbits/pull/4197)). See [Troubleshooting](/docs/guides/troubleshooting).
 
 ## v1.5.5 and v1.5.6 (2026-07) {#v1-5-5}
 
