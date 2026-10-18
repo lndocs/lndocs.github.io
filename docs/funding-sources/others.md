@@ -55,7 +55,7 @@ The token is sent as a Bearer header. Bark's fee estimates can exceed LNbits' de
 
 ## Boltz {#boltz}
 
-`BoltzWallet` connects over gRPC to a running [boltz-client](https://docs.boltz.exchange/v/boltz-client) and handles Lightning payments through submarine swaps on Liquid. Run boltz-client in standalone mode (`boltzd --standalone`). LNbits uses a boltz-client wallet named `lnbits`: on first connect it restores that wallet from `BOLTZ_MNEMONIC` if you set one, or creates a new one.
+`BoltzWallet` connects over gRPC to a running [boltz-client](https://github.com/BoltzExchange/boltz-client) and handles Lightning payments through submarine swaps on Liquid. Run boltz-client in standalone mode (`boltzd --standalone`). LNbits uses a boltz-client wallet named `lnbits`: on first connect it restores that wallet from `BOLTZ_MNEMONIC` if you set one, or creates a new one.
 
 ```bash title=".env"
 LNBITS_BACKEND_WALLET_CLASS=BoltzWallet

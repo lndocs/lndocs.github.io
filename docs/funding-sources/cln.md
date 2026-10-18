@@ -206,4 +206,4 @@ Umbrel, Start9 and RaspiBlitz each expose CLN differently. Take the clnrest URL,
 - [Funding sources overview](/docs/funding-sources/overview)
 - [LND](/docs/funding-sources/lnd)
 - [Security](/docs/configuration/security)
-- CLN: [REST](https://docs.corelightning.org/docs/rest), [createrune](https://docs.corelightning.org/reference/lightning-createrune)
+- CLN: [REST](https://docs.corelightning.org/docs/rest), [createrune](https://docs.corelightning.org/reference/createrune)
