@@ -21,7 +21,7 @@ class Payment(BaseModel):
     payment_hash: str            # BOLT11 payment hash
     wallet_id: str
     amount: int                  # millisatoshis, signed: > 0 incoming, < 0 outgoing
-    fee: int                     # millisatoshis; sign is not normalised (see Fee Handling)
+    fee: int                     # millisatoshis; usually stored negative (see Fee Handling)
     bolt11: str
     payment_request: str | None  # not stored; bolt11, or the fiat provider's payment request
     fiat_provider: str | None
@@ -86,7 +86,7 @@ stateDiagram-v2
 
 A `success` row can still be edited later:
 
-- its labels, with `PUT /api/v1/payments/{payment_hash}/labels`;
+- its labels, with `PUT /api/v1/payments/{payment_hash}/labels` (admin key; unknown label names are added to the user's labels);
 - new keys in its `extra`, with `PATCH /api/v1/payments/extra` (admin key; allowed only after success, and only for keys not already present);
 - its hold-invoice flags.
 
@@ -96,7 +96,7 @@ A `success` row can still be edited later:
 
 `POST /api/v1/payments` with `"out": false` (an invoice key is enough) calls `create_invoice` in `lnbits/core/services/payments.py`:
 
-1. Reject amountless invoices, and wallets that can't receive (for example a shared wallet without the receive permission).
+1. Check the `webhook` URL, if given, against `LNBITS_CALLBACK_URL_RULES`. Reject amountless invoices, and wallets that can't receive (for example a shared wallet without the receive permission).
 2. Convert a fiat `unit` to sats and record the rates in `extra`.
 3. Check `LNBITS_MAX_INCOMING_PAYMENT_AMOUNT_SATS` and the maximum wallet balance (`LNBITS_WALLET_LIMIT_MAX_BALANCE`, 0 = no limit).
 4. Ask the funding source for an invoice. The funding source is called with the amount in **sats**.
@@ -109,12 +109,13 @@ A webhook, if given, is called only when the invoice is paid, not when it is cre
 
 `POST /api/v1/payments` with `"out": true` and `bolt11` (admin key required) calls `pay_invoice`:
 
-1. Decode the BOLT11. Amountless invoices are refused, and the amount must not exceed `LNBITS_MAX_OUTGOING_PAYMENT_AMOUNT_SATS`.
-2. Take the global `payment_lock`, then a per-wallet lock, and re-read the wallet balance.
+1. Refuse everything if `LNBITS_ONLY_ALLOW_INCOMING_PAYMENTS` is on. Decode the BOLT11: amountless invoices are refused, and the amount must not exceed `LNBITS_MAX_OUTGOING_PAYMENT_AMOUNT_SATS`. Check the wallet limits `LNBITS_WALLET_LIMIT_SECS_BETWEEN_TRANS` and `LNBITS_WALLET_LIMIT_DAILY_MAX_WITHDRAW` (0 = off), and that an invoice from this instance hasn't been paid already.
+2. Take the wallet's lock (`wallets_payments_lock[wallet_id]`; the global `payment_lock` only guards creating that lock) and re-read the wallet balance.
 3. Check for an internal payment (below). If it is one, settle it in the database.
 4. Otherwise check the balance against the amount plus the fee reserve, create a `pending` row, and call the funding source.
 5. Wait up to `LNBITS_FUNDING_SOURCE_PAY_INVOICE_WAIT_SECONDS` (default 5). If the funding source hasn't answered, return the payment still `pending`; it is resolved later.
 6. On success, set `fee` to the actual routing fee plus the service fee. On failure, mark the row `failed`.
+7. If a service fee applies, credit it to the fee wallet (see [Service Fees](#service-fees)).
 
 `pay_invoice` never sets a webhook, so a `webhook` field is ignored for outgoing payments in v1.6.2.
 
@@ -142,8 +143,9 @@ The fee reserve for internal payments is 0. The service fee is also skipped, unl
 
 - While an external payment is pending, `fee = -(reserve + service fee)`.
 - When it succeeds, `fee = -(routing fee + service fee)`, using the routing fee the funding source reports.
+- The sender row of an internal payment stores `-(service fee)`, usually 0.
 
-The fee sign is not normalised across all rows. For example, the sender row of an internal payment stores a positive (or zero) fee. The balance view uses `ABS(fee)` for this reason.
+`create_payment` always stores `-abs(fee)`. One path doesn't: when the funding source's paid-invoice stream settles an incoming invoice, LNbits copies the backend's `fee_msat` as reported. The balance view uses `ABS(fee)`, so the sign never changes a balance.
 
 ### Fee Reserve {#fee-reserve}
 
@@ -169,6 +171,10 @@ LNBITS_SERVICE_FEE_IGNORE_INTERNAL=true   # default true: no fee on internal pay
 
 No service fee is charged unless `LNBITS_SERVICE_FEE_WALLET` is set. The fee wallet gets its own `success` row with `checking_id = service_fee_{payment_hash}`. See [Service Fees](/docs/guides/service-fees).
 
+:::caution Service fee on payments that later fail
+`pay_invoice` credits the fee wallet as soon as the funding source call returns, even if the payment is still `pending` (`lnbits/core/services/payments.py`, `pay_invoice` and `_credit_service_fee_wallet`). If that payment later fails, the sender gets the amount and fee back, but the fee wallet keeps its `service_fee_` row. Payments that fail straight away are not charged.
+:::
+
 With the Admin UI on (the default), these settings live in the database after the first start and override `.env`. Change them in the Admin UI (`/admin`).
 
 ## Payment Identification {#payment-identification}
@@ -184,7 +190,7 @@ With the Admin UI on (the default), these settings live in the database after th
 | Service fee | `service_fee_{payment_hash}` |
 | Fiat provider invoice | `fiat_{provider}_{provider_checking_id}` |
 
-Uniqueness is enforced on `(wallet_id, checking_id)`. There is no primary key column.
+The table has a `UNIQUE (wallet_id, checking_id)` constraint and no primary key column. `create_payment` also refuses a `checking_id` that already exists in any wallet.
 
 ### Payment Hash {#payment-hash}
 
@@ -206,7 +212,8 @@ When the invoice is paid, LNbits sends one `POST` to the webhook URL:
 - The body is the whole `Payment` model, sent as `json=payment.json()`. `payment.json()` is already a JSON string, and httpx JSON-encodes it again, so the body is a **JSON string** you must decode twice.
 - `amount` and `fee` are in **millisatoshis** (a 1000 sat invoice has `"amount": 1000000`), and `status` is `"success"`.
 - It is sent once. The response status (or `-1` on error) is stored in `webhook_status`, and there is no retry.
-- Webhook targets that resolve to private or non-global IPs (LAN, localhost) are refused unless `LNBITS_CALLBACK_ALLOW_PRIVATE_IPS=true`. Redirects are not followed.
+- The URL must match `LNBITS_CALLBACK_URL_RULES`, which by default allows only `http(s)` URLs with a domain name. This is checked when the invoice is created.
+- Targets that resolve to private or non-global IPs (LAN, localhost) are refused at send time unless `LNBITS_CALLBACK_ALLOW_PRIVATE_IPS=true`. Redirects are not followed, and the request times out after 40 seconds.
 
 ## Hold Invoices {#hold-invoices}
 
@@ -220,21 +227,29 @@ Settling stores the preimage and sets `extra.hold_invoice_settled`; cancelling s
 
 ## Payment Extras {#payment-extras}
 
-`extra` is a JSON object for extension and application data. When an invoice is created in a fiat `unit`, LNbits adds `fiat_currency`, `fiat_amount`, `fiat_rate` and `btc_rate`. When the wallet has a currency, it also adds `wallet_fiat_currency`, `wallet_fiat_amount`, `wallet_fiat_rate` and `wallet_btc_rate`.
+`extra` is a JSON object for extension and application data. LNbits adds fiat amounts to it (`calculate_fiat_amounts`):
+
+- `wallet_fiat_currency`, `wallet_fiat_amount`, `wallet_fiat_rate` and `wallet_btc_rate`, in the wallet's currency (`USD` unless set otherwise), on every invoice and payment when a rate is available;
+- `fiat_currency`, `fiat_amount`, `fiat_rate` and `btc_rate`, only when an invoice is created in a fiat `unit` that differs from the wallet's currency.
+
+`*_rate` is sats per fiat unit and `*_btc_rate` is the fiat price of one bitcoin. A 10.50 EUR invoice on a USD wallet might store:
 
 ```json
 {
-  "tag": "tpos",
-  "fiat_currency": "USD",
+  "fiat_currency": "EUR",
   "fiat_amount": 10.5,
   "fiat_rate": 952.38,
-  "btc_rate": 105000.0
+  "btc_rate": 105000.0,
+  "wallet_fiat_currency": "USD",
+  "wallet_fiat_amount": 12.1,
+  "wallet_fiat_rate": 826.45,
+  "wallet_btc_rate": 121000.0
 }
 ```
 
 ## Payment Queries {#payment-queries}
 
-`GET /api/v1/payments` (invoice key) returns the wallet's pending **and** completed payments, newest first. It takes the generic filter syntax `field[op]=value`, with operators `eq`, `ne`, `gt`, `ge`, `lt`, `le`, `in`, `ex`, `like`, `every` and `any`.
+`GET /api/v1/payments` (invoice key) returns the wallet's `pending` and `success` payments, newest first. **Failed payments are left out.** `GET /api/v1/payments/paginated` returns every status. Both take the generic filter syntax `field[op]=value`, with operators `eq`, `ne`, `gt`, `ge`, `lt`, `le`, `in`, `ex`, `like`, `every` and `any`. Unknown filter fields are ignored.
 
 ### By Status {#by-status}
 
@@ -243,7 +258,7 @@ GET /api/v1/payments?status=success
 GET /api/v1/payments?status=pending
 ```
 
-There is no `pending=true` filter; it is ignored.
+There is no `pending=true` filter; it is ignored. On `/api/v1/payments`, `status=failed` always returns an empty list.
 
 ### By Date Range {#by-date-range}
 
@@ -260,7 +275,7 @@ GET /api/v1/payments?limit=10&offset=20
 GET /api/v1/payments/paginated?limit=50&offset=0   # returns {data, total}
 ```
 
-The default limit is 10 and the maximum is 1000.
+The default limit is 10 and the maximum is 1000. `limit=0` means 1000.
 
 ## Performance Considerations {#performance-considerations}
 
