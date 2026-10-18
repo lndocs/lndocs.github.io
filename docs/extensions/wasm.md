@@ -289,7 +289,7 @@ The full file, with all twelve exports and eleven permissions, is at [lnbits/tip
 
 ## Building a WASM extension {#authoring}
 
-LNbits v1.6.2 doesn't ship a WASM authoring guide, and docs.lnbits.com doesn't have one yet either. The best reference is a working extension such as [lnbits/tips](https://github.com/lnbits/tips). Its layout:
+LNbits v1.6.2 ships no WASM authoring guide. The unreleased `dev` branch adds one, [docs/wasm-extensions.md](https://github.com/lnbits/lnbits/blob/dev/docs/wasm-extensions.md), but it describes code that comes after v1.6.2. For v1.6.2 the best reference is a working extension such as [lnbits/tips](https://github.com/lnbits/tips). Its layout:
 
 ```text
 tips/
