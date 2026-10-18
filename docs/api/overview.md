@@ -101,8 +101,9 @@ Errors use FastAPI's shape:
 | 400 | Bad input. LNbits returns 400, not 422, for request validation errors, with a list of problems in `detail` |
 | 401 | Missing credential, expired or invalid token, or wrong password |
 | 403 | The credential is valid but not allowed, for example an invoice key used to pay |
-| 404 | Unknown wallet key, or the object does not exist |
-| 429 | Rate limit exceeded |
+| 404 | Unknown wallet key, or the object does not exist (for example `Payment does not exist.`) |
+| 429 | Rate limit exceeded. This body is `{"error": "Rate limit exceeded: ..."}`, not `detail`. Repeated failed logins also return 429 |
+| 500 | Unhandled server error: `{"detail": "Unexpected error! ID: ..."}`. The ID matches a line in the LNbits log |
 | 520 | The payment or invoice failed at the Lightning layer, for example insufficient balance. The body is `{"detail": "...", "status": "failed"}` or `"status": "pending"` |
 
 Treat a 520 with `"status": "pending"` as "not known yet", not as a failure. Check the payment again before you retry it.
@@ -156,15 +157,15 @@ List routes that take filters, such as `GET /api/v1/payments`, accept these quer
 
 | Parameter | Meaning |
 |---|---|
-| `limit`, `offset` | Page size and start. There is no default limit and no maximum, so always set one |
-| `sortby`, `direction` | Sort field, and `asc` or `desc` |
+| `limit`, `offset` | Page size and start. `limit` defaults to **10** and is capped at **1000**. `limit=0` means 1000 |
+| `sortby`, `direction` | Sort field, and `asc` or `desc`. Payments sort by `time`, newest first, by default. A `sortby` the route doesn't allow returns 400 |
 | `search` | Free-text search over the model's search fields |
 | `<field>=<value>` | Equality filter on a model field |
-| `<field>[op]=<value>` | Operator filter. `op` is one of `eq`, `ne`, `gt`, `ge`, `lt`, `le`, `in`, `ex`, `like`, `every`, `any` |
+| `<field>[op]=<value>` | Operator filter. `op` is one of `eq`, `ne`, `gt`, `ge`, `lt`, `le`, `in`, `ex`, `like`, `every`, `any`. `in`, `ex`, `every` and `any` take comma-separated values |
 
-Unknown field names are silently ignored. A typo returns unfiltered results rather than an error.
+Filters fail silently. An unknown field name, an unknown operator or a value of the wrong type (`amount[gt]=abc`) is dropped, and you get unfiltered results instead of an error.
 
-Routes ending in `/paginated` return `{"data": [...], "total": n}`, which is what you need for page controls.
+To fetch everything, page through with `offset` until you have `total` items. Routes ending in `/paginated` return `{"data": [...], "total": n}`, which is what you need for that.
 
 ### Filtering examples {#filtering--sorting}
 

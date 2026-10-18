@@ -57,7 +57,7 @@ The result is stored on the payment as `webhook_status`. It holds the HTTP statu
 |---|---|
 | `Content-Type` | `application/json` |
 | `User-Agent` | `LNbits/<version>`, for example `LNbits/1.6.2` |
-| `Host` | The host of your webhook URL |
+| `Host` | The host (and port, if the URL has one) of your webhook URL. LNbits connects to the resolved IP and sends the hostname as `Host` and TLS SNI |
 
 There is no signature header and no LNbits-specific header. Don't try to authenticate the sender from headers.
 
@@ -138,7 +138,7 @@ def lnbits_webhook():
     return "", 200
 ```
 
-`details` is only present when the key belongs to the wallet that owns the payment. That makes it a check that the payment is yours.
+With a key, LNbits only looks in that key's wallet, so a payment hash from another wallet returns 404. A 200 with `details` therefore means the payment is yours.
 
 ### Express.js handler {#expressjs-handler}
 
@@ -177,7 +177,7 @@ You can also put a hard-to-guess token in the webhook URL path to cut down on no
 
 When you confirm with `GET /api/v1/payments/{payment_hash}`:
 
-- Send your wallet key in the `X-Api-Key` header, and require `details` in the response. Without it, the payment isn't in your wallet.
+- Send your wallet key in the `X-Api-Key` header. A 404 means the payment isn't in your wallet. Require `details` in a 200 response.
 - Check `paid` is `true`.
 - Check `details.amount` (msat) matches what you expected for the order.
 
@@ -259,7 +259,7 @@ A public request-inspection service with a dotted hostname works as a webhook UR
 
 1. Check `details.webhook_status` on the payment (see [Webhook status](#webhook-status)).
 2. `"-1"` means the URL was refused by the URL rules or the private-IP check, or the connection failed. Check the LNbits log.
-3. A status code means LNbits reached your server. Look at your server's logs for that status.
+3. A status code means LNbits reached your server. Look at your server's logs for that status. A `3xx` code means your server redirected, which LNbits doesn't follow.
 4. `null` means no attempt has been made yet. The invoice may not be paid.
 5. Remember that redirects are not followed. Use the final URL, including `https://` if your site redirects to it.
 

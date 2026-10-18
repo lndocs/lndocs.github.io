@@ -34,42 +34,7 @@ Pin the schema to the LNbits version you run, and regenerate when you upgrade.
 
 ## Plain HTTP {#curl--rest-api}
 
-### Authentication {#authentication}
-
-```bash
-# Admin key: receive, read and spend
-curl -H "X-Api-Key: $ADMIN_KEY" https://lnbits.example.com/api/v1/wallet
-
-# Invoice key: receive and read (balance, payment history), but not spend
-curl -H "X-Api-Key: $INVOICE_KEY" https://lnbits.example.com/api/v1/wallet
-```
-
-See [Authentication](/docs/api/authentication) for user tokens and ACL API tokens.
-
-### Create an invoice {#create-invoice}
-
-```bash
-curl -X POST https://lnbits.example.com/api/v1/payments \
-  -H "X-Api-Key: $INVOICE_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"out": false, "amount": 1000, "memo": "Payment"}'
-```
-
-### Pay an invoice {#pay-invoice}
-
-```bash
-curl -X POST https://lnbits.example.com/api/v1/payments \
-  -H "X-Api-Key: $ADMIN_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"out": true, "bolt11": "lnbc..."}'
-```
-
-### Check a payment {#check-payment}
-
-```bash
-curl https://lnbits.example.com/api/v1/payments/$PAYMENT_HASH \
-  -H "X-Api-Key: $INVOICE_KEY"
-```
+The curl calls for the common jobs are on [API Overview](/docs/api/overview) and [Payments API](/docs/api/payments). The two wrappers below cover the same jobs: balance, create an invoice, pay one, check one.
 
 ### A minimal Python client {#python}
 
@@ -109,6 +74,7 @@ class LnbitsClient:
         )
 
     def is_paid(self, payment_hash: str) -> bool:
+        # 404 (raised here) if the payment is not in this wallet
         return self._request("GET", f"/api/v1/payments/{payment_hash}", self.invoice_key)["paid"]
 ```
 

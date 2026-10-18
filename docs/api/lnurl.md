@@ -25,7 +25,7 @@ Creating your own LNURL-pay or LNURL-withdraw **links** is done by extensions, m
 
 ## Decoding an LNURL {#decoding-lnurl}
 
-`POST /api/v1/lnurlscan` takes a bech32 LNURL or a Lightning address. LNbits fetches it and returns the service's response. It needs an invoice or admin key.
+`POST /api/v1/lnurlscan` takes a bech32 LNURL or a Lightning address. LNbits fetches it and returns the service's response. An LNURL-auth link is the exception: LNbits decodes it locally and contacts nobody. The route needs an invoice or admin key.
 
 ```bash
 curl -X POST https://lnbits.example.com/api/v1/lnurlscan \
@@ -70,35 +70,47 @@ curl -X POST https://lnbits.example.com/api/v1/payments/lnurl \
 | `unit` | Optional. `sat`, or a fiat code that is converted at the current rate |
 | `comment` | Optional. Sent to the recipient if the link allows comments |
 
-LNbits fetches the invoice from the service's callback and pays it. The response is the payment object (see [Payments API](/docs/api/payments)). Payment failures return 520. Service errors (amount out of range, comment too long, unreachable) return 400 with the service's reason.
+LNbits fetches the invoice from the service's callback, checks that its amount matches what you asked for, and pays it. The response is HTTP **200** (not 201) with the payment object (see [Payments API](/docs/api/payments)). Payment failures return 520, as for `POST /api/v1/payments`. Service errors (amount out of range, comment too long, unreachable, wrong invoice amount) return 400 with the reason in `detail`. Sending neither `lnurl` nor `res` returns 400 `Missing LNURL or LnurlPayResponse data.`
+
+A `comment` longer than the link's `commentAllowed` returns 400. If the link doesn't allow comments at all, the comment is dropped silently.
 
 If the service marks the link as not disposable (`"disposable": false`), LNbits also saves it in the wallet's stored pay links.
 
 ## LNURL-withdraw {#lnurl-withdraw}
 
-To pull funds from someone else's withdraw link into your wallet, first resolve the link with `POST /api/v1/lnurlscan`. Then create an invoice and pass the withdraw response in `lnurl_withdraw`:
+To pull funds from someone else's withdraw link into your wallet, resolve the link with `POST /api/v1/lnurlscan`, then create an invoice with the withdraw response in `lnurl_withdraw`. With `jq` installed:
 
 ```bash
+withdraw=$(curl -s -X POST https://lnbits.example.com/api/v1/lnurlscan \
+  -H "X-Api-Key: $INVOICE_KEY" -H "Content-Type: application/json" \
+  -d '{"lnurl": "LNURL1DP68GURN8GHJ7..."}')
+
 curl -X POST https://lnbits.example.com/api/v1/payments \
-  -H "X-Api-Key: $INVOICE_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"out": false, "amount": 100, "memo": "Withdraw", "lnurl_withdraw": <the withdrawRequest object from lnurlscan>}'
+  -H "X-Api-Key: $INVOICE_KEY" -H "Content-Type: application/json" \
+  -d "$(jq -n --argjson w "$withdraw" '{out: false, amount: 100, memo: "Withdraw", lnurl_withdraw: $w}')"
 ```
 
-LNbits creates the invoice and sends it to the link's callback. If the service rejects it, the returned payment has `status: "failed"` and the reason in `extra.lnurl_response`. Otherwise wait for the payment to arrive as usual.
+`amount` is in sats here, and must sit between the link's `minWithdrawable` and `maxWithdrawable` (msat).
+
+LNbits creates the invoice and sends it to the link's callback. If the service rejects it, the returned payment shows `status: "failed"` and the reason in `extra.lnurl_response`. That status is only in this response: the stored invoice stays pending until it expires. Otherwise wait for the payment to arrive as usual.
 
 To create withdraw links that others can pull from, use the Withdraw Links extension.
 
 ## LNURL-auth {#lnurl-auth}
 
-`POST /api/v1/lnurlauth` logs in to an LNURL-auth site as your wallet. LNbits derives the linking key from the wallet's admin key, so each wallet gets a stable identity per site. Resolve the `lnurl` with `POST /api/v1/lnurlscan` first, then send the returned `login` object (`tag`, `callback`, `k1`) as the body, with the admin key:
+`POST /api/v1/lnurlauth` logs in to an LNURL-auth site as your wallet. LNbits derives the linking key from the wallet's admin key and the site's domain, so each wallet gets a stable identity per site. Resolve the `lnurl` with `POST /api/v1/lnurlscan` first, then send the returned `login` object (`tag`, `callback`, `k1`) as the body, with the admin key:
 
 ```bash
+auth_req=$(curl -s -X POST https://lnbits.example.com/api/v1/lnurlscan \
+  -H "X-Api-Key: $INVOICE_KEY" -H "Content-Type: application/json" \
+  -d '{"lnurl": "LNURL1..."}')
+
 curl -X POST https://lnbits.example.com/api/v1/lnurlauth \
-  -H "X-Api-Key: $ADMIN_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"tag": "login", "callback": "https://site.example/auth?tag=login&k1=...", "k1": "..."}'
+  -H "X-Api-Key: $ADMIN_KEY" -H "Content-Type: application/json" \
+  -d "$auth_req"
 ```
+
+The callback must pass the [callback URL rules](/docs/api/webhooks). Rotating the wallet's keys changes the derived identity, so you lose the login on every site.
 
 LNbits does not offer LNURL-auth as a way to log in to LNbits itself. Its login methods are listed in [Authentication](/docs/api/authentication).
 
@@ -142,8 +154,8 @@ The core API routes that **use** LNURLs (`/api/v1/lnurlscan`, `/api/v1/payments/
 
 LNbits limits where it will send LNURL requests:
 
-- It only fetches LNURLs over HTTPS from public IP addresses, or `.onion` hosts through Tor. Private and non-global addresses are refused unless `LNBITS_LNURL_ALLOW_PRIVATE_IPS` is true.
-- It follows a redirect only if the target origin matches `LNBITS_LNURL_REDIRECT_URL_RULES`, which is empty by default, so redirects are refused.
+- It fetches public hosts over HTTPS only, and `.onion` hosts through a Tor SOCKS proxy at `127.0.0.1:9050`. Hosts that resolve to private or other non-global addresses are refused unless `LNBITS_LNURL_ALLOW_PRIVATE_IPS` is true. Plain HTTP is accepted only for such private hosts, with that setting on.
+- It follows up to 3 redirects, and only to origins that match `LNBITS_LNURL_REDIRECT_URL_RULES`. That list is empty by default, so redirects are refused.
 - LNURL-auth and LNURL-withdraw callbacks must also match `LNBITS_CALLBACK_URL_RULES`. See [Webhooks](/docs/api/webhooks) for how those rules work.
 
 If paying or scanning a service on your own LAN fails with a "private or non-global IP" error, these settings are the reason.
