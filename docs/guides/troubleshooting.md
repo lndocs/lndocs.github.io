@@ -67,7 +67,7 @@ psql "$LNBITS_DATABASE_URL" -c 'select 1'
 
 ## Payments stuck pending {#payments-stuck-pending}
 
-A payment still in flight after `LNBITS_FUNDING_SOURCE_PAY_INVOICE_WAIT_SECONDS` (default 5) is returned as **pending**, not failed. LNbits logs `payment status unknown <checking_id>: ...`. It re-checks pending payments from the last 15 days at startup and then every `LNBITS_FUNDING_SOURCE_PENDING_INTERVAL_SECONDS` (default 1800, every 30 minutes). These checks are skipped while the funding source is `VoidWallet`.
+A payment still in flight after `LNBITS_FUNDING_SOURCE_PAY_INVOICE_WAIT_SECONDS` (default 5) is returned as **pending**, not failed. LNbits logs `payment status unknown <checking_id>: ...`. A background task re-checks pending payments from the last 15 days at startup and then every `LNBITS_FUNDING_SOURCE_PENDING_INTERVAL_SECONDS` (default 1800, every 30 minutes). In v1.6.2 each run looks only at the **10 most recent** pending payments, so older ones can wait a long time or never be picked up while newer ones pile up. The task does nothing while the funding source is `VoidWallet`.
 
 To check one payment now, call `GET /api/v1/payments/{payment_hash}`. It asks the funding source and updates the status.
 
@@ -85,7 +85,7 @@ This deletes the record without asking the node. If the payment did go out, you 
 
 `lnbits-cli db check-payments` does **not** fix stuck payments. It checks the other direction: it lists incoming payments that LNbits marked as paid but the funding source still reports as pending (by default from the last 3 days). It changes nothing.
 
-Unpaid incoming invoices are marked failed, with the label `expired`, once they expire (since v1.6.0). The log says `invoice <checking_id> expired, marked as failed`.
+Unpaid incoming invoices are marked failed, with the label `expired`, when that check (or a status request) finds them expired (since v1.6.0). The log says `invoice <checking_id> expired, marked as failed`. Because of the 10-payment limit above, a backlog of expired invoices clears slowly, and not at all on `VoidWallet`; [#4197](https://github.com/lnbits/lnbits/pull/4197) on `dev` (unreleased) fails them all in one pass.
 
 <a id="invoice-not-received"></a>
 
