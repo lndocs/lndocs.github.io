@@ -29,7 +29,7 @@ SPARK_L2_NETWORK=MAINNET
 ```
 
 - `SPARK_L2_EXTERNAL_API_KEY` is sent as `X-Api-Key` to the sidecar; set the same key on the sidecar side.
-- The seed: if the sidecar was started with its own mnemonic, that one is used. Otherwise the sidecar gets `SPARK_L2_MNEMONIC` from LNbits. Any Spark-compatible seed works.
+- The seed: if the sidecar was started with its own mnemonic, that one is used. Otherwise LNbits sends it `SPARK_L2_MNEMONIC`, and if that is empty too, LNbits **generates a new mnemonic**, gives it to the sidecar and saves it in `SPARK_L2_MNEMONIC`. Back it up from the Admin UI. Upstream says seeds from other Spark wallets work too (unverified here).
 - Tuning, with defaults: `SPARK_L2_PAY_WAIT_MS=4000`, `SPARK_L2_PAY_POLL_MS=500`, `SPARK_L2_STREAM_KEEPALIVE_MS=15000`.
 - Upstream notes that Spark L2 needs a higher fee reserve and a longer payment wait than the defaults. Raise `LNBITS_RESERVE_FEE_MIN` if small payments fail.
 

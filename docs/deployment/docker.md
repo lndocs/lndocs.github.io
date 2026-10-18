@@ -19,7 +19,7 @@ Facts from the v1.6.2 `Dockerfile`, which matter for every example below:
 - `--forwarded-allow-ips='*'` is hard-coded, so `FORWARDED_ALLOW_IPS` has no effect in the container: it trusts `X-Forwarded-*` headers from any client that can reach it. Don't let anything but your reverse proxy reach port 5000 (see below).
 - The working directory is `/app`, and the data folder is **`/app/data`**. Mount it.
 - It runs as root, includes all optional extras (Breez, Liquid/Boltz), and ships `pg_dump` from **postgresql-client-14**.
-- It ships with no extensions.
+- It ships with no extensions. The `.env.example` used below sets `LNBITS_EXTENSIONS_DEFAULT_INSTALL="tpos"`, so TPoS is installed on the first start; clear that line if you don't want it.
 
 :::warning Don't publish port 5000 to the world
 Behind a reverse proxy on the same host, publish the port on localhost only: `127.0.0.1:5000:5000`. A plain `5000:5000` opens LNbits on every interface, without TLS, and lets anyone forge the forwarded headers LNbits trusts (client IP for rate limits and audit, and the `https` scheme for LNURL links).
@@ -42,7 +42,9 @@ docker run -d \
   lnbits/lnbits:v1.6.2
 ```
 
-Then open `http://127.0.0.1:5000/first_install` (through your reverse proxy for a server) and set the Super User's username and password. Set `FIRST_INSTALL_TOKEN` in `.env` beforehand if someone else could reach the page before you.
+Then open `http://127.0.0.1:5000/first_install` (on a server, through your [reverse proxy](/docs/deployment/reverse-proxy) or an SSH tunnel) and set the Super User's username and password. Set `FIRST_INSTALL_TOKEN` in `.env` beforehand if someone else could reach the page before you.
+
+`AUTH_HTTPS_ONLY=true` (the default) marks the login cookie `Secure`. Browsers generally accept that on `http://localhost` and `http://127.0.0.1`, but not on plain HTTP to a LAN IP or host name, where login then silently fails. Use HTTPS, or set `AUTH_HTTPS_ONLY=false` for a local test instance only.
 
 - Leave `AUTH_SECRET_KEY` empty: LNbits generates one and stores it in `data/.lnbits_auth_key`. If you set it yourself, use `openssl rand -hex 32`. Never use a placeholder: this key signs login tokens.
 - The instance starts on `VoidWallet`. Pick a funding source in **Settings → Funding**; see [Funding sources](/docs/funding-sources/overview).
@@ -50,7 +52,7 @@ Then open `http://127.0.0.1:5000/first_install` (through your reverse proxy for 
 
 ### Keep extensions across re-creates {#extensions-path}
 
-By default, installed extensions land in `/app/lnbits/extensions`, inside the container, and **disappear when the container is re-created** (for example on every image update). `LNBITS_EXTENSIONS_PATH=/app/data/extensions` puts them on the data volume instead; LNbits creates the `extensions` folder under that path. Set it from the first start. Extension archives are unpacked in `data/upgrades/`, but the code runs from that extensions folder, so both must be on the volume.
+By default, installed Python extensions land in `/app/lnbits/extensions`, inside the container, and **disappear when the container is re-created** (for example on every image update). `LNBITS_EXTENSIONS_PATH=/app/data/extensions` puts them on the data volume instead: the code then lives in `data/extensions/extensions/<id>`, because LNbits always adds an `extensions` folder under that path. Set it from the first start. (Downloaded archives go to `data/zips/`, and `data/upgrades/` is a scratch folder emptied at every start; both are on the volume anyway.)
 
 ## Docker Compose {#docker-compose}
 
@@ -115,7 +117,7 @@ volumes:
   postgres-data:
 ```
 
-Put `POSTGRES_PASSWORD=` followed by the output of `openssl rand -hex 32` in the `.env` next to the compose file (Compose reads it for `${...}`). Notes:
+Add a line `POSTGRES_PASSWORD=` followed by the output of `openssl rand -hex 32` to the `.env` next to the compose file. Compose reads that file to fill in `${POSTGRES_PASSWORD}`; it's the same file LNbits reads, which ignores the extra line. Notes:
 
 - **Keep the `./data` volume** even with PostgreSQL. It still holds `.lnbits_auth_key`, `.super_user`, the extensions, uploaded assets and logs.
 - The URL must start with `postgres://`.
@@ -181,7 +183,7 @@ tar -czf lnbits-backup-$(date +%Y%m%d).tar.gz data/
 docker compose start lnbits
 ```
 
-Or, while it runs, download a backup as the Super User: the **Download backup** button in the Admin UI, or `GET /admin/api/v1/backup`. It zips the data folder, and adds a `pg_dump` when you use PostgreSQL (see the version caveat above). With PostgreSQL, also back up the database itself. The backup contains secrets (the auth key and any funding credentials), so store it encrypted.
+Or, while it runs, download a backup as the Super User: the **Download database backup** button in the Admin UI (`/admin`), or `GET /admin/api/v1/backup`. It zips the data folder, and adds a `pg_dump` when you use PostgreSQL (see the version caveat above). With PostgreSQL, also back up the database itself. The backup contains secrets (the auth key and any funding credentials), so store it encrypted.
 
 ## Troubleshooting {#troubleshooting}
 

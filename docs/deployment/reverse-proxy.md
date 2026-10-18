@@ -37,6 +37,8 @@ Caddy gets and renews the Let's Encrypt certificate itself, sets `X-Forwarded-Fo
 sudo apt install caddy
 ```
 
+If your distribution has no `caddy` package, or an old one, add Caddy's own apt repository first ([install docs](https://caddyserver.com/docs/install)).
+
 ```text title="/etc/caddy/Caddyfile"
 lnbits.example.com {
     reverse_proxy 127.0.0.1:5000

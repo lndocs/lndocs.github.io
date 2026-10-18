@@ -65,11 +65,13 @@ Then create the app, the volume (in the same region) and any secrets, and deploy
 ```bash
 fly apps create my-lnbits
 fly volumes create lnbits_data --size 1 --region ams
-fly secrets set FIRST_INSTALL_TOKEN=$(openssl rand -hex 16)
+FIRST_INSTALL_TOKEN=$(openssl rand -hex 16); echo "First-install token: $FIRST_INSTALL_TOKEN"
+fly secrets set FIRST_INSTALL_TOKEN="$FIRST_INSTALL_TOKEN"
 fly deploy
 fly scale count 1
 ```
 
+- Note the printed token: `/first_install` asks for it. Fly secrets can't be read back.
 - `internal_port = 5000` is what matters: it must match the port LNbits listens on in the image.
 - Keep one machine: a Fly volume belongs to one machine, and LNbits must not run twice on one database anyway.
 - `fly logs` shows the logs; `fly ssh console` opens a shell in the machine.

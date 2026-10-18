@@ -98,8 +98,8 @@ These live under **Settings → Funding** in the Admin UI (or in `.env` before t
 | `LNBITS_RESERVE_FEE_MIN` | `2000` (msat) | Minimum routing-fee reserve LNbits holds back on an outgoing payment |
 | `LNBITS_RESERVE_FEE_PERCENT` | `1.0` | Reserve as a percentage of the amount; the larger of the two is used |
 | `LNBITS_FUNDING_SOURCE_PAY_INVOICE_WAIT_SECONDS` | `5` | How long a payment call waits before LNbits reports the payment as pending (it doesn't fail it) |
-| `FUNDING_SOURCE_MAX_RETRIES` | `4` | Connection attempts at startup. If they all fail, LNbits falls back to `VoidWallet` until the next restart |
-| `LNBITS_WATCHDOG_SWITCH_TO_VOIDWALLET` | `false` | If the LNbits balances exceed the funding-source balance by more than `LNBITS_WATCHDOG_DELTA` sats (default 1,000,000), switch to `VoidWallet` |
+| `FUNDING_SOURCE_MAX_RETRIES` | `4` | Retries after a failed connection check at startup, with growing waits. When they run out, LNbits falls back to `VoidWallet` until the next restart |
+| `LNBITS_WATCHDOG_SWITCH_TO_VOIDWALLET` | `false` | Every `LNBITS_WATCHDOG_INTERVAL_MINUTES` (default 60), if the LNbits balances exceed the funding-source balance by `LNBITS_WATCHDOG_DELTA` sats (default 1,000,000) or more, switch to `VoidWallet` until the next restart |
 | `LNBITS_NOTIFICATION_WATCHDOG` | `false` | Same check, but only notify the admins. The watchdog does nothing unless one of these two is on |
 | `LNBITS_NODE_UI` | `false` | Node management page, for the backends that support it in v1.6.2: `LndRestWallet`, `CoreLightningWallet` and `PhoenixdWallet` |
 
@@ -107,10 +107,10 @@ If small payments fail with an error like `fee of 20000 msat exceeds limit of 50
 
 ## Testing the connection {#testing-your-connection}
 
-- **Admin UI:** **Settings → Funding** shows the current funding source and its balance.
-- **API:** `GET /api/v1/status` reports `funding_source`, `funding_source_error` and `funding_source_balance_msat`, but only to an admin user (send your bearer token or session cookie). Anyone else gets only the version and uptime.
+- **Admin UI:** **Settings → Funding** shows the node balance next to the total of all LNbits balances.
+- **API:** `GET /api/v1/status` reports `funding_source`, `funding_source_error` and `funding_source_balance_msat`, but only to an admin user (send your bearer token or session cookie). Other logged-in users get only the server time, uptime and version.
 - `GET /api/v1/health` only returns the server time and uptime. It doesn't test the funding source.
-- **Logs:** a backend that can't connect logs the reason (for example, a missing rune or certificate) on each attempt. After `FUNDING_SOURCE_MAX_RETRIES` failed attempts, LNbits logs `Fallback to VoidWallet` and keeps running on `VoidWallet`, so the instance is up but no payment works.
+- **Logs:** a backend that can't connect logs the reason (for example, a missing rune or certificate) on each attempt. After `FUNDING_SOURCE_MAX_RETRIES` retries, LNbits logs `Fallback to VoidWallet` and keeps running on `VoidWallet`, so the instance is up but no payment works.
 
 Then create a small invoice and pay it from another wallet.
 
@@ -126,18 +126,7 @@ Switching affects every wallet on the instance at once. If the new backend has f
 
 ## Balance reconciliation {#balance-reconciliation}
 
-The sum of all LNbits wallet balances should never exceed what the funding source actually holds:
-
-```mermaid
-flowchart LR
-    FS["Funding source<br/>1,000,000 sats"]
-    FS --> A["Wallet A<br/>400,000 sats"]
-    FS --> B["Wallet B<br/>350,000 sats"]
-    FS --> C["Wallet C<br/>200,000 sats"]
-    FS --> U["Unallocated<br/>50,000 sats"]
-```
-
-Watch for discrepancies. The watchdog (off by default) can notify you when the gap grows too large, or stop payments by switching to `VoidWallet`.
+The sum of all LNbits wallet balances should never exceed what the funding source actually holds. **Settings → Funding** shows both numbers; admins can also read them from `GET /admin/api/v1/audit` (`lnbits_balance_sats`, `node_balance_sats`). The watchdog (off by default, see the table above) can notify you when the gap reaches `LNBITS_WATCHDOG_DELTA`, or stop payments by switching to `VoidWallet`.
 
 ## Common issues {#common-issues}
 

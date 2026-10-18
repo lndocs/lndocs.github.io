@@ -95,7 +95,7 @@ Paste the rune strings after the `=`. Notes:
 - **`CLNREST_CA` is required for `https://` URLs.** It takes a file path or the PEM text. LNbits checks the chain against this CA but not the host name, so connecting by IP works.
 - Plain `http://` is only accepted for `localhost`, `127.0.0.1` or `::1`.
 - `CLNREST_NODEID` (from `lightning-cli getinfo | jq -r .id`) is only needed for CLN v23.08.
-- `CLNREST_LAST_PAY_INDEX` is optional. It sets where the invoice listener starts; upstream suggests `lightning-cli listinvoices | jq -r '.invoices | map(.created_index) | max'`.
+- `CLNREST_LAST_PAY_INDEX` is optional. LNbits sends it to `waitanyinvoice` as `lastpay_index`, so it is a **`pay_index`**: `lightning-cli listinvoices | jq '[.invoices[].pay_index // 0] | max'`. Upstream's `.env.example` suggests `created_index`, which is a different counter.
 - `CLNREST_CERT` exists as a setting, but the v1.6.2 wallet code doesn't use it.
 
 ### Testing the connection {#testing-connection}
@@ -146,7 +146,7 @@ CORELIGHTNING_REST_MACAROON=/home/lnbits/cln/access.macaroon
 CORELIGHTNING_REST_CERT=/home/lnbits/cln/certificate.pem
 ```
 
-The macaroon can also be given as base64 or hex.
+The macaroon can also be given as base64 or hex. If `CORELIGHTNING_REST_CERT` is empty, LNbits **doesn't verify TLS at all** for this backend, so set it.
 
 ## Spark wallet {#spark-wallet}
 
@@ -180,7 +180,10 @@ services:
       - ./cln-data:/root/.lightning
 ```
 
-The environment values only take effect on LNbits' first start (or with the Admin UI off); after that, change them in **Settings → Funding**. Check the CLN image's own docs for its data path and options.
+- Start CLN once before LNbits, so `ca.pem` exists. If the file is missing when the container starts, Docker creates an empty **directory** called `ca.pem` in its place.
+- Put the three runes in the `.env` next to the compose file, so Compose can fill in `${...}`.
+- The environment values only take effect on LNbits' first start (or with the Admin UI off); after that, change them in **Settings → Funding**.
+- Check the CLN image's own docs for its data path and options.
 
 ## Node packages {#common-cln-setups}
 

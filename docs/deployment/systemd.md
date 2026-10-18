@@ -16,16 +16,21 @@ Run LNbits as a system service so it starts at boot and restarts on failure. Thi
 ```bash
 sudo useradd -m -s /bin/bash lnbits
 sudo -iu lnbits
+```
 
+Then, in the shell that opens as `lnbits`:
+
+```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 git clone https://github.com/lnbits/lnbits.git
 cd lnbits
 git checkout v1.6.2
 ~/.local/bin/uv sync --all-extras
 cp .env.example .env
-
 exit
 ```
+
+Before the first start, set `FORWARDED_ALLOW_IPS=127.0.0.1` in `/home/lnbits/lnbits/.env` if a reverse proxy on the same host will sit in front (see [Reverse proxy](/docs/deployment/reverse-proxy)). The service below passes `--host` and `--port` but not `--forwarded-allow-ips`, so that `.env` value applies.
 
 ## Create the service file {#create-service-file}
 

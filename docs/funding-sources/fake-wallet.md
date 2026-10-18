@@ -42,7 +42,7 @@ Wallets, balances and payment history live in the database and survive restarts 
 
 New wallets start at 0. To give one a balance:
 
-- As the Super User, use **Credit / Debit** on the wallet in the UI, or call `PUT /users/api/v1/balance`.
+- As the Super User, use **Credit / Debit** on the wallet in the UI, or call `PUT /users/api/v1/balance` with your login (bearer token or cookie, not a wallet key) and a body like `{"id": "<wallet_id>", "amount": 100000}` (sats; negative to debit). This works on every backend, not only FakeWallet, so on a real instance it creates unbacked balance.
 - Then pay other wallets on the same instance from it.
 
 ## Simulating payments with the API {#simulating-payments}
@@ -74,7 +74,7 @@ Always send `"out": false` to create an invoice: if you leave `out` out, LNbits 
 | | Fake Wallet | Real Lightning |
 |---|---|---|
 | Speed | Instant | Usually seconds |
-| Fees | None | Routing fees |
+| Routing fees | None (internal payments) | Yes |
 | External invoices | Fail | Paid over the network |
 | Failures | Only bad, expired or external invoices | Routing, liquidity, timeouts |
 | Channels | None | Required |
