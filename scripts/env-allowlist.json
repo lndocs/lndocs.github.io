@@ -1,4 +1,14 @@
 {
-  "_comment": "Upper-case names in the docs that are deliberately not LNbits settings: other programs' env vars and shell placeholders.",
-  "allowed": ["POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_DB", "DATE", "BACKUP_DIR", "PATH", "HOME"]
+  "_comment": "Upper-case names in the docs that are deliberately not LNbits settings: other programs' env vars, shell placeholders, and Docker image vars (LNBITS_HOST/LNBITS_PORT are read by the Dockerfile CMD, not settings.py).",
+  "allowed": [
+    "POSTGRES_USER",
+    "POSTGRES_PASSWORD",
+    "POSTGRES_DB",
+    "DATE",
+    "BACKUP_DIR",
+    "PATH",
+    "HOME",
+    "LNBITS_HOST",
+    "LNBITS_PORT"
+  ]
 }
