@@ -9,12 +9,12 @@ verified_with: v1.6.2
 
 # WASM Extensions {#wasm-extensions}
 
-LNbits v1.6.0 added a second kind of extension: **WASM extensions**. They are WebAssembly components that LNbits runs in a sandbox with [wasmtime](https://wasmtime.dev/). They reach wallets, storage and the network only through host functions, and each host function needs a permission that an admin granted at install time.
+LNbits v1.6.0 added a second kind of extension: **WASM extensions**. They are WebAssembly components that LNbits runs in a sandbox with [wasmtime](https://wasmtime.dev/). They reach wallets, storage and the network only through host functions. Apart from three harmless ones (random id, clock, log), each host function needs a permission that an admin granted at install time.
 
 The v1.6.0 release notes say WASM extensions are "tightly sandboxed, meaning they can be vibe coded and shared without the security risks associated with traditional extensions". Their registry describes itself as a "Registry of extensions that do not need vetting".
 
 :::warning The sandbox limits what an extension can do, not what you grant it
-A WASM extension can't read your database or other extensions' data on its own. But if you grant `wallet.pay_invoice_background`, it can spend from the wallets a user ties to that grant, up to the grant's limit. Read the permission list in the install dialog. LNbits marks permissions that can move funds as high risk.
+A WASM extension can't read your database or other extensions' data on its own. But if you grant `wallet.pay_invoice_background`, it can spend from the wallet a user ties to that grant with no user present. The grant's `max_amount` caps each payment, in sats. It is not a total or a rate limit, so the extension can pay again and again. Read the permission list in the install dialog. LNbits marks permissions that can move funds as high risk.
 :::
 
 ## How WASM differs from Python extensions {#wasm-vs-python}
@@ -26,7 +26,7 @@ A WASM extension can't read your database or other extensions' data on its own. 
 | Installed to | `{LNBITS_EXTENSIONS_PATH}/extensions/<id>` (default `lnbits/extensions/<id>`) | `LNBITS_WASM_EXTENSIONS_PATH/<id>` (default `data/wasm_extensions/<id>`) |
 | Registry setting | `LNBITS_EXTENSIONS_MANIFESTS` | `LNBITS_WASM_EXTENSIONS_MANIFESTS` |
 | `config.json` | Display metadata (name, tile, versions) | Full runtime contract: exports, routes, events, permissions |
-| UI | Jinja/Vue page at `/<id>/` inside the LNbits layout | Sandboxed iframe under `/ext/<id>/...` |
+| UI | Jinja/Vue page at `/<id>/` inside the LNbits layout | Sandboxed iframe at `/ext` + each declared `ui_routes` path (by convention `/ext/<id>/...`) |
 | HTTP API | Whatever the router defines, by convention `/<id>/api/v1/...` | Routes declared in `config.json`, mounted at `/api/v1/ext/{ext_id}/{path}` |
 | Database | Own SQL schema, written by `migrations.py` | Owner-scoped tables declared in JSON migrations |
 | Background work | `<id>_start()` / `<id>_stop()`, invoice listeners | None. It can react to the `onInvoicePaid` event |
@@ -52,7 +52,7 @@ Compiled components are cached in memory, so later calls don't recompile.
 
 The UI is sandboxed too:
 
-- The extension page at `/ext/<id>/...` is an LNbits wrapper. It loads the extension's HTML in an iframe from `/ext-frame/{ext_id}/...`, and each frame load needs a one-time token. The token is bound to the extension, the frame path and the user, and expires after 60 seconds.
+- The extension page is an LNbits wrapper at `/ext` plus the path declared in `ui_routes`. LNbits doesn't add the extension id to that path, so extensions should start their paths with `/<id>` (tips uses `/tips`). The wrapper loads the extension's HTML in an iframe from `/ext-frame/{ext_id}/{route_index}`, and each frame load needs a one-time token. The token is bound to the extension, the frame path and, on logged-in pages, the user, and expires after 60 seconds.
 - The iframe's Content Security Policy starts with `sandbox allow-scripts allow-pointer-lock; default-src 'none'`. Scripts, styles, fonts and media can load only from `/ext-assets/{ext_id}/`, and images only from there or `data:` URLs. `connect-src`, `form-action`, `frame-src`, `worker-src` and `object-src` are all `'none'`, so the page can't call LNbits or anything else directly. It talks to LNbits through the parent page's `postMessage` bridge.
 - Extension code never receives the user's LNbits access token.
 
@@ -76,16 +76,16 @@ These are the server-wide defaults. `0` turns a limit off.
 | `WASM_RUNTIME_MAX_CONCURRENT_INVOCATIONS_PER_EXTENSION` | 4 | Invocations at once for one extension |
 | `WASM_RUNTIME_MAX_CONCURRENT_INVOCATIONS_PER_USER` | 4 | Invocations at once for one user |
 | `WASM_RUNTIME_MAX_HOST_CALLS` | 1000 | Host calls per invocation |
-| `WASM_RUNTIME_MAX_HTTP_CALLS` | 20 | `http.request` calls per invocation |
+| `WASM_RUNTIME_MAX_HTTP_CALLS` | 20 | `http.request` and `extension.api.request` calls per invocation |
 | `WASM_RUNTIME_MAX_STORAGE_CALLS` | 100 | Storage calls per invocation |
 | `WASM_RUNTIME_MAX_WALLET_CALLS` | 20 | Wallet calls per invocation |
-| `WASM_RUNTIME_HTTP_TIMEOUT_MS` | 5000 | Timeout of one outbound HTTP call |
-| `WASM_RUNTIME_MAX_HTTP_RESPONSE_BYTES` | 1048576 (1 MiB) | Body size of one outbound HTTP response |
+| `WASM_RUNTIME_HTTP_TIMEOUT_MS` | 5000 | Timeout of one outbound HTTP or extension API call |
+| `WASM_RUNTIME_MAX_HTTP_RESPONSE_BYTES` | 1048576 (1 MiB) | Body size of one outbound HTTP or extension API response |
 | `LNBITS_WASM_INVOCATION_RETENTION_DAYS` | 7 | How long the invocation history is kept |
 
-These are editable settings. With the Admin UI on (the default), the values saved in the database override `.env` after first start, so change them in the Admin UI's **WASM Runtime** tab. An admin can also override any limit for one installed extension, from the Admin UI or with `PUT /api/v1/extension/wasm/runtime-limits/{ext_id}` (body `{"limits": {...}}`). The override is stored with the installed extension, not in its `config.json`.
+These are editable settings. With the Admin UI on (the default), the values saved in the database override `.env` after first start, so change them in the Admin UI: **Extensions** tab, **Wasm Limit Config** button (`/admin/extensions/wasm/limits`). The retention days are in the same tab's **Advanced** section. An admin can also override any limit for one installed extension, on the same Wasm Limit Config page or with `PUT /api/v1/extension/wasm/runtime-limits/{ext_id}` (body `{"limits": {...}}`). The override is stored with the installed extension, not in its `config.json`.
 
-Admins can watch invocations with `GET /api/v1/extension/wasm/invocations`, `GET /api/v1/extension/wasm/invocations/current` and `GET /api/v1/extension/wasm/invocations/stats`.
+The **WASM Runtime** button next to it (`/admin/extensions/wasm`) opens the invocation monitor. Through the API, admins can watch invocations with `GET /api/v1/extension/wasm/invocations`, `GET /api/v1/extension/wasm/invocations/current` and `GET /api/v1/extension/wasm/invocations/stats`.
 They can stop one with `POST /api/v1/extension/wasm/invocations/{invocation_id}/stop`.
 
 ## Permissions {#permissions}
@@ -103,12 +103,12 @@ LNbits v1.6.2 knows 17 permission IDs. An extension that asks for any other ID f
 | `wallet.create_invoice` | Create an invoice on a wallet of the logged-in user |
 | `wallet.create_invoice_public` | Create an invoice from a public page, on the wallet stored in a row (policy: `table`, `wallet_field`) |
 | `wallet.pay_invoice` | Pay an invoice or LNURL-pay from the logged-in user's own wallet |
-| `wallet.pay_invoice_background` | Pay without a logged-in user, within a grant each user creates (wallet, `max_amount`, and `own_wallets_only` or `external_allowed`) |
+| `wallet.pay_invoice_background` | Pay without a logged-in user, within a grant each user creates: a wallet, `max_amount` (sats, per payment) and `destination_policy`, either `own_wallets_only` (internal invoices to the same user's wallets) or `external_allowed` |
 | `wallet.payments.watch` | Follow payments on a wallet the user grants |
 | `websocket.publish` | Publish messages on the extension's own websocket channels (policy: one `max_messages_per_second`) |
 | `websocket.subscribe` | Let clients connect to the extension's websocket at `/api/v1/ext/ws/{ext_id}/{item_id}` |
-| `http.request` | Make outbound HTTPS requests to allow-listed origins (policy: `host`) |
-| `extension.api.request` | Call another installed extension's API (policy: `id` and `access`, `read` and/or `write`) |
+| `http.request` | Make outbound HTTPS requests to allow-listed origins (policy: `host`). No redirects, and localhost and private addresses are blocked |
+| `extension.api.request` | Call another installed extension's API as the logged-in user (policy: `id` and `access`, `read` for GET/HEAD and/or `write` for POST/PUT/PATCH/DELETE). The user must have that extension enabled |
 | `utils.basic` | Use helpers: currency lists, rates and conversion, invoice decoding and validation, preimage checks, server health |
 | `ui.camera.scan_qr` | Ask the user to scan a QR code with the camera |
 
@@ -120,12 +120,12 @@ Storage is owner-scoped. LNbits adds its own owner column to every extension tab
 
 1. The extension lists the permissions it wants, with their policies, in the `permissions` array of its `config.json`.
 2. When an admin installs it from the Extensions page, LNbits fetches that `config.json` (the registry entry's `details_link`) and the install dialog shows each permission and its policies. Permissions that can move funds get a high-risk warning.
-3. The admin installs with the permissions they approve. LNbits checks the grant against the request. It rejects permissions the extension didn't ask for, and policies wider than requested. On install, an admin may raise `max_rows_per_source` and `max_messages_per_second` above the requested values. Every other policy has to stay inside the request.
-4. LNbits saves the granted set with the installed extension. Admins can change it later with `PUT /api/v1/extension/{ext_id}/permissions`.
+3. The admin installs with the permissions they approve. LNbits checks the grant against the request. It rejects permissions the extension didn't ask for, and policies wider than requested. An admin may raise `max_rows_per_source` and `max_messages_per_second` above the requested values, at install or later. Every other policy has to stay inside the request.
+4. LNbits saves the granted set with the installed extension. Admins can change it later on the Extensions page or with `PUT /api/v1/extension/{ext_id}/permissions`. Every reinstall or update replaces the saved set with the grants sent in that request. Per-extension runtime limit overrides are kept.
 5. `wallet.pay_invoice_background` and `wallet.payments.watch` also need a per-user grant. Each user creates it for one of their own wallets (`POST /api/v1/extension/{ext_id}/permissions/background-payment` or `/permissions/wallet-payments-watch`).
-They can revoke it with `DELETE /api/v1/extension/{ext_id}/permissions/user/{grant_id}`. Background payments can't come from shared wallets.
+They can revoke it with `DELETE /api/v1/extension/{ext_id}/permissions/user/{grant_id}`. Background payments can't come from shared wallets, and the user must have the extension enabled.
 
-An install request that grants nothing still installs the extension, but with no permissions, so every host call that needs one fails. `lnbits-cli extensions install` sends no grants, so grant permissions in the Admin UI after a CLI install.
+An install request that grants nothing still installs the extension, but with no permissions, so every host call that needs one fails. `lnbits-cli extensions install` and `update` send no grants. After a CLI install or update the extension has **no** permissions, even ones granted before, so grant them again on the Extensions page.
 
 ## Registry and install location {#registry}
 
@@ -173,7 +173,7 @@ A WASM extension's `config.json` is its runtime contract. LNbits v1.6.2 validate
 | `wasm.module` | yes | Path of the component, e.g. `wasm/module.wasm` |
 | `wasm.wit`, `wasm.world` | no | The WIT interface file and world name |
 | `wasm.exports[]` | no | `{name, visibility}`, with visibility `authenticated`, `public` or `event` |
-| `events.onInvoicePaid` | no | Export to call when an invoice for this extension is paid (the only event in v1.6.2) |
+| `events.onInvoicePaid` | no | Export to call when an invoice for this extension is paid, or a payment lands on a wallet a user tied to a `wallet.payments.watch` grant. The export needs visibility `event`. It is the only event in v1.6.2 |
 | `ui_routes[]` | no | `{path, entrypoint, auth, path_params}`, auth `user` or `public` |
 | `api_routes[]` | no | `{method, path, export, auth, path_params, ownerContext, openapi}`, method one of DELETE/GET/PATCH/POST/PUT; `ownerContext` is `{table, idParam}` |
 | `permissions[]` | no | `{id, description, policies}` |
@@ -182,7 +182,7 @@ A WASM extension's `config.json` is its runtime contract. LNbits v1.6.2 validate
 
 `max_lnbits_version` is exclusive: a release with `"max_lnbits_version": "1.6.2"` won't install on v1.6.2. The Extensions page shows a WASM extension's icon from `/ext-assets/<id>/assets/icon.png`.
 
-This is the real `config.json` of `tips` v0.1.4, shortened (`...` marks removed entries):
+This is the real `config.json` of `tips` v0.1.4, shortened. Seven exports, seven API routes and the permissions `wallet.create_invoice`, `wallet.list` and `utils.basic` are left out, and the permissions are reordered:
 
 {/* snippet:skip: abridged copy of a third-party config.json, not runnable */}
 ```json title="config.json (lnbits/tips v0.1.4, abridged)"
@@ -275,7 +275,7 @@ This is the real `config.json` of `tips` v0.1.4, shortened (`...` marks removed 
 }
 ```
 
-With this file, the user page is at `/ext/tips` and the public jar page at `/ext/tips/jars/{jar_id}`. The API routes are mounted under the WASM prefix:
+With this file, the user page is at `/ext/tips` and the public jar page at `/ext/tips/jars/{jar_id}`, because the declared paths start with `/tips`. The API routes are mounted under the WASM prefix:
 
 {/* snippet:skip: WASM routes are registered from lnbits/core/wasm_ext/routes, which the snippet gate does not scan */}
 ```text
@@ -309,12 +309,15 @@ tips/
 
 What the v1.6.2 source requires:
 
-- **Storage migrations** are JSON files named `NNNN_<name>.json` in `storage/migrations/`. Each holds a `version` and a list of `operations` such as `create_table`. LNbits runs them in order at install and records the version, as it does for Python migrations.
-- **Exports** named in `api_routes` and `events` must exist in the component, and a call to a missing export fails.
-- **Assets** are served only from the extension's own `/ext-assets/{ext_id}/` path. LNbits checks the file type, MIME type and HTML-like content. Shared LNbits assets (Vue, Quasar, the LNbits CSS) come through `/ext-assets/{ext_id}/_lnbits/<asset>`.
+- **Storage schema.** Any storage call needs `storage/schema.json`, which lists `tables.<name>.fields`. Field types are `string`, `integer`, `number`, `boolean` and `datetime`, with optional `list`, `nullable` and `default`. Every table needs an `id` field.
+- **Storage migrations** are JSON files in `storage/migrations/`, named `<number>_<name>.json` (tips uses `0001_initial.json`). LNbits takes the version from the number in the file name and ignores any `version` key inside. It reads only the `operations` list, whose ops are `create_table`, `add_field` and `create_index`. Migrations run in order at install, and LNbits records the version, as it does for Python migrations. A badly named JSON file in that folder stops the install.
+- **Exports.** Every `api_routes[].export` must be listed in `wasm.exports` with visibility `public` or `authenticated`, or the routes don't register. The `onInvoicePaid` export needs visibility `event`, or LNbits skips it with a warning. An export that is declared but missing from the component fails when called, with a 404.
+- **`ownerContext`** on a public API route looks up the row's owner and runs the call as that owner. It is not authentication of the caller, so a public route with `ownerContext` must only do what any visitor may do.
+- **UI entrypoints** in `ui_routes` must be relative `.html` files outside `static/`.
+- **Assets** are served only from the extension's own `/ext-assets/{ext_id}/` path, and only with these suffixes: `.css`, `.gif`, `.ico`, `.jpeg`, `.jpg`, `.js`, `.ogg`, `.png`, `.webp`, `.woff`, `.woff2`. SVG, HTML and JSON files in `static/` are not served. LNbits sets the Content-Type itself and refuses `.js` and `.css` files that start like HTML. A fixed set of shared LNbits assets (Vue, Quasar, the Material Icons, the LNbits CSS bundle, the QR code component) comes through `/ext-assets/{ext_id}/_lnbits/<asset>`.
 - **The archive** is a zip with one top-level folder that holds `config.json`. A GitHub tag archive has this layout.
 
-The tips repository builds its JavaScript source into a component with the Bytecode Alliance `jco componentize` tool against `wasm/lnbits-extension.wit` (see its `dev/package.json`). Other languages that produce WebAssembly components should work too, but no official example uses one. The LNbits source also has a TypeScript SDK generator at `tools/codegen/extension_sdk_typescript.py`. Its output isn't published or documented.
+The tips repository builds its JavaScript source into a component with the Bytecode Alliance `jco componentize` tool against `wasm/lnbits-extension.wit` (see its `dev/package.json`). Other languages that produce WebAssembly components should work too, but no official example uses one. The LNbits source also has a TypeScript SDK generator at `tools/codegen/extension_sdk_typescript.py`, and tips ships a generated frontend SDK as `static/lnbits-extension-sdk.js`, loaded through the `sdk` section of its `config.json`. LNbits v1.6.2 doesn't document either.
 
 To publish, tag a GitHub release and ask for it to be added to [lnbits/lnbits-extensions-wasm](https://github.com/lnbits/lnbits-extensions-wasm), or run your own registry and add its URL as a WASM source.
 

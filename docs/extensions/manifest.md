@@ -47,9 +47,9 @@ Official extensions also carry keys such as `repo`, `donate`, `terms_and_conditi
 
 There is **no `admin_only` key**. To limit an extension to admins, put its id in the server setting `LNBITS_ADMIN_EXTENSIONS`.
 
-This is the `config.json` of the official [example extension](https://github.com/lnbits/example):
+This is the `config.json` of the official [example extension](https://github.com/lnbits/example), shortened. The real file also has `donate`, `terms_and_conditions_md` and two more `images`:
 
-```json title="config.json (lnbits/example)"
+```json title="config.json (lnbits/example, abridged)"
 {
   "name": "Build your own!",
   "short_description": "Extension building guide",

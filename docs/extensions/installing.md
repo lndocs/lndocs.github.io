@@ -97,7 +97,7 @@ Options for `install` and `update`:
 With `--url`, the CLI calls the server's API with `?usr=<admin user id>`, and the install, update and uninstall routes need an admin. LNbits v1.6.2 never accepts that for an admin. With the default login methods it answers 401 ("Missing user ID or access token."), and if user-id-only login is turned on it answers 403 ("User id only access for admins is forbidden."). The `dev` branch replaces this with bearer-token authentication (#4235). Until that ships in a release, stop the server and run the CLI without `--url`, or use the Admin UI.
 :::
 
-The CLI sends no permission grants, so a WASM extension installed this way starts with no permissions. Grant them afterwards in the Admin UI.
+The CLI sends no permission grants. A WASM extension installed **or updated** this way ends up with no permissions, even ones granted before, so grant them again on the Extensions page.
 
 ## Updating {#updating-extensions}
 

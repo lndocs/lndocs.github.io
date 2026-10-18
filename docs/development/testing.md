@@ -28,7 +28,9 @@ make test-api       # tests/api (HTTP routes through an in-process client)
 make test-wallets   # tests/wallets (funding-source clients against mocked servers)
 ```
 
-`make test` runs all of the above **plus** `make test-regtest`, which needs real Lightning nodes from the regtest Docker stack in `docker/regtest` (`./start-regtest`). Most contributors run the targeted targets locally and leave regtest to CI.
+`make test` runs all of the above **plus** `make test-regtest`, which needs real Lightning nodes from the regtest Docker stack in `docker/regtest` (`./start-regtest`). `make test-regtest` also deletes `./tests/data` first. Most contributors run the targeted targets locally and leave regtest to CI.
+
+CI (`.github/workflows/ci.yml`) runs `tests/unit`, `tests/api` and `tests/wallets` on Python 3.10 and 3.12, each against SQLite and against PostgreSQL 18, with `FakeWallet`. To try the PostgreSQL side locally, set `LNBITS_DATABASE_URL` as shown in [Development Setup](/docs/development/setup). The regtest job runs against LND, Core Lightning, Eclair, Boltz and LNbits backends.
 
 To run one file or one test, set the same variables yourself:
 

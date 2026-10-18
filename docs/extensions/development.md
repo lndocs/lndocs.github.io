@@ -37,11 +37,13 @@ mv templates/example templates/myextension
 LNbits loads any folder in `{LNBITS_EXTENSIONS_PATH}/extensions/` (default `lnbits/extensions/`) that has a `config.json`, using the folder name as the extension id. From your LNbits checkout:
 
 ```bash
-ln -s /path/to/myextension lnbits/extensions/myextension
+ln -s /absolute/path/to/myextension lnbits/extensions/myextension
 uv run lnbits --reload
 ```
 
-Then enable **myextension** for your account on the Extensions page. `--reload` restarts the server when files change. Setting `DEBUG=true` turns on debug logging.
+At startup LNbits registers the folder as an installed, active extension and runs its migrations. Then enable **myextension** for your account on the Extensions page. A folder without a `config.json` is skipped.
+
+`--reload` restarts the server when files in the working directory change (uvicorn's default). If edits in the symlinked folder don't trigger a reload, restart LNbits by hand. Set `DEBUG=true` to see debug logging, including LNbits' deprecation messages.
 
 ## Extension structure {#extension-structure}
 
@@ -76,11 +78,11 @@ LNbits imports the package and looks for names built from the extension id:
 | `<id>_ext` | yes | The `APIRouter`, with `prefix="/<id>"` |
 | `db` | yes | The extension's `Database`. LNbits uses it to run `migrations.py` |
 | `<id>_static_files` | no | `[{"path": "/<id>/static", "name": "<id>_static"}]` |
-| `<id>_start` | no | Called when the extension is activated. Start background tasks here |
-| `<id>_stop` | if `<id>_start` starts tasks | Called on deactivate, uninstall and upgrade. Cancel your tasks here |
+| `<id>_start` | no | Called at server start and when the extension is activated. Start background tasks here. Make it a plain `def`: at server start LNbits calls it without awaiting it |
+| `<id>_stop` | if `<id>_start` starts tasks | Called on deactivate, uninstall and upgrade. Cancel your tasks here. May be `def` or `async def` |
 | `<id>_redirect_paths` | no | Lets the extension answer paths outside its prefix (LNURLp uses this for `/.well-known/lnurlp`) |
 
-From lnbits/example, renamed:
+From lnbits/example, renamed. The router's own `prefix` is what puts your routes under `/myextension`: LNbits includes the router as it is, so keep the prefix equal to the folder name.
 
 ```python title="__init__.py"
 import asyncio
@@ -167,7 +169,7 @@ class Item(BaseModel):
 
 Each extension gets its own database, `Database("ext_<id>")`. On SQLite that is the file `data/ext_<id>.sqlite3`, and on PostgreSQL the schema `<id>`. Either way you address tables as `<id>.<table>`.
 
-Migrations are `async def mNNN_name(db)` functions. LNbits runs them in order and records the last version in `dbversions`. A migration runs only once, so put changes in a new `m002_...` function instead of editing old ones.
+Migrations are `async def mNNN_name(db)` functions, with exactly three digits. LNbits runs the ones newer than the recorded version, in the order they appear in the file, and records each version in the core `dbversions` table. Pending migrations run at install, at upgrade and at every server start. A migration runs only once, so put changes in a new `m002_...` function instead of editing old ones.
 
 ```python title="migrations.py"
 async def m001_initial(db):
@@ -275,7 +277,9 @@ Without the `item.wallet` check, any admin key on the server could delete any us
 
 ## Frontend {#templates}
 
-LNbits v1.x uses **Vue 3 and Quasar 2**. The template extends `base.html`, calls `window_vars(user)` and loads your script. The script creates the app with `Vue.createApp` and the `windowMixin` (which provides `this.g.user`, the user's wallets and more). `new Vue({...})` is Vue 2 and won't work.
+LNbits v1.x uses **Vue 3 and Quasar 2**. The template extends `base.html` and loads your script in the `scripts` block. The script assigns `window.app = Vue.createApp({...})`, and LNbits mounts it on `#vue` after adding a global mixin that provides `this.g` (with `this.g.user` and its wallets), `this.api` and `this.utils`. `this.g.user` is filled in only because the view passes `{"user": user.json()}` to the template. `new Vue({...})` is Vue 2 and won't work.
+
+The example below keeps two leftovers from lnbits/example: `window_vars(user)` and `mixins: [windowMixin]`. In v1.6.2 both are empty stubs kept for older extensions (`window_vars` renders only a "deprecated" comment, and `windowMixin` is `{}`). They do no harm, and you can drop them.
 
 ```html title="templates/myextension/index.html"
 {% extends "base.html" %} {% from "macros.jinja" import window_vars with context
@@ -344,9 +348,9 @@ async def on_invoice_paid(payment: Payment) -> None:
     ...
 ```
 
-In v1.6.2 `register_invoice_listener` and `create_permanent_unique_task` from `lnbits.tasks` are deprecated (they still work and log a warning). The replacement is `lnbits.task_manager.task_manager`, shown in [API Integration](/docs/extensions/api-integration).
+In v1.6.2 `register_invoice_listener` and `create_permanent_unique_task` from `lnbits.tasks` are deprecated. They still work and log a `DEPRECATED` message at debug level. The replacement is `lnbits.task_manager.task_manager`, shown in [API Integration](/docs/extensions/api-integration).
 
-`create_invoice` and `pay_invoice` take keyword arguments only. `pay_invoice` takes `payment_request=`, not `bolt11=`. Details are in [API Integration](/docs/extensions/api-integration).
+`create_invoice` and `pay_invoice` take keyword arguments only. `pay_invoice` takes `payment_request=`, not `bolt11=`. Pass `tag="myextension"` to `pay_invoice` so that LNbits refuses the payment when the wallet's owner has disabled your extension. Details are in [API Integration](/docs/extensions/api-integration).
 
 ## Publishing {#publishing}
 
