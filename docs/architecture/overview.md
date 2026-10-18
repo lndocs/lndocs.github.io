@@ -9,7 +9,7 @@ verified_with: v1.6.2
 
 # Architecture Overview
 
-LNbits is a single Python process that keeps Lightning accounts for many users on top of one funding source. It serves a REST API and a web UI, records every payment in its own database, and calls the funding source to create and pay invoices.
+LNbits keeps Lightning accounts for many users on top of one funding source. It is one Python server process (the `lnbits` command starts it in a child process so that it can restart it). It serves a REST API and a web UI, records every payment in its own database, and calls the funding source to create and pay invoices.
 
 ## High-level architecture {#high-level-architecture}
 
@@ -42,7 +42,7 @@ The core services talk to both the database and the funding source. The database
 
 | Layer | Technology |
 |---|---|
-| HTTP server | Uvicorn (one process, started by the `lnbits` command) |
+| HTTP server | Uvicorn, one server process started by the `lnbits` command (`lnbits/server.py`) |
 | Web framework | FastAPI |
 | Database access | SQLAlchemy async engine with hand-written SQL (no ORM models) |
 | Frontend | Vue 3 and Quasar |
@@ -57,9 +57,9 @@ The core routes live in `lnbits/core/views/`. The main files are `payment_api.py
 
 Middleware adds:
 
-- per-IP rate limiting (slowapi; `LNBITS_RATE_LIMIT_NO` per `LNBITS_RATE_LIMIT_UNIT`);
-- IP allow and block lists (`LNBITS_ALLOWED_IPS`, `LNBITS_BLOCKED_IPS`);
-- GZip compression;
+- per-IP rate limiting (slowapi; `LNBITS_RATE_LIMIT_NO` per `LNBITS_RATE_LIMIT_UNIT`, default 200 per minute);
+- an IP block list (`LNBITS_BLOCKED_IPS`). `LNBITS_ALLOWED_IPS` only lists exceptions to it; it is not an allow-only list;
+- GZip compression, sessions, and an HTTP audit log (the `audit` table);
 - CORS with `allow_origins=["*"]`. Any website can call the API from a browser, so protect keys rather than relying on the origin.
 
 ### Database layer {#database-layer}
@@ -116,7 +116,7 @@ See [Extensions](/docs/extensions/overview).
 ### Paying an invoice {#paying-an-invoice}
 
 1. The client calls `POST /api/v1/payments` with a `bolt11`, using the **admin key**. If `out` is left out, it defaults to paying.
-2. LNbits takes a global payment lock and a per-wallet lock, then checks the balance, including the fee reserve.
+2. LNbits takes the wallet's payment lock, re-reads the balance and checks it covers the amount plus the fee reserve.
 3. If the invoice belongs to another wallet on the same instance, LNbits settles it internally: no Lightning payment is made.
 4. Otherwise it stores a pending row and asks the funding source to pay. It waits up to `LNBITS_FUNDING_SOURCE_PAY_INVOICE_WAIT_SECONDS` (default 5); if there's no answer yet, the payment stays pending and is checked again later.
 5. On success, the row is updated with the real fee and marked successful.
@@ -187,19 +187,19 @@ Login methods (username and password, Nostr NIP-98, Google, GitHub, Keycloak, OI
 
 ```mermaid
 flowchart TB
-    SU["Super User<br/>restart, reset settings, backup,<br/>credit and debit wallets, manage admins"]
-    AD["Admin<br/>instance settings incl. funding source,<br/>users, extensions"]
+    SU["Super User<br/>restart, reset settings, backup,<br/>credit and debit wallets, reset passwords"]
+    AD["Admin<br/>all instance settings (via the API),<br/>users, extensions, impersonation"]
     US["User<br/>own wallets, enabled extensions"]
 
     SU --> AD --> US
 ```
 
-Each role includes the powers of the ones below it. Admins and the Super User must have a password set.
+Each role includes the powers of the ones below it. Admins and the Super User must have a password set. Admins are close to the Super User in power: `PUT /admin/api/v1/settings` only needs admin rights, and it accepts the funding source and the admin list. See [Users & Accounts](/docs/architecture/users).
 
 ## Running LNbits: one process only {#scalability-considerations}
 
 :::danger Run a single LNbits process per database
-LNbits protects against double spends with **in-process asyncio locks**: a global payment lock, a lock per wallet, and a lock per database connection. These locks don't work across processes. If you run several LNbits processes or containers against the same database, two of them can pay from the same wallet at the same time and overdraw it.
+LNbits protects against double spends with **in-process asyncio locks**: a lock per wallet around each payment, and a lock per `Database` object around each connection. These locks don't work across processes. If you run several LNbits processes or containers against the same database, two of them can pay from the same wallet at the same time and overdraw it.
 
 The `lnbits` command has no workers option. Don't put several LNbits instances behind a load balancer, and don't run more than one replica in Docker or Kubernetes.
 :::

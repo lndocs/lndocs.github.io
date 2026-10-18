@@ -9,31 +9,29 @@ verified_with: v1.6.2
 
 # Ledger System
 
-LNbits uses a single-table ledger to track all wallet balances and payments. Understanding it helps when building extensions or debugging payment issues. Everything on this page describes LNbits v1.6.2 (`lnbits/core/migrations.py`, `lnbits/core/services/payments.py`).
+LNbits has no accounts table and no stored balances. Every invoice and payment is one row in `apipayments`, and a wallet's balance is a SQL view over those rows. This page explains the rules that turn rows into balances, and where they bend. It describes v1.6.2 (`lnbits/core/migrations.py`, `lnbits/core/services/payments.py`, `lnbits/core/crud/payments.py`). For how rows are created, see [Payments](/docs/architecture/payments).
 
-## Design Philosophy {#design-philosophy}
+## Design {#design-philosophy}
 
-LNbits uses a **simplified ledger** rather than double-entry bookkeeping:
+- One table, `apipayments`, one row per payment. No double-entry bookkeeping and no debit/credit columns.
+- `amount` is signed millisatoshis: positive for incoming, negative for outgoing.
+- Fees go in a separate `fee` column.
+- Balances are computed by the `balances` view each time a wallet is read.
 
-- One `apipayments` table stores every payment
-- Signed amounts (positive = incoming, negative = outgoing), in millisatoshis
-- Balances are computed by the `balances` SQL view when read; they are not stored
-- No separate debit/credit columns
+## Database schema {#database-schema}
 
-## Database Schema {#database-schema}
+### The `apipayments` table {#payments-table}
 
-### Payments Table {#payments-table}
-
-The table was built up by many migrations (m001 onwards). Its columns in v1.6.2 are equivalent to:
+The table was built up by migrations m001 to m045. Its columns in v1.6.2 are equivalent to:
 
 ```sql
 -- Not a literal CREATE statement: the columns as they stand after all migrations.
 apipayments (
     checking_id    TEXT NOT NULL,      -- id used to check status with the funding source
-    payment_hash   TEXT,               -- BOLT11 payment hash (nullable: added by ALTER)
+    payment_hash   TEXT,               -- BOLT11 payment hash
     wallet_id      TEXT NOT NULL,
     amount         BIGINT NOT NULL,    -- signed millisatoshis
-    fee            INTEGER NOT NULL DEFAULT 0,  -- millisatoshis, sign not normalised
+    fee            INTEGER NOT NULL DEFAULT 0,  -- millisatoshis, usually negative
     bolt11         TEXT,
     preimage       TEXT,
     status         TEXT DEFAULT 'pending',      -- pending / success / failed
@@ -54,22 +52,17 @@ apipayments (
 )
 ```
 
-There is no primary key column. The old boolean `pending` column was dropped in m024; `status` replaced it.
+There is no primary key column. The old boolean `pending` column was dropped in m024; `status` replaced it in m021.
 
-### Key Fields {#key-fields}
+### Key fields {#key-fields}
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `amount` | Signed int | Positive for incoming, negative for outgoing (msat) |
-| `fee` | Int | Fee in msat. Usually negative on outgoing rows, but not always (see [Fee sign](#fee-sign)) |
-| `status` | Text | `pending`, `success` or `failed` |
-| `checking_id` | Text | Unique per wallet; used to look the payment up at the funding source |
-| `expiry` | Timestamp | When an incoming invoice expires |
-| `extra` | JSON | Extensible metadata |
+- `checking_id` identifies the row. The code looks rows up by `checking_id` alone, and `create_payment` refuses a second row with the same one in any wallet.
+- `status` is the only state. There is no history of how it changed.
+- `expiry` is when an incoming invoice expires. Expired pending invoices are marked `failed`.
 
-## Balance Calculation {#balance-calculation}
+## Balance calculation {#balance-calculation}
 
-Balances are computed by the `balances` view (migration `m025_refresh_view`):
+The `balances` view, as last defined in migration `m025_refresh_view`:
 
 ```sql
 CREATE VIEW balances AS
@@ -79,54 +72,30 @@ FROM wallets
 LEFT JOIN apipayments ON apipayments.wallet_id = wallets.id
 WHERE (wallets.deleted = false OR wallets.deleted is NULL)
 AND (
-    (apipayments.status = 'success' AND apipayments.amount > 0)            -- incoming: only confirmed
-    OR (apipayments.status IN ('success', 'pending') AND apipayments.amount < 0)  -- outgoing: immediately
+    (apipayments.status = 'success' AND apipayments.amount > 0)            -- incoming: only once paid
+    OR (apipayments.status IN ('success', 'pending') AND apipayments.amount < 0)  -- outgoing: at once
 )
 GROUP BY apipayments.wallet_id
 ```
 
-`get_wallet` reads it as `COALESCE((SELECT balance FROM balances ...), 0) AS balance_msat`. Deleted wallets are excluded.
+`get_wallet` reads it as `COALESCE((SELECT balance FROM balances ...), 0) AS balance_msat`. Deleted wallets drop out of the view.
 
-### Balance Rules {#balance-rules}
+### Balance rules {#balance-rules}
 
-```mermaid
-flowchart LR
-    B["Balance"]
+| Direction | Status | Counted? |
+|-----------|--------|----------|
+| Incoming | `pending` | No |
+| Incoming | `success` | Yes: `amount - ABS(fee)` |
+| Incoming | `failed` | No |
+| Outgoing | `pending` | Yes: `amount - ABS(fee)`, with the fee reserve still in `fee` |
+| Outgoing | `success` | Yes: `amount - ABS(fee)`, with the real fee |
+| Outgoing | `failed` | No: the amount and the fee are available again |
 
-    subgraph Incoming["Incoming payments"]
-        I1["PENDING"]
-        I2["SUCCESS"]
-        I3["FAILED"]
-    end
+Outgoing payments count while pending so that money in flight can't be spent twice. The other half of that protection is a per-wallet `asyncio` lock around the balance check and the insert (`wallets_payments_lock` in `services/payments.py`). The lock only works inside one process, so run a single LNbits process per database.
 
-    subgraph Outgoing["Outgoing payments"]
-        O1["PENDING"]
-        O2["SUCCESS"]
-        O3["FAILED"]
-    end
+## Internal transfers {#internal-transfers}
 
-    I1 -.->|"not counted"| B
-    I2 -->|"+ amount"| B
-    I3 -.->|"not counted"| B
-    O1 -->|"- amount - ABS(fee)"| B
-    O2 -->|"- amount - ABS(fee)"| B
-    O3 -.->|"not counted"| B
-```
-
-| Direction | Status | Affects Balance? |
-|-----------|--------|------------------|
-| Incoming | PENDING | No (wait for confirmation) |
-| Incoming | SUCCESS | Yes (add amount, minus any fee) |
-| Incoming | FAILED | No |
-| Outgoing | PENDING | Yes (immediate deduction, including the fee reserve) |
-| Outgoing | SUCCESS | Yes (confirmed deduction) |
-| Outgoing | FAILED | No (the funds are available again) |
-
-**Why immediate deduction for outgoing?** It prevents double-spending: funds are reserved as soon as a payment starts. The other half of the protection is a per-wallet lock around the balance check and the insert (`wallets_payments_lock` in `services/payments.py`). That lock is an in-process `asyncio` lock, so LNbits must run as a single process.
-
-## Internal Transfers {#internal-transfers}
-
-When the sender and the receiver are on the same LNbits instance:
+When the invoice being paid was issued by the same instance, no Lightning payment is made:
 
 ```mermaid
 sequenceDiagram
@@ -135,145 +104,129 @@ sequenceDiagram
     participant Receiver as Receiver wallet
 
     Sender->>LNbits: Pay invoice (bolt11)
-    LNbits->>LNbits: check_internal: pending incoming row with same payment_hash?
-    LNbits->>LNbits: Insert sender row (internal_{hash}, -amount, SUCCESS)
-    LNbits->>LNbits: Update receiver row to SUCCESS
+    LNbits->>LNbits: check_internal: pending incoming row with the same payment_hash?
+    LNbits->>LNbits: Check amount and bolt11 match, check sender balance
+    LNbits->>LNbits: Insert sender row (internal_{hash}, -amount, success)
+    LNbits->>LNbits: Update receiver row to success
     LNbits-->>Sender: Notify
-    LNbits-->>Receiver: Notify
+    LNbits-->>Receiver: Notify, and queue for extension listeners
 ```
 
-### Internal Payment Characteristics {#internal-payment-characteristics}
+### Properties {#internal-payment-characteristics}
 
 - The **sender** row gets `checking_id = internal_{payment_hash}`. The receiver row keeps its original `checking_id`.
 - No routing fee and no fee reserve. A service fee is charged only if `LNBITS_SERVICE_FEE_IGNORE_INTERNAL=false`.
-- Instant settlement, and no funding source call, so it works even with `VoidWallet`.
-- The two rows are written by two separate statements, each committed on its own. They are not wrapped in one database transaction; the in-process locks keep the order.
+- No funding source call, so internal payments work even with `VoidWallet`.
+- **Not atomic.** Every statement commits on its own (`Connection.execute` in `lnbits/db.py` commits after each one). The sender row is committed before the receiver row is updated. If the process dies between the two, the sender is debited and the receiver's invoice is still pending.
 
-### Ledger Entries for Internal Transfer {#ledger-entries-for-internal-transfer}
+### Example {#ledger-entries-for-internal-transfer}
 
 ```
-Receiver wallet: +10,000,000 msat (status: SUCCESS)
-Sender wallet:   -10,000,000 msat (status: SUCCESS)
-Net change:                0 msat (balanced)
+Receiver wallet: +10,000,000 msat (incoming row, now success)
+Sender wallet:   -10,000,000 msat (internal_ row, success)
+Instance total:            0 msat
 ```
 
-## Fee Handling {#fee-handling}
+## Fees {#fee-handling}
 
-### Fee Types {#fee-types}
+### Kinds of fee {#fee-types}
 
-```mermaid
-flowchart TB
-    Payment["Outgoing payment amount"]
+- **Fee reserve.** Held in `fee` while an external payment is pending, and passed to the funding source as the routing fee limit.
+- **Routing fee.** What the funding source reports it actually paid. It replaces the reserve on success.
+- **Service fee.** An optional operator fee, added to the sender's `fee` and credited to the fee wallet as a separate `service_fee_{payment_hash}` row.
 
-    Payment --> Reserve["Fee reserve<br/>(held while pending)"]
-    Payment --> Service["Service fee<br/>(operator percentage)"]
-    Payment --> Routing["Routing fee<br/>(actual network cost)"]
-
-    Reserve -.->|"replaced by the real fee on success"| Wallet["Sender wallet balance"]
-    Service -->|"separate service_fee_ row"| FeeWallet["Service fee wallet"]
-    Routing -->|"paid to"| Network["Lightning Network"]
-```
-
-The reserve and the service fee are charged **on top of** the amount, not taken out of it.
+The reserve and the service fee are charged **on top of** the amount.
 
 ### Fee sign {#fee-sign}
-
-The sign of `fee` is not normalised in storage. That is why the view uses `ABS(fee)`:
 
 | Row | Stored `fee` |
 |-----|--------------|
 | External outgoing, pending | `-(reserve + service fee)` |
 | External outgoing, success | `-(routing fee + service fee)` |
-| Internal outgoing (sender) | `+service fee` (positive, usually 0) |
-| Incoming | Whatever the funding source reports, usually 0 |
+| Internal outgoing (sender) | `-(service fee)`, usually 0 |
+| Incoming, when created | `-abs(fee)` from the backend, usually 0 |
+| Incoming, settled by the paid-invoice stream | The backend's `fee_msat` as reported |
 
-Don't rely on the sign of `fee`. Use its absolute value.
+`create_payment` stores `-abs(fee)`, so most fees are negative. The settled-incoming path is the exception, which is why the view uses `ABS(fee)`. Use the absolute value when you read `fee`.
 
-### Fee Configuration {#fee-configuration}
+### Fee settings {#fee-configuration}
 
-```bash
-# Fee reserve (held during payment)
-LNBITS_RESERVE_FEE_MIN=2000        # Minimum reserve (msat)
-LNBITS_RESERVE_FEE_PERCENT=1.0     # Percentage reserve
+`LNBITS_RESERVE_FEE_MIN`, `LNBITS_RESERVE_FEE_PERCENT`, `LNBITS_SERVICE_FEE`, `LNBITS_SERVICE_FEE_MAX`, `LNBITS_SERVICE_FEE_WALLET` and `LNBITS_SERVICE_FEE_IGNORE_INTERNAL`. Their defaults and meanings are on [Payments](/docs/architecture/payments).
 
-# Service fee (operator revenue), off unless LNBITS_SERVICE_FEE_WALLET is set
-LNBITS_SERVICE_FEE=0.5             # 0.5% of payment (default 0)
-LNBITS_SERVICE_FEE_MAX=1000        # Max 1000 sats (default 0 = no cap)
-LNBITS_SERVICE_FEE_WALLET=         # Collection wallet ID
-LNBITS_SERVICE_FEE_IGNORE_INTERNAL=true
-```
+### Worked example {#fee-accounting}
 
-With the Admin UI on (the default), these live in the database after the first start and override `.env`. Change them in the Admin UI.
-
-### Fee Accounting {#fee-accounting}
-
-For a 10,000 sat outgoing payment with the settings above:
+A 10,000 sat external payment with `LNBITS_RESERVE_FEE_PERCENT=1.0`, `LNBITS_SERVICE_FEE=0.5` and a fee wallet set:
 
 ```
-Payment amount:     -10,000,000 msat
-Fee reserve (1%):      -100,000 msat   (beats the 2,000 msat minimum)
-Service fee (0.5%):     -50,000 msat
-─────────────────────────────────────
+Amount:              -10,000,000 msat
+Fee reserve (1%):       -100,000 msat   (more than the 2,000 msat minimum)
+Service fee (0.5%):      -50,000 msat
 Pending row: amount -10,000,000, fee -150,000  → -10,150,000 counted
+Fee wallet:  service_fee_{hash}, +50,000 msat, success
 
-After routing (actual routing fee: 50,000 msat):
+Routing fee reported: 50,000 msat
 Success row: amount -10,000,000, fee -100,000  → -10,100,000 counted
-Fee wallet:  service_fee_{hash}, +50,000 msat, SUCCESS
 ```
 
 There is no refund row. The pending row's `fee` is overwritten with the real fee.
 
-## Payment States {#payment-states}
+:::caution Service fee rows are not reversed
+The fee wallet is credited as soon as the payment call returns, while the payment may still be pending (`pay_invoice` calls `_credit_service_fee_wallet` without checking the status). If the payment then fails, the sender's row stops counting but the `service_fee_` row stays. The fee wallet can end up holding sats that no successful payment paid for.
+:::
+
+## Payment states {#payment-states}
 
 ```mermaid
 stateDiagram-v2
     [*] --> PENDING: invoice created / external payment started
-    [*] --> SUCCESS: internal sender row / service-fee row
+    [*] --> SUCCESS: internal sender row / service-fee row / admin credit or debit
 
-    PENDING --> SUCCESS: confirmed
-    PENDING --> FAILED: funding source error / rejected
+    PENDING --> SUCCESS: paid / funding source reports success
+    PENDING --> FAILED: funding source reports failure
     PENDING --> FAILED: incoming invoice expired (label "expired")
     PENDING --> FAILED: hold invoice cancelled
 
-    FAILED --> SUCCESS: retry finds the earlier attempt was paid
+    FAILED --> SUCCESS: paying the same invoice again finds the first attempt was paid
 ```
 
-While a row is pending, an outgoing row already reduces the balance and an incoming row does not.
+### Transitions and their effect {#state-transitions}
 
-### State Transitions {#state-transitions}
-
-| From | To | Trigger | Balance Effect |
+| From | To | Trigger | Balance effect |
 |------|----|---------|----------------|
-| - | PENDING | Invoice created / external payment started | None (incoming) / Deduct (outgoing) |
-| - | SUCCESS | Internal sender row, service-fee row | Deduct / Add |
-| PENDING | SUCCESS | Payment confirmed | Add (incoming) / Keep deduction, fee adjusted (outgoing) |
-| PENDING | FAILED | Error, rejection, expiry (incoming, label `expired`), hold-invoice cancel | None (incoming) / Funds released (outgoing) |
-| FAILED | SUCCESS | Paying the same invoice again, when the funding source reports it was in fact paid | Deduct again (outgoing) |
+| (new) | PENDING | Invoice created / external payment started | None (incoming) / deducted (outgoing) |
+| (new) | SUCCESS | Internal sender row, service-fee row, Super User credit or debit | Deducted / added |
+| PENDING | SUCCESS | Payment confirmed | Added (incoming) / still deducted, fee adjusted (outgoing) |
+| PENDING | FAILED | Error, rejection, expiry, hold-invoice cancel | None (incoming) / released (outgoing) |
+| FAILED | SUCCESS | Paying the same invoice again, when the funding source now reports the first attempt as paid (`_verify_external_payment`) | Deducted again (outgoing) |
 
-`FAILED` is therefore not final. `SUCCESS` rows are also not frozen: labels, new `extra` keys and hold-invoice flags can still be written to them.
+`FAILED` is not final, and `SUCCESS` rows still change: labels, new `extra` keys and hold-invoice flags can be written to them.
 
-## Payment Identification {#payment-identification}
+A Super User credit or debit (`PUT /users/api/v1/balance`) is an ordinary `success` row with the memo "Admin credit" or "Admin debit". It adds or removes sats in LNbits only, not on the funding source.
 
-### Checking ID Formats {#checking-id-formats}
+## Payment identification {#payment-identification}
 
-| Type | Format | Example |
-|------|--------|---------|
-| Incoming | The funding source's id | often the payment hash |
-| External outgoing | `{payment_hash}`, possibly replaced by the funding source's id | `a1b2c3d4...` |
-| Internal (sender row) | `internal_{payment_hash}` | `internal_a1b2c3...` |
-| Service fee | `service_fee_{payment_hash}` | `service_fee_a1b2...` |
-| Fiat provider | `fiat_{provider}_{id}` | `fiat_stripe_...` |
+### `checking_id` formats {#checking-id-formats}
 
-### Payment Hash {#payment-hash}
+| Row | `checking_id` |
+|------|--------|
+| Incoming invoice | The funding source's id, often the payment hash |
+| External outgoing | The payment hash, possibly replaced by the funding source's id |
+| Internal, sender row | `internal_{payment_hash}` |
+| Admin debit | `internal_{random hash}` |
+| Service fee | `service_fee_{payment_hash}` |
+| Fiat provider invoice | `fiat_{provider}_{provider id}` |
 
-The 32-byte BOLT11 payment hash serves as:
-- The matching key for internal transfers
-- The lookup key for most API calls (`/api/v1/payments/{payment_hash}`)
-- Proof of payment, together with the preimage
+Rows whose `checking_id` starts with `internal_` or `fiat_` count as internal: LNbits never asks the funding source about them.
 
-## Querying the Ledger {#querying-the-ledger}
+### Payment hash {#payment-hash}
 
-### Get Wallet Balance {#get-wallet-balance}
+The 32-byte BOLT11 payment hash links an internal payment to its invoice, is the key for `GET /api/v1/payments/{payment_hash}`, and with the preimage proves payment: `sha256(preimage) == payment_hash`.
+
+## Reading the ledger from Python {#querying-the-ledger}
+
+For extensions running inside LNbits.
+
+### Balance {#get-wallet-balance}
 
 ```python
 from lnbits.core.crud import get_wallet
@@ -283,76 +236,46 @@ wallet.balance_msat  # from the balances view
 wallet.balance       # balance_msat // 1000 (sats)
 ```
 
-### Payment History {#payment-history}
+### Payment history {#payment-history}
 
 ```python
 from lnbits.core.crud import get_payments
 
 payments = await get_payments(   # keyword-only arguments
     wallet_id=wallet_id,
-    pending=True,      # include pending
-    complete=True,     # include complete
+    pending=True,
+    complete=True,     # with pending=True: pending and success rows, no failed ones
     limit=100,
     offset=0,
 )
 ```
 
-### Daily Statistics {#daily-statistics}
+### Daily statistics {#daily-statistics}
 
-```python
-from lnbits.core.crud.payments import get_daily_stats
+`lnbits.core.crud.payments.get_daily_stats(filters=None, user_id=None)` returns `(stats_in, stats_out)`, two lists of `PaymentDailyStats`. It takes a `Filters[PaymentFilters]`, not a `wallet_id` argument.
 
-stats_in, stats_out = await get_daily_stats(filters, user_id=user_id)
-# Each is a list of PaymentDailyStats:
-# date, balance, balance_in, balance_out, payments_count, count_in, count_out, fee
-```
+## Audit trail and repair {#audit-trail}
 
-`get_daily_stats(filters=None, user_id=None)` takes a `Filters[PaymentFilters]` (for example a `wallet_id` filter), not a `wallet_id` argument.
+Each row has `time`, `created_at` and `updated_at`, and nothing more: LNbits keeps no history of status changes. The `audit` table logs HTTP requests (IP, user, path, response code), not ledger changes.
 
-## Audit Trail {#audit-trail}
+`lnbits-cli db` has tools for when the ledger and the funding source disagree. Back up the data folder before you use them, because they change balances.
 
-Every payment has:
+| Command | What it does |
+|---------|--------------|
+| `lnbits-cli db check-payments` | Lists incoming payments that are `success` in LNbits but still pending on the funding source (last 3 days by default; options `-d`, `-l`, `-w`, `-v`). It changes nothing |
+| `lnbits-cli db mark-payment-pending -c <checking_id>` | Sets one payment back to `pending` |
+| `lnbits-cli db delete-wallet-payment -w <wallet> -c <checking_id>` | Meant to delete one row. In v1.6.2 it fails, because its SQL still uses the old column name `wallet` (`delete_wallet_payment` in `lnbits/core/crud/payments.py`) |
 
-| Field | Purpose |
-|-------|---------|
-| `created_at` | When the record was created |
-| `updated_at` | Last modification time |
-| `time` | Payment timestamp |
-| `extra` | JSON metadata (extension data, fiat rates, etc.) |
+## Reconciliation {#balance-reconciliation}
 
-LNbits keeps no history of status changes. The separate `audit` table logs HTTP requests (IP, user, path, response), not ledger changes.
-
-Extensions can store custom data in `extra`:
-
-```python
-extra = {
-    "tag": "tpos",
-    "tpos_id": "abc123",
-    "fiat_amount": 10.50,
-    "fiat_currency": "USD",
-}
-```
-
-## Balance Reconciliation {#balance-reconciliation}
-
-The sum of all wallet balances should never exceed the funding source balance. LNbits monitors this but does not enforce it:
-
-```mermaid
-flowchart LR
-    FS["Funding source<br/>1,000,000 sats"]
-
-    FS --> W1["Wallet A<br/>400,000"]
-    FS --> W2["Wallet B<br/>350,000"]
-    FS --> W3["Wallet C<br/>200,000"]
-    FS --> UN["Unallocated<br/>50,000"]
-```
-
-The tooling:
+Nothing stops the wallets from adding up to more than the funding source holds. LNbits monitors the gap instead:
 
 - **`GET /admin/api/v1/audit`** (admin) returns `lnbits_balance_sats` and `node_balance_sats`.
-- **The watchdog** runs every `LNBITS_WATCHDOG_INTERVAL_MINUTES` (default 60). If LNbits' total exceeds the node balance by at least `LNBITS_WATCHDOG_DELTA` sats (default 1,000,000), it sends an admin notification and, with `LNBITS_WATCHDOG_SWITCH_TO_VOIDWALLET=true`, switches the funding source to `VoidWallet`. It does nothing unless `LNBITS_WATCHDOG_SWITCH_TO_VOIDWALLET` or `LNBITS_NOTIFICATION_WATCHDOG` is enabled; both default to off.
+- **The watchdog** runs every `LNBITS_WATCHDOG_INTERVAL_MINUTES` (default 60). If LNbits' total exceeds the node balance by at least `LNBITS_WATCHDOG_DELTA` sats (default 1,000,000), it sends an admin notification and, with `LNBITS_WATCHDOG_SWITCH_TO_VOIDWALLET=true`, switches the funding source to `VoidWallet`. It does nothing unless `LNBITS_WATCHDOG_SWITCH_TO_VOIDWALLET` or `LNBITS_NOTIFICATION_WATCHDOG` is on; both are off by default.
 
-## See Also
+Admin credits, the service-fee gap above, and payments that are pending in LNbits but settled on the node all move the two totals apart.
+
+## See also
 
 - [Ledger Specification](/docs/architecture/ledger-spec): an independent lndocs proposal, not LNbits behaviour
 - [Architecture Overview](/docs/architecture/overview)
