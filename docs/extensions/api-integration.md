@@ -1,345 +1,276 @@
 ---
 sidebar_position: 5
 title: API Integration
-description: Integrating extensions with LNbits core APIs
+description: Use LNbits core auth, wallets, payments, database and websockets from a Python extension
+last_update:
+  date: 2026-10-18
+verified_with: v1.6.2
 ---
 
 # Extension API Integration
 
-Learn how extensions interact with LNbits core functionality.
+How a **Python extension** uses LNbits core: authentication, wallets and payments, its database, background tasks and websockets. Everything here is checked against the v1.6.2 source and the [lnbits/example](https://github.com/lnbits/example) template. WASM extensions can't import any of this. They use permissioned host functions instead (see [WASM Extensions](/docs/extensions/wasm)).
 
-## Authentication Decorators
+## URL prefix {#url-prefix}
 
-Extensions use the same authentication as core:
+LNbits mounts your router under `/<ext_id>`. By convention its API routes sit under `api/v1`, so the items route of the example on the [development page](/docs/extensions/development) is served at `/myextension/api/v1/items`. Core routes such as `/api/v1/payments` are separate and unchanged.
+
+## Authentication decorators {#authentication-decorators}
+
+All of these are in `lnbits.decorators`:
+
+| Dependency | Accepts | Returns |
+|---|---|---|
+| `require_admin_key` | The wallet **admin key** | `WalletTypeInfo` (`key_type`, `wallet`) |
+| `require_invoice_key` | The admin key **or** the invoice key. Check `key_info.key_type` if it matters | `WalletTypeInfo` |
+| `require_base_admin_key`, `require_base_invoice_key` | Same keys, lighter wallet object | `BaseWalletTypeInfo` |
+| `check_user_exists` | A logged-in user (bearer token or cookie) | `User`, with wallets |
+| `check_account_exists` | A logged-in user | `Account` |
+| `check_account_id_exists` | A logged-in user | `AccountId` |
+| `check_admin` | A logged-in admin or super user who has a password set | `Account` |
+| `check_super_user` | The logged-in super user, with a password set | `Account` |
+
+Wallet keys go in the `X-API-KEY` header (or the `?api-key=` query parameter). The user-level dependencies don't accept wallet keys. They take an `Authorization: Bearer` access token or the login cookie, or `?usr=<user id>` only when user-id-only login is turned on (it is off by default since v1.6.0, and never allowed for admins).
+
+The key checks fail like this: no key gives `401 No Api Key provided.`, an unknown key gives `404 Wallet not found.`, and an invoice key where the admin key is required gives `403 Invalid adminkey.`
 
 ```python
-from lnbits.decorators import (
-    require_admin_key,
-    require_invoice_key,
-    check_user_exists
-)
+from fastapi import Depends
+from lnbits.core.models import User, WalletTypeInfo
+from lnbits.decorators import check_user_exists, require_admin_key, require_invoice_key
 
-# Full wallet access
-@router.post("/api/v1/action")
-async def action(wallet: WalletTypeInfo = Depends(require_admin_key)):
-    pass
 
-# Invoice operations only
-@router.get("/api/v1/data")
-async def get_data(wallet: WalletTypeInfo = Depends(require_invoice_key)):
-    pass
+@myextension_ext_api.post("/api/v1/action")
+async def action(key_info: WalletTypeInfo = Depends(require_admin_key)):
+    ...  # can spend from key_info.wallet
 
-# User context only
-@router.get("/")
+
+@myextension_ext_api.get("/api/v1/data")
+async def get_data(key_info: WalletTypeInfo = Depends(require_invoice_key)):
+    ...  # read-only for key_info.wallet
+
+
+@myextension_ext_generic.get("/")
 async def page(user: User = Depends(check_user_exists)):
-    pass
+    ...  # user.wallets, user.wallet_ids
 ```
 
-## Wallet Operations
+LNbits also checks extension access for you. When a request to your paths is authenticated, by wallet key or by login, the wallet's owner must have the extension enabled, and an admin-only extension (`LNBITS_ADMIN_EXTENSIONS`) needs an admin. Otherwise the request gets a 403.
 
-### Get Wallet Info
+## Wallets and payments {#wallet-operations}
+
+### Get a wallet {#get-wallet-info}
 
 ```python
 from lnbits.core.crud import get_wallet
 
 wallet = await get_wallet(wallet_id)
-print(wallet.balance_msat)  # Balance in millisatoshis
+if wallet:
+    print(wallet.balance_msat)  # millisatoshis
 ```
 
-### Create Invoice
+### Create an invoice {#create-invoice}
+
+`create_invoice` takes keyword arguments only. `amount` is in the given `currency` (default `"sat"`). It returns a `Payment`:
 
 ```python
 from lnbits.core.services import create_invoice
 
-result = await create_invoice(
+payment = await create_invoice(
     wallet_id=wallet_id,
-    amount=1000,           # sats
-    memo="Extension payment",
-    extra={"tag": "myextension", "item_id": item_id}
+    amount=1000,  # sats
+    memo="Order 123",
+    extra={"tag": "myextension", "order_id": "123"},
 )
-
-payment_request = result.payment_request
-payment_hash = result.payment_hash
+bolt11 = payment.bolt11
+payment_hash = payment.payment_hash
 ```
 
-### Pay Invoice
+Put your extension id in `extra["tag"]` so your invoice listener can pick out your payments. You can also pass `webhook=` (a URL LNbits calls when the invoice is paid), `expiry=`, `labels=` and `external_id=`.
+
+### Pay an invoice {#pay-invoice}
 
 ```python
 from lnbits.core.services import pay_invoice
 
-result = await pay_invoice(
+payment = await pay_invoice(
     wallet_id=wallet_id,
-    payment_request=bolt11,
-    extra={"tag": "myextension"}
+    payment_request=bolt11,  # not bolt11=
+    max_sat=5000,            # optional upper bound
+    extra={"tag": "myextension"},
 )
 ```
 
-### Check Payment Status
+When a payment fails, `pay_invoice` raises `lnbits.exceptions.PaymentError`. Uncaught, LNbits returns it as HTTP 520 with `{"detail": ..., "status": "failed"}`.
+
+### Check a payment {#check-payment-status}
 
 ```python
 from lnbits.core.crud import get_standalone_payment
 
-payment = await get_standalone_payment(checking_id)
+payment = await get_standalone_payment(payment_hash)  # checking id or payment hash
 if payment and payment.success:
-    print("Payment completed!")
+    ...
 ```
 
-## Database Access
+`payment.amount` is in **msat** (`payment.sat` gives sats). Outgoing payments have negative amounts.
 
-### Using Extension Database
+## Database {#database-access}
+
+Each extension has its own database, `Database("ext_<id>")`, with tables named `<id>.<table>` (see [Extension Development](/docs/extensions/development)). Queries take **named `:param` placeholders and a dict**. An optional model class gives typed results.
 
 ```python
 from lnbits.db import Database
 
-# Create database instance
 db = Database("ext_myextension")
 
-# Execute queries
 await db.execute(
-    "INSERT INTO mytable (id, value) VALUES (?, ?)",
-    (id, value)
+    "UPDATE myextension.items SET name = :name WHERE id = :id",
+    {"name": name, "id": item_id},
 )
-
-# Fetch data
-row = await db.fetchone(
-    "SELECT * FROM mytable WHERE id = ?",
-    (id,)
+item = await db.fetchone(
+    "SELECT * FROM myextension.items WHERE id = :id", {"id": item_id}, Item
 )
-
-rows = await db.fetchall(
-    "SELECT * FROM mytable WHERE wallet_id = ?",
-    (wallet_id,)
+items = await db.fetchall(
+    "SELECT * FROM myextension.items WHERE wallet = :wallet", {"wallet": wallet_id}, Item
 )
+await db.insert("myextension.items", item)   # INSERT from a pydantic model
+await db.update("myextension.items", item)   # UPDATE ... WHERE id = :id
 ```
 
-### Transactions
+`db.fetch_page(...)` with `lnbits.db.Filters` gives paginated, filterable lists like the core API's.
+
+### Connections {#transactions}
 
 ```python
 async with db.connect() as conn:
-    await conn.execute("UPDATE ...")
-    await conn.execute("INSERT ...")
-    # Auto-commit on success, rollback on exception
+    await conn.execute("UPDATE ...", {...})
+    await conn.execute("INSERT ...", {...})
 ```
 
-## Event Handling
+`db.connect()` gives you one connection and holds that database's lock until the block ends. In v1.6.2, `execute`, `insert` and `update` **commit straight away**, so the block is not a transaction: if the second statement fails, the first one stays committed. Write your code so that a partial write is safe.
 
-### Payment Webhooks
+## Background tasks {#event-handling}
 
-When creating invoices, specify a webhook:
+Start tasks in `<id>_start()` and keep the handles, so `<id>_stop()` can cancel them. LNbits calls `<id>_stop()` on deactivate, uninstall and upgrade.
+
+In v1.6.2 the recommended API is `lnbits.task_manager.task_manager`. `register_invoice_listener` calls your coroutine with each paid incoming payment. Filter by your tag:
 
 ```python
-invoice = await create_invoice(
-    wallet_id=wallet_id,
-    amount=1000,
-    memo="Order #123",
-    webhook="https://your-server.com/webhook",
-    extra={"order_id": "123"}
-)
+from loguru import logger
+
+from lnbits.core.models import Payment
+from lnbits.task_manager import task_manager
+
+scheduled_tasks = []
+
+
+async def on_invoice_paid(payment: Payment) -> None:
+    if payment.extra.get("tag") != "myextension":
+        return
+    ...
+
+
+def myextension_start():
+    task = task_manager.register_invoice_listener(on_invoice_paid, "ext_myextension")
+    scheduled_tasks.append(task)
+
+
+def myextension_stop():
+    for task in scheduled_tasks:
+        try:
+            task_manager.cancel_task(task)
+        except Exception as ex:
+            logger.warning(ex)
 ```
 
-### Background Tasks
+`task_manager.create_permanent_task(func, name=..., interval=...)` runs a coroutine function forever, restarts it when it fails, and waits `interval` seconds between runs if you set one.
 
-```python title="tasks.py"
-from lnbits.tasks import register_task
+lnbits/example still uses the older helpers `lnbits.tasks.create_permanent_unique_task(name, coro)` and `lnbits.tasks.register_invoice_listener(queue, name)`. They still work in v1.6.2 but log a deprecation message.
 
-async def my_background_task():
-    while True:
-        # Do periodic work
-        await asyncio.sleep(60)
+## Websockets {#sse-updates}
 
-# Register on startup
-register_task(my_background_task)
-```
-
-### SSE Updates
-
-Push real-time updates to frontend:
+To push updates to a browser, send a string to an item id. Clients listen on `/api/v1/ws/{item_id}`:
 
 ```python
+import json
+
 from lnbits.core.services import websocket_manager
 
-await websocket_manager.send_data(
-    message={"type": "update", "data": data},
-    item_id=wallet_id
-)
+await websocket_manager.send(item_id, json.dumps({"paid": True}))
 ```
 
-## Settings Management
+(`websocket_updater(item_id, data)` still exists but is deprecated.)
 
-### Extension Settings
+:::warning Websocket messages are not authenticated
+Anyone can push a message to any item id with
+`POST /api/v1/ws/{item_id}` or
+`GET /api/v1/ws/{item_id}/{data}`.
+Neither route needs a key. Never fulfil an order, unlock content or release goods because a websocket message said "paid". Use the message as a hint, then confirm on the server, for example with `get_standalone_payment` or `GET /api/v1/payments/{payment_hash}`.
+:::
 
-```json title="config.json"
-{
-  "settings": [
-    {
-      "name": "api_key",
-      "type": "string",
-      "description": "External API key",
-      "default": ""
-    },
-    {
-      "name": "enabled",
-      "type": "bool",
-      "description": "Enable feature",
-      "default": true
-    }
-  ]
-}
-```
+## Settings {#settings-management}
 
-### Accessing Settings
+LNbits has no settings framework for extensions. An extension that needs configuration keeps it in its own table and serves it from its own routes. Protect admin-wide settings with `check_admin`. lnurlp does this with its `/lnurlp/api/v1/settings` route. Don't read secrets from `config.json`: it is public metadata shown in the extension details.
 
-```python
-from lnbits.extensions.myextension.config import settings
+## Outbound HTTP {#http-client}
 
-api_key = settings.api_key
-```
-
-## HTTP Client
-
-Make external API calls:
+LNbits depends on `httpx`, so use it rather than adding a new HTTP library:
 
 ```python
 import httpx
 
-async with httpx.AsyncClient() as client:
-    response = await client.get(
-        "https://api.example.com/data",
-        headers={"Authorization": f"Bearer {api_key}"}
-    )
-    data = response.json()
+async with httpx.AsyncClient(timeout=10) as client:
+    resp = await client.get("https://api.example.com/data")
+    resp.raise_for_status()
+    data = resp.json()
 ```
 
-## Templates & Frontend
+## Frontend helpers {#templates-frontend}
 
-### Vue.js Integration
+The page loads Vue 3, Quasar 2 and the LNbits JS helpers. Build your app with `Vue.createApp({mixins: [windowMixin], ...})` (see [Extension Development](/docs/extensions/development)). `windowMixin` provides `this.g.user`, the user's wallets with their `inkey` and `adminkey`.
 
-```html
-{% block scripts %}
-{{ window_vars(user) }}
-<script>
-new Vue({
-  el: '#vue',
-  mixins: [windowMixin],
-  data() {
-    return {
-      items: []
-    }
-  },
-  methods: {
-    async loadData() {
-      const {data} = await LNbits.api.request(
-        'GET',
-        '/myextension/api/v1/items',
-        this.g.user.wallets[0].inkey
-      )
-      this.items = data
-    },
-    async createItem(item) {
-      const {data} = await LNbits.api.request(
-        'POST',
-        '/myextension/api/v1/items',
-        this.g.user.wallets[0].adminkey,
-        item
-      )
-      this.items.push(data)
-    }
-  }
-})
-</script>
-{% endblock %}
-```
+```js
+// generic request: method, path, api key, body
+LNbits.api.request('GET', '/myextension/api/v1/items', wallet.inkey)
+LNbits.api.request('POST', '/myextension/api/v1/items', wallet.adminkey, data)
 
-### LNbits.api Methods
-
-```javascript
-// GET request
-LNbits.api.request('GET', '/path', apiKey)
-
-// POST request
-LNbits.api.request('POST', '/path', apiKey, data)
-
-// DELETE request
-LNbits.api.request('DELETE', '/path', apiKey)
-
-// Create invoice
-LNbits.api.createInvoice(wallet, amount, memo)
-
-// Pay invoice
+// core helpers
+LNbits.api.createInvoice(wallet, amount, memo) // unit defaults to 'sat'
 LNbits.api.payInvoice(wallet, bolt11)
+
+// show an API error as a notification
+LNbits.utils.notifyApiError(error)
 ```
 
-## Error Handling
+## Errors and validation {#error-handling}
 
-### API Errors
-
-```python
-from fastapi import HTTPException
-
-@router.get("/api/v1/item/{id}")
-async def get_item(id: str):
-    item = await crud.get_item(id)
-    if not item:
-        raise HTTPException(status_code=404, detail="Item not found")
-    return item
-```
-
-### Validation
+Raise `fastapi.HTTPException` for client errors. LNbits also turns an uncaught `ValueError` or `AssertionError` into a 400 with `{"detail": "<message>"}`. Validate request bodies with pydantic (v1.10) models:
 
 ```python
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, Field, validator
+
 
 class CreateItem(BaseModel):
-    name: str
-    amount: int
+    name: str = Field(..., min_length=1, max_length=100)
+    amount: int = Field(..., gt=0)
 
-    @validator('amount')
-    def amount_must_be_positive(cls, v):
-        if v <= 0:
-            raise ValueError('Amount must be positive')
-        return v
+    @validator("name")
+    def strip_name(cls, v):
+        return v.strip()
 ```
 
-## Security Considerations
+## Security checklist {#security-considerations}
 
-### Wallet Ownership
-
-Always verify wallet ownership:
-
-```python
-@router.get("/api/v1/items")
-async def get_items(wallet: WalletTypeInfo = Depends(require_invoice_key)):
-    # Only return items for this wallet
-    return await get_items_for_wallet(wallet.wallet.id)
-```
-
-### Input Validation
-
-Use Pydantic models for all inputs:
-
-```python
-@router.post("/api/v1/items")
-async def create(data: CreateItemModel, wallet: WalletTypeInfo = Depends(require_admin_key)):
-    # data is already validated
-    pass
-```
-
-### Rate Limiting
-
-Extensions inherit LNbits rate limits. For additional limits:
-
-```python
-from slowapi import Limiter
-limiter = Limiter(key_func=get_remote_address)
-
-@router.get("/api/v1/expensive")
-@limiter.limit("10/minute")
-async def expensive_operation():
-    pass
-```
+- **Check ownership.** Every route that reads, changes or deletes an object must check that it belongs to `key_info.wallet.id` (or to one of `user.wallet_ids`). The delete example in [Extension Development](/docs/extensions/development) shows how.
+- **Use the weakest key that works.** Use `require_invoice_key` for reads and invoice creation, and `require_admin_key` only where you spend or change data.
+- **Public routes are public.** A route with no dependency can be called by anyone. Don't return wallet ids, keys or other users' data from it.
+- **Don't trust websocket messages** (see above). Confirm payments on the server.
+- **Rate limits.** LNbits' global limit (`LNBITS_RATE_LIMIT_NO` per `LNBITS_RATE_LIMIT_UNIT`, default 200 per minute) applies to extension routes too.
 
 ## See Also
 
 - [Extension Development](/docs/extensions/development)
+- [WASM Extensions](/docs/extensions/wasm)
 - [API Reference](/docs/api/overview)
 - [Security](/docs/configuration/security)

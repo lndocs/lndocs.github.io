@@ -1,294 +1,107 @@
 ---
 sidebar_position: 1
 title: Extensions Overview
-description: Extend LNbits functionality with modular extensions
+description: What LNbits extensions are, how they are enabled, and the security model of Python and WASM extensions
+last_update:
+  date: 2026-10-18
+verified_with: v1.6.2
 ---
 
 # Extensions Overview
 
-Extensions add powerful features to LNbits without modifying core code.
+Extensions add features to LNbits, such as a point-of-sale terminal, LNURL pay links or a Nostr marketplace, without changing the core code. LNbits v1.6.2 has two kinds:
 
-## What are Extensions?
+- **Python extensions** are Python packages that LNbits imports into its own process. Almost all extensions are this kind.
+- **WASM extensions** (new in v1.6.0) are WebAssembly components that LNbits runs in a sandbox. See [WASM Extensions](/docs/extensions/wasm).
 
-Extensions are self-contained modules that:
-- Add new functionality (TPoS, Paywall, etc.)
-- Have their own API endpoints
-- Store data in dedicated tables
-- Integrate with the wallet system
-
-```mermaid
-flowchart TB
-    subgraph Core["⚡ LNbits Core"]
-        C1["Wallets"]
-        C2["Payments"]
-        C3["Authentication"]
-    end
-
-    Core --> TPoS["🏪 TPoS"]
-    Core --> LNURL["🔗 LNURL-pay"]
-    Core --> Paywall["🔒 Paywall"]
-    Core --> More["...100+ more"]
-```
-
-## Popular Extensions
-
-### Payment & Commerce
-
-| Extension | Purpose | Repository |
-|-----------|---------|------------|
-| **TPoS** | Point of Sale terminal | [lnbits/tpos](https://github.com/lnbits/tpos) |
-| **SatsPay** | Payment processor with webhooks | [lnbits/satspay](https://github.com/lnbits/satspay) |
-| **Paywall** | Content monetization | [lnbits/paywall](https://github.com/lnbits/paywall) |
-| **Invoices** | Invoice management | [lnbits/invoices](https://github.com/lnbits/invoices) |
-| **Offline Shop** | Receive payments offline | [lnbits/offlineshop](https://github.com/lnbits/offlineshop) |
-| **TipJar** | Accept tips | [lnbits/tipjar](https://github.com/lnbits/tipjar) |
-
-### LNURL Protocol
-
-| Extension | Purpose | Repository |
-|-----------|---------|------------|
-| **LNURL-pay** | Static payment links | [lnbits/lnurlp](https://github.com/lnbits/lnurlp) |
-| **LNURL-withdraw** | Vouchers and faucets | [lnbits/withdraw](https://github.com/lnbits/withdraw) |
-| **LNURLdevice** | Hardware integration | [lnbits/lnurldevice](https://github.com/lnbits/lnurldevice) |
-| **Lightning Address** | LN addresses on your domain | [lnbits/lnaddress](https://github.com/lnbits/lnaddress) |
-| **LNDhub** | BlueWallet/Zeus compatibility | [lnbits/lndhub](https://github.com/lnbits/lndhub) |
-
-### Swaps & Liquidity
-
-| Extension | Purpose | Repository |
-|-----------|---------|------------|
-| **Boltz** | Submarine swaps (LN ↔ onchain) | [lnbits/boltz](https://github.com/lnbits/boltz-extension) |
-| **Deezy** | LN to onchain swaps | [lnbits/deezy](https://github.com/lnbits/deezy) |
-| **Onchain Wallet** | Watch-only BTC wallet | [lnbits/watchonly](https://github.com/lnbits/watchonly) |
-
-### Nostr Integration
-
-| Extension | Purpose | Repository |
-|-----------|---------|------------|
-| **NOSTR Market** | Decentralized marketplace | [lnbits/nostrmarket](https://github.com/lnbits/nostrmarket) |
-| **NOSTR NIP-5** | Sell NIP-05 verification | [lnbits/nostrnip5](https://github.com/lnbits/nostrnip5) |
-| **NOSTR Client** | Multi-relay connections | [lnbits/nostrclient](https://github.com/lnbits/nostrclient) |
-| **NOSTR Relay** | Run your own relay | [lnbits/nostr-relay](https://github.com/lnbits/nostr-relay-extension) |
-
-### Ecash & Privacy
-
-| Extension | Purpose | Repository |
-|-----------|---------|------------|
-| **Cashu** | Ecash mint (peg in/out) | [lnbits/cashu](https://github.com/lnbits/cashu) |
-
-### NFC & Hardware
-
-| Extension | Purpose | Repository |
-|-----------|---------|------------|
-| **BoltCard** | NFC card payments | [lnbits/boltcards](https://github.com/lnbits/boltcards) |
-| **Bleskomat** | ATM integration | [lnbits/bleskomat](https://github.com/lnbits/bleskomat) |
-| **Gerty** | Bitcoin display device | [lnbits/gerty](https://github.com/lnbits/gerty) |
-
-### Streaming & Content
-
-| Extension | Purpose | Repository |
-|-----------|---------|------------|
-| **Streamer Copilot** | Streaming tips with animations | [lnbits/copilot](https://github.com/lnbits/copilot) |
-| **Stream Alerts** | OBS/streaming integration | [lnbits/livestream](https://github.com/lnbits/livestream) |
-| **DJ Livestream** | DJ tips with producer splits | [lnbits/livestream](https://github.com/lnbits/livestream-extension) |
-| **Jukebox** | Spotify-powered jukebox | [lnbits/jukebox](https://github.com/lnbits/jukebox) |
-
-### Events & Ticketing
-
-| Extension | Purpose | Repository |
-|-----------|---------|------------|
-| **Events** | Event ticket sales | [lnbits/events](https://github.com/lnbits/events) |
-| **LNticket** | Pay-per-word tickets | [lnbits/lnticket](https://github.com/lnbits/lnticket) |
-
-### Automation & Splitting
-
-| Extension | Purpose | Repository |
-|-----------|---------|------------|
-| **Split Payments** | Distribute to multiple wallets | [lnbits/splitpayments](https://github.com/lnbits/splitpayments) |
-| **Scrub** | Auto-forward to LNURL/wallet | [lnbits/scrub](https://github.com/lnbits/scrub) |
-
-### Bots & Integrations
-
-| Extension | Purpose | Repository |
-|-----------|---------|------------|
-| **Discord Bot** | Discord wallet integration | [lnbits/discordbot](https://github.com/lnbits/discordbot) |
-| **UserManager** | User/wallet management | [lnbits/usermanager](https://github.com/lnbits/usermanager) |
-
-### Gaming & Fun
-
-| Extension | Purpose | Repository |
-|-----------|---------|------------|
-| **Satsdice** | LNURL-powered dice game | [lnbits/satsdice](https://github.com/lnbits/satsdice) |
-| **Hivemind** | Prediction markets | [lnbits/hivemind](https://github.com/lnbits/hivemind) |
-
-### Other
-
-| Extension | Purpose | Repository |
-|-----------|---------|------------|
-| **Subdomains** | Sell subdomains | [lnbits/subdomains](https://github.com/lnbits/subdomains) |
-| **SMTP** | Paid email sending | Built-in |
-| **Diagon Alley** | Shop-in-shop system | [lnbits/Diagon-Alley](https://github.com/lnbits/Diagon-Alley) |
-
-## Extension Architecture
-
-Each extension follows a standard structure:
-
-```
-extension/
-├── manifest.json     # Metadata and version
-├── __init__.py       # Extension registration
-├── views.py          # Web UI routes
-├── views_api.py      # API endpoints
-├── models.py         # Data models
-├── crud.py           # Database operations
-├── migrations.py     # Schema migrations
-├── tasks.py          # Background tasks
-└── templates/        # HTML templates
-    └── extension/
-        └── index.html
-```
-
-## Managing Extensions
-
-### Via Web UI
-
-1. Go to **Extensions** in sidebar
-2. Browse available extensions
-3. Click **Enable** to activate
-4. Configure in extension settings
-
-### Via Admin UI
-
-Administrators can:
-- Install new extensions
-- Set default extensions for users
-- Disable extensions globally
-- Manage extension sources
-
-### Via Environment
-
-```bash
-# Default extensions for new users
-LNBITS_EXTENSIONS_DEFAULT_INSTALL=tpos,lnurlp
-
-# Disable all extensions
-LNBITS_EXTENSIONS_DEACTIVATE_ALL=true
-```
-
-## Extension Sources
-
-Extensions are distributed via manifests:
-
-```bash
-# Add custom manifest
-LNBITS_EXTENSIONS_MANIFESTS="https://example.com/extensions.json"
-```
-
-### Official Registry
-
-The official extension registry is at:
-- https://extensions.lnbits.com
-
-### Custom Sources
-
-Create your own manifest:
-
-```json
-{
-  "extensions": [
-    {
-      "id": "myext",
-      "name": "My Extension",
-      "version": "1.0.0",
-      "archive": "https://github.com/.../myext.zip"
-    }
-  ]
-}
-```
-
-## Per-User Extensions
-
-Each user can:
-- Enable/disable extensions for themselves
-- See only enabled extensions in sidebar
-- Have separate extension configurations
-
-## Admin-Only Extensions
-
-Some extensions are restricted to admins:
-
-```json title="manifest.json"
-{
-  "name": "Admin Tool",
-  "admin_only": true
-}
-```
-
-Examples:
-- Server management tools
-- Global analytics
-- System integrations
-
-## Extension API
-
-Extensions expose APIs at:
-```
-/api/v1/{extension_id}/...
-```
-
-Example (TPoS):
-```
-GET /api/v1/tpos/
-POST /api/v1/tpos/
-GET /api/v1/tpos/{tpos_id}
-```
-
-## Extension Data
-
-Each extension has isolated tables:
-
-```sql
--- TPoS example
-CREATE TABLE tpos (
-    id TEXT PRIMARY KEY,
-    wallet_id TEXT,
-    name TEXT,
-    currency TEXT,
-    ...
-);
-```
-
-## Webhooks from Extensions
-
-Extensions can fire webhooks:
-
-```python
-# In extension code
-await send_webhook(
-    url=webhook_url,
-    data={"event": "payment_received", ...}
-)
-```
-
-## Security Model
+## Security model {#security-model}
 
 :::warning Python extensions are not sandboxed
-A Python extension runs inside the LNbits process with full access to its database, its settings and every wallet's funds. Installing one means trusting its code as much as LNbits itself. Install only extensions you have reviewed, or from a source you trust.
+A Python extension runs inside the LNbits process. It can read and write the whole database, read every setting (funding source credentials included), and spend from every wallet on the server. Nothing in LNbits limits what its code does. Installing one means trusting its code, and every later update of it, as much as LNbits itself.
 
-WASM extensions (new in v1.6.0) run in a sandbox with resource limits and declared permissions.
+- Install Python extensions only from the official registry or from sources you have reviewed.
+- Each extra manifest URL you add is a new party you trust with your funds. The Admin UI warns: "only use the official LNbits extension source, and sources you can trust".
+- An admin installs an extension for the whole server. A user only enables or disables what is already installed.
 :::
 
-## Extension Lifecycle
+:::info WASM extensions are sandboxed
+A WASM extension runs in a wasmtime sandbox with fuel, time and memory limits. It reaches storage, wallets and the network only through host functions, and each needs a permission an admin grants at install. Its UI runs in a sandboxed iframe with a strict Content Security Policy. A permission can still be powerful: `wallet.pay_invoice_background` lets it spend within the grant a user creates. See [WASM Extensions](/docs/extensions/wasm).
+:::
 
-1. **Install** - Downloaded and extracted
-2. **Migrate** - Database tables created
-3. **Enable** - User activates for wallet
-4. **Use** - Extension functions available
-5. **Disable** - Hidden but data retained
-6. **Uninstall** - Removed (admin)
+## How extensions are enabled {#lifecycle}
+
+An extension goes through three levels. The first two are server-wide. The third is **per user, not per wallet**:
+
+1. **Install** (admin, server-wide). LNbits downloads the release archive, checks its sha256 `hash` when the registry gives one, extracts it and runs its database migrations. Python extensions go to `{LNBITS_EXTENSIONS_PATH}/extensions/<id>` (default `lnbits/extensions/<id>`). WASM extensions go to `data/wasm_extensions/<id>`.
+2. **Activate / deactivate** (admin, server-wide). A deactivated extension stays installed, but its paths answer 404 for everyone.
+3. **Enable / disable** (each user, for their own account). Enabling adds the extension to that user's menu, and it can then work with any of the user's wallets. The API is `PUT /api/v1/extension/{ext_id}/enable` and `PUT /api/v1/extension/{ext_id}/disable`, with user authentication rather than a wallet key.
+
+**Uninstall** (admin) removes the code and the installed-extension record for all users. **The extension's data stays.** Deleting it is a separate action: **Remove Data** in the UI, or `DELETE /api/v1/extension/{ext_id}/db`. See [Installing Extensions](/docs/extensions/installing).
+
+Related settings:
+
+| Setting | Effect |
+|---|---|
+| `LNBITS_EXTENSIONS_DEFAULT_INSTALL` | Installs these extension IDs server-wide at startup, and reinstalls them if removed. Environment only |
+| `LNBITS_USER_DEFAULT_EXTENSIONS` | Enables these extensions for each **new** user account |
+| `LNBITS_ADMIN_EXTENSIONS` | Only admins and the super user can use these extensions |
+| `LNBITS_EXTENSIONS_DEACTIVATE_ALL` | Starts LNbits core only, with no extensions loaded |
+| `LNBITS_MAX_EXTENSIONS` | Caps the number of installed extensions (`0` = no limit). Environment only |
+
+Apart from the two marked "environment only", these are editable settings. With the Admin UI on (the default), the database values override `.env` after first start, so change them on the Admin UI's **Extensions** tab.
+
+An admin can also charge users to enable an extension (pay to enable), and a registry can offer paid releases (pay to install). [docs.lnbits.com: Monetization](https://docs.lnbits.com/dev/extensions/monetization) covers both.
+
+## Where extension routes live {#routes}
+
+- A Python extension's router is mounted under `/<ext_id>`. Its page is at `/<ext_id>/`, and by convention its API is at `/<ext_id>/api/v1/...`. TPoS, for example, serves `GET /tpos/api/v1/tposs`.
+- A WASM extension's pages are at `/ext/<ext_id>/...` and its API routes at `/api/v1/ext/{ext_id}/{path}`.
+
+Every extension's API shows up in your instance's OpenAPI docs at `/docs`.
+
+## Registries {#registries}
+
+LNbits finds installable extensions in registry manifests. v1.6.2 ships with two:
+
+| Kind | Setting | Default URL |
+|---|---|---|
+| Python | `LNBITS_EXTENSIONS_MANIFESTS` | `https://raw.githubusercontent.com/lnbits/lnbits-extensions/main/extensions.json` |
+| WASM | `LNBITS_WASM_EXTENSIONS_MANIFESTS` | `https://raw.githubusercontent.com/lnbits/lnbits-extensions-wasm/refs/heads/main/extensions.json` |
+
+On 2026-10-18 the Python registry listed 61 extensions (189 releases) and the WASM registry 20 (25 releases). Setting either variable **replaces** its default list, so keep the official URL in it if you still want the official extensions. The registry file format is described in [Extension Manifest](/docs/extensions/manifest).
+
+## Some active extensions {#popular-extensions}
+
+Each of these is in the v1.6.2 default registry with a release that installs on v1.6.2 (checked 2026-10-18):
+
+| Extension | What it does | Repository |
+|---|---|---|
+| TPoS (`tpos`) | Shareable point-of-sale terminal | [lnbits/tpos](https://github.com/lnbits/tpos) |
+| Pay Links (`lnurlp`) | Reusable LNURL-pay links and Lightning addresses | [lnbits/lnurlp](https://github.com/lnbits/lnurlp) |
+| Withdraw Links (`withdraw`) | LNURL-withdraw links, vouchers and faucets | [lnbits/withdraw](https://github.com/lnbits/withdraw) |
+| Boltz (`boltz`) | Swaps between Lightning and on-chain/Liquid | [lnbits/boltz](https://github.com/lnbits/boltz) |
+| Bolt Cards (`boltcards`) | NFC Bolt Cards with one-time LNURL-withdraw | [lnbits/boltcards](https://github.com/lnbits/boltcards) |
+| NWC Provider (`nwcprovider`) | Nostr Wallet Connect service for LNbits wallets | [lnbits/nwcprovider](https://github.com/lnbits/nwcprovider) |
+| LndHub (`lndhub`) | Use LNbits wallets from BlueWallet or Zeus | [lnbits/lndhub](https://github.com/lnbits/lndhub) |
+| Split Payments (`splitpayments`) | Split incoming payments across wallets | [lnbits/splitpayments](https://github.com/lnbits/splitpayments) |
+| Events (`events`) | Sell and check event tickets | [lnbits/events](https://github.com/lnbits/events) |
+| Nostr Market (`nostrmarket`) | Nostr marketplace and webshop | [lnbits/nostrmarket](https://github.com/lnbits/nostrmarket) |
+| SatsPay (`satspay`) | On-chain and Lightning charges | [lnbits/satspay](https://github.com/lnbits/satspay) |
+| Onchain Wallet (`watchonly`) | Watch-only on-chain wallets | [lnbits/watchonly](https://github.com/lnbits/watchonly) |
+
+For the full catalogue, with descriptions and setup guides generated from each extension's README, see **[docs.lnbits.com/extensions](https://docs.lnbits.com/extensions/)**.
+
+:::note Gone or replaced
+`cashu`, `discordbot`, `market`, `infinity` and `sonof` are archived on GitHub. `lnurldevice` and `usermanager` have no release that installs on v1.6.2: their newest releases set `max_lnbits_version` to 1.0.0. `bitcoinswitch`, `fossa` and `lnpos` replace `lnurldevice`, and the core **Users** admin page replaces `usermanager`. Since v1.6.0, wallets can have a Lightning address without an extension.
+:::
+
+## Extension Builder {#extension-builder}
+
+LNbits has had a no-code **Extension Builder** at `/extensions/builder` since v1.3.0. You describe the extension in a form, and it generates a **Python** extension from the [extension_builder_stub](https://github.com/lnbits/extension_builder_stub) template. You can download it as a zip (`POST /api/v1/extension/builder/zip`), and an admin can install and activate it straight away (`POST /api/v1/extension/builder/deploy`). Only admins can use it unless `LNBITS_EXTENSIONS_BUILDER_ACTIVATE_NON_ADMINS` is turned on. A generated extension is a normal Python extension, with the same trust model. See [docs.lnbits.com: Extension Builder](https://docs.lnbits.com/guide/core/extension-builder).
 
 ## See Also
 
 - [Installing Extensions](/docs/extensions/installing)
+- [WASM Extensions](/docs/extensions/wasm)
 - [Extension Development](/docs/extensions/development)
 - [Extension Manifest](/docs/extensions/manifest)

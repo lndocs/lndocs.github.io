@@ -21,7 +21,7 @@ An LNbits backup has up to three parts: the **data folder**, the **PostgreSQL da
 | `ext_<id>.sqlite3` | One database per Python extension. Only present on SQLite. |
 | `.lnbits_auth_key` | The key that signs login tokens when `AUTH_SECRET_KEY` is empty. Without it, existing logins stop working. |
 | `.super_user` | A copy of the Super User ID. LNbits rewrites it from the database at every start. |
-| `upgrades/` | Downloaded Python extension packages. The running copy lives under `lnbits/extensions` (see `LNBITS_EXTENSIONS_PATH`), and the list of installed extensions is in the database. |
+| `upgrades/` | Temporary unpack folder, cleared at every start (`lnbits/app.py:426`). No need to back it up. The running Python extension code lives in `{LNBITS_EXTENSIONS_PATH}/extensions`, downloaded zips in `zips/`, and the list of installed extensions in the database. |
 | `wasm_extensions/` | Installed WASM extensions. |
 | `logs/` | Log files. |
 
@@ -82,7 +82,7 @@ For a non-Docker install, stop the service instead (for example `sudo systemctl 
 
 ## PostgreSQL backup {#postgresql-backup}
 
-Dump the database with `pg_dump`, using the same credentials as `LNBITS_DATABASE_URL`. `pg_dump` accepts the `postgres://user:password@host:port/dbname` URL directly. Then back up the data folder as well, because it still holds `.lnbits_auth_key`, `upgrades/` and `wasm_extensions/`.
+Dump the database with `pg_dump`, using the same credentials as `LNBITS_DATABASE_URL`. `pg_dump` accepts the `postgres://user:password@host:port/dbname` URL directly. Then back up the data folder as well, because it still holds `.lnbits_auth_key`, `zips/` and `wasm_extensions/`.
 
 ```bash
 # Load LNBITS_DATABASE_URL from your .env (or export it yourself)
