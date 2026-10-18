@@ -112,6 +112,8 @@ The admin QR code gives the app full spending access to that wallet.
 
 The [LNbits GitHub wiki](https://github.com/lnbits/lnbits/wiki) has older community material, including printable flyers.
 
+<a id="removed-links"></a>
+
 ## Contributing {#contributing}
 
 To add a resource, open a PR against [this site's repository](https://github.com/lndocs/lndocs.github.io) or suggest it in the [LNbits Telegram](https://t.me/lnbits). To improve the official docs, use [`lnbits/docs`](https://github.com/lnbits/docs).
