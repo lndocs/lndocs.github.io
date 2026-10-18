@@ -1,356 +1,201 @@
 ---
 sidebar_position: 8
 title: SDKs & Libraries
-description: Official and community SDKs for integrating with LNbits
+description: There is no official LNbits SDK. The community libraries are unmaintained, so use plain HTTP or generate a client from the OpenAPI schema
+last_update:
+  date: 2026-10-18
+verified_with: v1.6.2
 ---
 
 # SDKs & Libraries
 
-Client libraries for integrating LNbits into your applications.
+**LNbits has no official client SDK.** The API is plain HTTP and JSON, and every instance publishes an OpenAPI schema. For most integrations, a few lines of HTTP code, as in the examples below, are the most reliable choice.
 
-## JavaScript / TypeScript
+## Community libraries (unmaintained) {#community-libraries}
 
-### lnbits (npm)
+Two community packages exist. Both are **unofficial** and **unmaintained**, and both were written for LNbits 0.x:
 
-The official JavaScript SDK for LNbits.
+| Package | Author | Last release | Status |
+|---|---|---|---|
+| [`lnbits` on npm](https://www.npmjs.com/package/lnbits) ([source](https://github.com/MiguelMedeiros/lnbits-js)) | Miguel Medeiros | 1.1.5, February 2021 | Not updated since 2021. Its user-manager calls target the `usermanager` extension, which has no release that installs on LNbits 1.x |
+| [`pylnbits` on PyPI](https://pypi.org/project/pylnbits/) ([source](https://github.com/lightningames/pylnbits)) | bitkarrot | 0.0.8, December 2023 | The repository is archived. Tested up to LNbits 0.11.2 |
 
-**Repository**: [MiguelMedeiros/lnbits-js](https://github.com/MiguelMedeiros/lnbits-js)
+:::caution
+Don't use these for new projects without reviewing them yourself. They predate LNbits 1.x and may not match today's routes, auth or units. For example, `balance` is in msat, not sats.
+:::
 
-#### Installation
+Earlier versions of this page showed sample code for these libraries, including a Python `LNBits` class. That class does not exist in `pylnbits`, so the samples have been removed.
 
-```bash
-npm install lnbits
-# or
-yarn add lnbits
-```
+## Generate a client from OpenAPI {#generate-a-client}
 
-#### Configuration
+Every instance serves its schema at `/openapi.json`, and an interactive explorer at `/docs` (Swagger UI). Point any OpenAPI client generator at `https://lnbits.example.com/openapi.json` to get typed models and methods for your language. The schema includes the extensions installed on that instance.
 
-```javascript
-import LNBits from 'lnbits';
+Pin the schema to the LNbits version you run, and regenerate when you upgrade.
 
-const { wallet, userManager, paywall, withdraw, paylink, tpos } = LNBits({
-  adminKey: 'd4a35826...',
-  invoiceReadKey: 'a2bc6f0e...',
-  endpoint: 'https://your-lnbits.com',
-});
-```
+## Plain HTTP {#curl--rest-api}
 
-#### Wallet Operations
-
-```javascript
-// Get wallet details
-const walletDetails = await wallet.walletDetails();
-console.log(`Balance: ${walletDetails.balance} sats`);
-
-// Create invoice
-const invoice = await wallet.createInvoice({
-  amount: 1000,
-  memo: 'Payment for services',
-  out: false,
-});
-console.log(`Invoice: ${invoice.payment_request}`);
-
-// Pay invoice
-const payment = await wallet.payInvoice({
-  bolt11: 'lnbc1000n1p...',
-  out: true,
-});
-
-// Check invoice status
-const status = await wallet.checkInvoice({
-  payment_hash: invoice.payment_hash,
-});
-console.log(`Paid: ${status.paid}`);
-```
-
-#### User Management
-
-```javascript
-// Get all users
-const users = await userManager.getUsers();
-
-// Get user's wallets
-const wallets = await userManager.getWallets({ user_id: 'user123' });
-
-// Get transactions
-const transactions = await userManager.getTransactions({
-  wallet_id: 'wallet456',
-});
-
-// Create user with wallet
-const newUser = await userManager.createUser({
-  admin_id: 'admin123',
-  user_name: 'john',
-  wallet_name: 'Main Wallet',
-});
-
-// Enable extension for user
-await userManager.activeExtension({
-  userid: 'user123',
-  extension: 'tpos',
-  active: true,
-});
-```
-
-#### Paywall
-
-```javascript
-// Create paywall
-const paywall = await paywall.createPaywall({
-  amount: 100,
-  description: 'Premium content access',
-  memo: 'Unlock article',
-  url: 'https://example.com/premium',
-});
-
-// Generate paywall invoice
-const invoice = await paywall.createInvoice({
-  paywall_id: paywall.id,
-});
-
-// Check if paid
-const access = await paywall.checkInvoice({
-  paywall_id: paywall.id,
-  payment_hash: invoice.payment_hash,
-});
-```
-
-#### Withdraw Links
-
-```javascript
-// Create withdraw link
-const link = await withdraw.createWithdrawLink({
-  title: 'Faucet',
-  min_withdrawable: 100,
-  max_withdrawable: 1000,
-  uses: 10,
-  wait_time: 60,
-});
-
-// Get all links
-const links = await withdraw.getWithdrawLinks();
-
-// Update link
-await withdraw.updateWithdrawLink({
-  withdraw_id: link.id,
-  title: 'Updated Faucet',
-  max_withdrawable: 2000,
-});
-
-// Delete link
-await withdraw.deleteWithdrawLink({ withdraw_id: link.id });
-```
-
-#### TPoS (Point of Sale)
-
-```javascript
-// Create terminal
-const terminal = await tpos.createTpos({
-  currency: 'USD',
-  name: 'Coffee Shop',
-});
-
-// Get terminals
-const terminals = await tpos.getTposs();
-
-// Delete terminal
-await tpos.deleteTpos({ tpos_id: terminal.id });
-```
-
----
-
-## Python
-
-### pylnbits
-
-Community-maintained Python SDK with async support.
-
-**Repository**: [lightningames/pylnbits](https://github.com/lightningames/pylnbits)
-
-#### Installation
+### Authentication {#authentication}
 
 ```bash
-pip install pylnbits
+# Admin key: receive, read and spend
+curl -H "X-Api-Key: $ADMIN_KEY" https://lnbits.example.com/api/v1/wallet
+
+# Invoice key: receive and read (balance, payment history), but not spend
+curl -H "X-Api-Key: $INVOICE_KEY" https://lnbits.example.com/api/v1/wallet
 ```
 
-#### Usage
+See [Authentication](/docs/api/authentication) for user tokens and ACL API tokens.
+
+### Create an invoice {#create-invoice}
+
+```bash
+curl -X POST https://lnbits.example.com/api/v1/payments \
+  -H "X-Api-Key: $INVOICE_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"out": false, "amount": 1000, "memo": "Payment"}'
+```
+
+### Pay an invoice {#pay-invoice}
+
+```bash
+curl -X POST https://lnbits.example.com/api/v1/payments \
+  -H "X-Api-Key: $ADMIN_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"out": true, "bolt11": "lnbc..."}'
+```
+
+### Check a payment {#check-payment}
+
+```bash
+curl https://lnbits.example.com/api/v1/payments/$PAYMENT_HASH \
+  -H "X-Api-Key: $INVOICE_KEY"
+```
+
+### A minimal Python client {#python}
+
+This is a small wrapper you can copy, not a published package:
 
 ```python
-import asyncio
-from pylnbits import LNBits
+import httpx
 
-async def main():
-    lnbits = LNBits(
-        url="https://your-lnbits.com",
-        admin_key="d4a35826...",
-        invoice_key="a2bc6f0e..."
-    )
 
-    # Get wallet balance
-    wallet = await lnbits.get_wallet()
-    print(f"Balance: {wallet['balance']} msats")
+class LnbitsClient:
+    def __init__(self, url: str, invoice_key: str, admin_key: str | None = None):
+        self.url = url.rstrip("/")
+        self.invoice_key = invoice_key
+        self.admin_key = admin_key
 
-    # Create invoice
-    invoice = await lnbits.create_invoice(
-        amount=1000,
-        memo="Test payment"
-    )
-    print(f"Invoice: {invoice['payment_request']}")
+    def _request(self, method: str, path: str, key: str, **kwargs) -> dict:
+        r = httpx.request(
+            method, f"{self.url}{path}", headers={"X-Api-Key": key}, timeout=60, **kwargs
+        )
+        r.raise_for_status()
+        return r.json()
 
-    # Pay invoice
-    payment = await lnbits.pay_invoice(
-        bolt11="lnbc1000n1p..."
-    )
+    def balance_sats(self) -> int:
+        return self._request("GET", "/api/v1/wallet", self.invoice_key)["balance"] // 1000
 
-    # Check payment
-    status = await lnbits.check_invoice(
-        payment_hash=invoice['payment_hash']
-    )
+    def create_invoice(self, sats: int, memo: str = "", webhook: str | None = None) -> dict:
+        body = {"out": False, "amount": sats, "memo": memo}
+        if webhook:
+            body["webhook"] = webhook
+        return self._request("POST", "/api/v1/payments", self.invoice_key, json=body)
 
-asyncio.run(main())
+    def pay_invoice(self, bolt11: str) -> dict:
+        if not self.admin_key:
+            raise ValueError("paying needs the admin key")
+        return self._request(
+            "POST", "/api/v1/payments", self.admin_key, json={"out": True, "bolt11": bolt11}
+        )
+
+    def is_paid(self, payment_hash: str) -> bool:
+        return self._request("GET", f"/api/v1/payments/{payment_hash}", self.invoice_key)["paid"]
 ```
 
----
-
-## cURL / REST API
-
-For languages without an SDK, use the REST API directly.
-
-### Authentication
-
-```bash
-# Admin key (full access)
-curl -H "X-Api-Key: YOUR_ADMIN_KEY" \
-  https://your-lnbits.com/api/v1/wallet
-
-# Invoice key (read + create invoices only)
-curl -H "X-Api-Key: YOUR_INVOICE_KEY" \
-  https://your-lnbits.com/api/v1/wallet
-```
-
-### Create Invoice
-
-```bash
-curl -X POST \
-  -H "X-Api-Key: YOUR_INVOICE_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"out": false, "amount": 1000, "memo": "Test"}' \
-  https://your-lnbits.com/api/v1/payments
-```
-
-### Pay Invoice
-
-```bash
-curl -X POST \
-  -H "X-Api-Key: YOUR_ADMIN_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"out": true, "bolt11": "lnbc1000n1p..."}' \
-  https://your-lnbits.com/api/v1/payments
-```
-
-### Check Payment
-
-```bash
-curl -H "X-Api-Key: YOUR_INVOICE_KEY" \
-  https://your-lnbits.com/api/v1/payments/PAYMENT_HASH
-```
-
----
-
-## WebSocket Payments
-
-Real-time payment notifications via WebSocket.
-
-### JavaScript
+### A minimal JavaScript client {#javascript--typescript}
 
 ```javascript
-const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-const ws = new WebSocket(`${protocol}//your-lnbits.com/api/v1/ws/${walletId}`);
-
-ws.onmessage = (event) => {
-  const data = JSON.parse(event.data);
-  if (data.payment) {
-    console.log('Payment received:', data.payment);
+export function lnbits(url, {invoiceKey, adminKey}) {
+  const call = async (method, path, key, body) => {
+    const res = await fetch(`${url}${path}`, {
+      method,
+      headers: {'X-Api-Key': key, 'Content-Type': 'application/json'},
+      body: body ? JSON.stringify(body) : undefined
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(`${res.status}: ${JSON.stringify(data.detail)}`)
+    return data
   }
-};
-```
-
-### Python
-
-```python
-import asyncio
-import websockets
-
-async def listen_payments(wallet_id):
-    uri = f"wss://your-lnbits.com/api/v1/ws/{wallet_id}"
-    async with websockets.connect(uri) as ws:
-        async for message in ws:
-            print(f"Payment: {message}")
-
-asyncio.run(listen_payments("your-wallet-id"))
-```
-
----
-
-## Webhooks
-
-Configure webhooks for payment notifications.
-
-### Creating Invoice with Webhook
-
-```bash
-curl -X POST \
-  -H "X-Api-Key: YOUR_INVOICE_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "out": false,
-    "amount": 1000,
-    "memo": "With webhook",
-    "webhook": "https://your-server.com/webhook"
-  }' \
-  https://your-lnbits.com/api/v1/payments
-```
-
-### Webhook Payload
-
-```json
-{
-  "payment_hash": "abc123...",
-  "payment_request": "lnbc1000n1p...",
-  "amount": 1000,
-  "memo": "With webhook",
-  "status": "success",
-  "checking_id": "abc123..."
+  return {
+    wallet: () => call('GET', '/api/v1/wallet', invoiceKey), // balance in msat
+    createInvoice: (sats, memo = '') =>
+      call('POST', '/api/v1/payments', invoiceKey, {out: false, amount: sats, memo}),
+    payInvoice: (bolt11) =>
+      call('POST', '/api/v1/payments', adminKey, {out: true, bolt11}),
+    payment: (hash) => call('GET', `/api/v1/payments/${hash}`, invoiceKey)
+  }
 }
 ```
 
-### Webhook Handler (Node.js)
+Keep the admin key on the server. Don't use this from browser code with an admin key.
+
+## WebSocket payments {#websocket-payments}
+
+Connect to `/api/v1/ws/<invoice key>` to get a message for every payment to or from the wallet. The message is `{"wallet_balance": <sats>, "payment": {...}}`, and `payment.amount` is in msat. The wallet ID does not work as the id.
+
+### JavaScript {#javascript}
 
 ```javascript
-app.post('/webhook', (req, res) => {
-  const { payment_hash, status, amount } = req.body;
+const ws = new WebSocket(`wss://lnbits.example.com/api/v1/ws/${invoiceKey}`)
 
-  if (status === 'success') {
-    console.log(`Payment ${payment_hash} received: ${amount} sats`);
-    // Fulfill order, grant access, etc.
+ws.onmessage = (event) => {
+  const {wallet_balance, payment} = JSON.parse(event.data)
+  if (payment.amount > 0 && payment.status === 'success') {
+    console.log(`Received ${payment.amount / 1000} sats, balance ${wallet_balance} sats`)
   }
-
-  res.sendStatus(200);
-});
+}
 ```
 
----
+### Python {#python-websocket}
 
-## API Reference
+```python
+import asyncio
+import json
+import os
 
-For complete API documentation, see:
-- [Interactive Swagger Docs](https://demo.lnbits.com/docs)
+import websockets
+
+
+async def listen():
+    url = f"wss://lnbits.example.com/api/v1/ws/{os.environ['INVOICE_KEY']}"
+    async with websockets.connect(url) as ws:
+        async for message in ws:
+            data = json.loads(message)
+            payment = data["payment"]
+            print(payment["payment_hash"], payment["status"], payment["amount"] // 1000, "sats")
+
+
+asyncio.run(listen())
+```
+
+:::warning
+WebSocket messages can be forged, because the WebSocket push routes need no authentication (see [API Overview](/docs/api/overview)).
+Before fulfilling an order, confirm the payment with `GET /api/v1/payments/{payment_hash}`.
+:::
+
+## Webhooks {#webhooks}
+
+Pass `webhook` when you create an invoice, and LNbits POSTs the payment to it once when it's paid. The body is the payment object **JSON-encoded twice**, with `amount` in msat. There are no retries and no signature, and private-network URLs are blocked by default. [Webhooks](/docs/api/webhooks) has working handlers and the URL rules.
+
+## API reference {#api-reference}
+
+- `/docs` on your instance: interactive Swagger UI with every route, including installed extensions
+- `/openapi.json` on your instance: the machine-readable schema
+- [docs.lnbits.com API reference](https://docs.lnbits.com/api/)
+
+## See also {#see-also}
+
 - [API Overview](/docs/api/overview)
 - [Authentication](/docs/api/authentication)
-
-## See Also
-
 - [Payments API](/docs/api/payments)
 - [Webhooks](/docs/api/webhooks)
-- [Resources](/docs/resources) - More community libraries

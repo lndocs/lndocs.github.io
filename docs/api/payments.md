@@ -1,322 +1,301 @@
 ---
 sidebar_position: 4
 title: Payments API
-description: Create invoices and pay Lightning payments
+description: Create invoices, pay invoices, list and check payments, and use hold invoices with the LNbits API
+last_update:
+  date: 2026-10-18
+verified_with: v1.6.2
 ---
 
 # Payments API
 
-Create invoices, pay invoices, and manage payments.
+All payment routes are under `/api/v1/payments`. They act on the wallet whose key you send in `X-API-KEY`. See [Authentication](/docs/api/authentication).
 
-## Create Invoice
+| Method and path | Credential | Purpose |
+|---|---|---|
+| `POST /api/v1/payments` | Invoice key to receive, admin key to pay | Create or pay a BOLT11 invoice |
+| `GET /api/v1/payments` | Invoice or admin key | List payments |
+| `GET /api/v1/payments/paginated` | Invoice or admin key | List payments as a page with a total |
+| `GET /api/v1/payments/{payment_hash}` | None (a key adds `details`) | Status of one payment |
+| `POST /api/v1/payments/decode` | None | Decode a BOLT11 invoice or LNURL |
+| `GET /api/v1/payments/fee-reserve` | None | Fee reserve for an invoice |
+| `POST /api/v1/payments/lnurl` | Admin key | Pay an LNURL or Lightning address (see [LNURL API](/docs/api/lnurl)) |
+| `POST /api/v1/payments/settle` | Admin key | Settle a hold invoice |
+| `POST /api/v1/payments/cancel` | Admin key | Cancel a hold invoice |
+| `PUT /api/v1/payments/{payment_hash}/labels` | Admin key | Set labels on a payment |
 
-Create a Lightning invoice to receive payment.
+## Create an invoice {#create-invoice}
 
-```http
-POST /api/v1/payments
-```
-
-**Authentication**: Invoice Key or Admin Key
-
-**Request Body**:
-```json
-{
-  "out": false,
-  "amount": 1000,
-  "memo": "Payment for coffee",
-  "unit": "sat",
-  "webhook": "https://your-server.com/webhook",
-  "expiry": 3600
-}
-```
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `out` | boolean | No, but always send it | Defaults to `true`. If you leave it out with an admin key, the request **pays** instead of creating an invoice. Send `false` to create one. |
-| `amount` | integer | Yes | Amount (in unit) |
-| `memo` | string | No | Invoice description |
-| `unit` | string | No | `sat` (default) or `msat` |
-| `webhook` | string | No | Callback URL |
-| `expiry` | integer | No | Seconds until expiry |
-
-**Response**:
-```json
-{
-  "payment_hash": "abc123...",
-  "payment_request": "lnbc10n1pj...",
-  "checking_id": "abc123..."
-}
-```
-
-**Example**:
 ```bash
-curl -X POST \
+curl -X POST https://lnbits.example.com/api/v1/payments \
   -H "X-Api-Key: $INVOICE_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"out": false, "amount": 1000, "memo": "Test"}' \
-  https://lnbits.com/api/v1/payments
+  -d '{"out": false, "amount": 1000, "memo": "Order #1234"}'
 ```
 
-## Pay Invoice
+:::warning `out` defaults to true
+If you leave `out` out, LNbits treats the request as a **payment**. With an invoice key you get 403 `Invoice (or Admin) key required.` With an admin key you get 400 `Missing BOLT11 invoice`. Always send `"out": false` when you want to receive.
+:::
 
-Pay a Lightning invoice.
+Request fields:
 
-```http
-POST /api/v1/payments
-```
+| Field | Type | Notes |
+|---|---|---|
+| `out` | boolean | **Must be `false`** to create an invoice. Default `true` |
+| `amount` | number | Amount in `unit`. Must be 0 or more |
+| `unit` | string | `sat` (default) or a fiat currency code such as `USD` or `EUR`, converted at the current rate. `msat` is not accepted |
+| `memo` | string | Invoice description, up to 640 characters. Defaults to the site title |
+| `expiry` | integer | Seconds until the invoice expires. Defaults to `LIGHTNING_INVOICE_EXPIRY` (3600) |
+| `description_hash` | hex string | Put this hash in the invoice instead of a memo (as LNURL-pay does) |
+| `unhashed_description` | hex string | The description to hash. LNbits hashes it for you |
+| `webhook` | URL | Called once when the invoice is paid. See [Webhooks](/docs/api/webhooks) |
+| `extra` | object | Your own metadata, stored with the payment |
+| `labels` | list of strings | Labels for filtering |
+| `external_id` | string | Your own reference, up to 256 characters. You can filter on it |
+| `payment_hash` | 64 hex characters | Create a [hold invoice](#hold-invoices) for this hash |
+| `fiat_provider` | string | Create a fiat payment request through an enabled fiat provider such as Stripe. `unit` must then be a fiat code |
 
-**Authentication**: Admin Key (required)
+The response is HTTP **201** with the full payment object:
 
-**Request Body**:
 ```json
 {
-  "out": true,
-  "bolt11": "lnbc10n1pj..."
+  "checking_id": "a3f1...",
+  "payment_hash": "a3f1...",
+  "wallet_id": "8b2f...",
+  "amount": 1000000,
+  "fee": 0,
+  "bolt11": "lnbc10u1p...",
+  "payment_request": "lnbc10u1p...",
+  "fiat_provider": null,
+  "status": "pending",
+  "memo": "Order #1234",
+  "expiry": "2026-10-18T13:00:00+00:00",
+  "webhook": null,
+  "webhook_status": null,
+  "preimage": "...",
+  "tag": null,
+  "extension": null,
+  "time": "2026-10-18T12:00:00+00:00",
+  "created_at": "2026-10-18T12:00:00+00:00",
+  "updated_at": "2026-10-18T12:00:00+00:00",
+  "labels": [],
+  "extra": {},
+  "external_id": null
 }
 ```
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `out` | boolean | Yes | `true` for payment |
-| `bolt11` | string | Yes | BOLT11 invoice |
+`amount` is in **msat**: 1000 sats is `1000000`. Show `bolt11` (or `payment_request`) to the payer, and keep `payment_hash` to check the status.
 
-**Response**:
-```json
-{
-  "payment_hash": "abc123...",
-  "checking_id": "abc123...",
-  "fee": 10
-}
-```
+If the webhook URL fails the server's [callback URL rules](/docs/api/webhooks), creation fails with 400.
 
-**Example**:
+## Pay an invoice {#pay-invoice}
+
+Paying needs the **admin key**:
+
 ```bash
-curl -X POST \
+curl -X POST https://lnbits.example.com/api/v1/payments \
   -H "X-Api-Key: $ADMIN_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"out": true, "bolt11": "lnbc10n1pj..."}' \
-  https://lnbits.com/api/v1/payments
+  -d '{"out": true, "bolt11": "lnbc10u1p..."}'
 ```
 
-## List Payments
+| Field | Notes |
+|---|---|
+| `out` | `true` |
+| `bolt11` | The invoice to pay. Required |
+| `extra`, `labels`, `external_id` | Optional metadata, as above |
 
-Get payment history.
+The response is HTTP **201** with the payment object. `amount` is negative (outgoing). `fee` is negative too, in msat: the fee reserve while the payment is pending, then the routing fee plus any service fee once it settles.
 
-```http
-GET /api/v1/payments
-```
+Check `status` in the response:
 
-**Authentication**: Admin Key
+- `success`: paid.
+- `pending`: the funding source has not confirmed yet. Poll `GET /api/v1/payments/{payment_hash}` until it changes. Do **not** pay the invoice again.
 
-**Query Parameters**:
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `limit` | int | Max results (default: 10) |
-| `offset` | int | Skip results |
-| `pending` | bool | Filter pending only |
-| `incoming` | bool | Filter incoming only |
-| `outgoing` | bool | Filter outgoing only |
+Errors from the Lightning layer return HTTP **520** with `{"detail": "...", "status": "failed"}` (for example `Insufficient balance.`) or `"status": "pending"` when the outcome is unknown.
 
-**Response**:
-```json
-[
-  {
-    "checking_id": "abc123",
-    "payment_hash": "abc123",
-    "amount": 1000,
-    "fee": 0,
-    "memo": "Test payment",
-    "status": "success",
-    "created_at": "2024-01-15T12:00:00Z"
-  }
-]
-```
+## List payments {#list-payments}
 
-**Example**:
 ```bash
-curl -H "X-Api-Key: $ADMIN_KEY" \
-  "https://lnbits.com/api/v1/payments?limit=20&incoming=true"
+curl "https://lnbits.example.com/api/v1/payments?limit=20&offset=0" \
+  -H "X-Api-Key: $INVOICE_KEY"
 ```
 
-## Get Payment
+This returns a JSON array of payment objects for the wallet. The invoice key is enough.
 
-Get specific payment details.
+Query parameters:
 
-```http
-GET /api/v1/payments/{checking_id}
+| Parameter | Meaning |
+|---|---|
+| `limit`, `offset` | Page size and start. **No default limit**, so without `limit` you get every payment |
+| `sortby` | `created_at`, `updated_at`, `amount`, `fee`, `memo`, `time`, `tag` or `external_id` |
+| `direction` | `asc` or `desc` |
+| `search` | Text search over memo, amount, wallet ID, tag, status, time, labels and external ID |
+| `status` | `pending`, `success` or `failed` |
+| `amount[gt]=0` / `amount[lt]=0` | Incoming only / outgoing only |
+| `tag`, `external_id`, `payment_hash`, `checking_id`, `memo`, `labels`, `time` | Filter on these fields, with `=` or an operator such as `[like]`, `[ge]` or `[in]` |
+
+Unknown parameters are ignored, not rejected. The `pending=true`, `incoming=true` and `outgoing=true` parameters from older docs do nothing. Use `status=pending`, `amount[gt]=0` and `amount[lt]=0`.
+
+```bash
+# Successful incoming payments with your own reference
+curl -g "https://lnbits.example.com/api/v1/payments?status=success&amount[gt]=0&external_id=order-1234" \
+  -H "X-Api-Key: $INVOICE_KEY"
 ```
 
-**Authentication**: Admin Key
+### Paginated list {#paginated-list}
 
-**Response**:
-```json
-{
-  "checking_id": "abc123",
-  "payment_hash": "abc123",
-  "bolt11": "lnbc10n1pj...",
-  "amount": 1000,
-  "fee": 0,
-  "memo": "Test payment",
-  "status": "success",
-  "preimage": "def456...",
-  "created_at": "2024-01-15T12:00:00Z"
-}
+`GET /api/v1/payments/paginated` takes the same parameters and returns `{"data": [...], "total": n}`. Add `recheck_pending=true` to have LNbits re-check pending payments in the page with the funding source first.
+
+Related read-only routes, also with an invoice key:
+
+- `GET /api/v1/payments/history?group=day` gives balance history points. `group` is `hour`, `day` or `month`.
+- `GET /api/v1/payments/stats/breakdown` gives totals for the wallet.
+
+## Check a payment {#get-payment}
+
+```bash
+curl https://lnbits.example.com/api/v1/payments/$PAYMENT_HASH
 ```
 
-## Check Payment Status
+This route needs **no key**. It looks the payment up by payment hash or checking ID.
 
-Check if a payment has been received.
-
-```http
-GET /api/v1/payments/{payment_hash}
-```
-
-**Authentication**: Invoice Key (for invoices you created)
-
-**Response**:
-```json
-{
-  "paid": true
-}
-```
-
-or
+Without a key, or with a key for another wallet:
 
 ```json
-{
-  "paid": false
-}
+{"paid": true, "preimage": "0f3a..."}
 ```
-
-## Decode Invoice
-
-Decode a BOLT11 invoice.
-
-```http
-POST /api/v1/payments/decode
-```
-
-**Authentication**: Invoice Key
-
-**Request Body**:
-```json
-{
-  "data": "lnbc10n1pj..."
-}
-```
-
-**Response**:
-```json
-{
-  "payment_hash": "abc123",
-  "amount_msat": 1000000,
-  "description": "Test payment",
-  "payee": "03abc...",
-  "expiry": 3600,
-  "timestamp": 1705320000
-}
-```
-
-## Payment Status Values
-
-| Status | Description |
-|--------|-------------|
-| `pending` | Awaiting confirmation |
-| `success` | Payment completed |
-| `failed` | Payment failed |
-
-## Webhook Notifications
-
-When a webhook URL is specified, LNbits sends a POST request on payment:
 
 ```json
-{
-  "payment_hash": "abc123",
-  "checking_id": "abc123",
-  "amount": 1000,
-  "memo": "Test",
-  "status": "success"
-}
+{"paid": false, "preimage": null}
 ```
 
-## Code Examples
+A failed payment returns `{"paid": false, "status": "failed"}`.
 
-### Python
+With the owning wallet's invoice or admin key **in the `X-Api-Key` header** (the query parameter is not read here), the response adds `details` (the full payment object) and, for pending payments, `status`:
+
+```bash
+curl https://lnbits.example.com/api/v1/payments/$PAYMENT_HASH \
+  -H "X-Api-Key: $INVOICE_KEY"
+```
+
+```json
+{"paid": false, "status": "pending", "preimage": null, "details": {"payment_hash": "...", "amount": 1000000, "...": "..."}}
+```
+
+The preimage is only returned once the payment has succeeded. A pending payment is re-checked with the funding source on each call, so this is also the way to refresh a stuck payment.
+
+This is the route to use to **confirm a payment before you fulfil an order**, whatever told you it was paid (a webhook, a WebSocket message or a redirect).
+
+## Decode an invoice {#decode-invoice}
+
+```bash
+curl -X POST https://lnbits.example.com/api/v1/payments/decode \
+  -H "Content-Type: application/json" \
+  -d '{"data": "lnbc10u1p..."}'
+```
+
+No key is needed. The body takes:
+
+- `data`: a BOLT11 invoice or a bech32 LNURL.
+- `filter_fields`: optional, a list of field names to return.
+
+For a BOLT11 invoice, the response is the decoded invoice fields. For an LNURL (a string starting with `LNURL`), it returns `{"domain": "<decoded URL>"}`. On failure you get 400 with `{"message": "Failed to decode: ..."}`. The exact field list is in Swagger at `/docs`.
+
+## Fee reserve {#fee-reserve}
+
+`GET /api/v1/payments/fee-reserve?invoice=lnbc...` returns `{"fee_reserve": <msat>}`. That is the amount LNbits holds back for routing fees, plus any service fee, when you pay that invoice. Your balance must cover the amount plus this reserve.
+
+## Hold invoices {#hold-invoices}
+
+A hold invoice locks the payer's funds until you settle or cancel it. Only funding sources that implement hold invoices support them. In v1.6.2 these are LND REST and LND gRPC. Others return 520 `Hold invoices are not supported by the funding source.`
+
+1. Generate a 32-byte preimage yourself and compute its SHA-256 hash.
+2. Create the invoice with `"out": false` and `"payment_hash": "<hash>"`, using the invoice or admin key.
+3. When the payer has paid, the payment stays pending. Settle it with the admin key:
+
+   ```bash
+   curl -X POST https://lnbits.example.com/api/v1/payments/settle \
+     -H "X-Api-Key: $ADMIN_KEY" -H "Content-Type: application/json" \
+     -d '{"preimage": "<64 hex characters>"}'
+   ```
+
+4. Or release the payer's funds with `POST /api/v1/payments/cancel`, body `{"payment_hash": "<hash>"}`, using the admin key.
+
+Keep the preimage secret until you settle. Anyone who has it can settle the invoice.
+
+## Labels {#labels}
+
+`PUT /api/v1/payments/{payment_hash}/labels` with body `{"labels": ["shop", "refund"]}` and the admin key replaces the payment's labels. New label names are added to your account automatically.
+
+## Payment status values {#payment-status-values}
+
+| `status` | Meaning |
+|---|---|
+| `pending` | Invoice not yet paid, or outgoing payment not yet confirmed |
+| `success` | Settled |
+| `failed` | Failed or expired |
+
+## Webhook notifications {#webhook-notifications}
+
+Set `webhook` when you create an invoice and LNbits POSTs the payment to that URL once, when the invoice is paid. Read [Webhooks](/docs/api/webhooks) before relying on it. The body format is unusual, there are no retries, and private-network URLs are blocked by default.
+
+## Code examples {#code-examples}
+
+### Python {#python}
 
 ```python
+import os
+import time
 import httpx
 
-async def create_invoice(api_key: str, amount: int, memo: str):
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            "https://lnbits.com/api/v1/payments",
-            headers={"X-Api-Key": api_key},
-            json={
-                "out": False,
-                "amount": amount,
-                "memo": memo
-            }
-        )
-        return response.json()
+LNBITS = "https://lnbits.example.com"
+invoice_key = os.environ["INVOICE_KEY"]
 
-async def pay_invoice(admin_key: str, bolt11: str):
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            "https://lnbits.com/api/v1/payments",
-            headers={"X-Api-Key": admin_key},
-            json={
-                "out": True,
-                "bolt11": bolt11
-            }
-        )
-        return response.json()
+r = httpx.post(
+    f"{LNBITS}/api/v1/payments",
+    headers={"X-Api-Key": invoice_key},
+    json={"out": False, "amount": 1000, "memo": "Order #1234"},
+)
+r.raise_for_status()
+invoice = r.json()
+print("Pay this:", invoice["bolt11"])
 
-async def check_payment(api_key: str, payment_hash: str):
-    async with httpx.AsyncClient() as client:
-        response = await client.get(
-            f"https://lnbits.com/api/v1/payments/{payment_hash}",
-            headers={"X-Api-Key": api_key}
-        )
-        return response.json()
+while True:
+    status = httpx.get(
+        f"{LNBITS}/api/v1/payments/{invoice['payment_hash']}",
+        headers={"X-Api-Key": invoice_key},
+    ).json()
+    if status["paid"]:
+        print("Paid", status["details"]["amount"] // 1000, "sats")
+        break
+    time.sleep(2)
 ```
 
-### JavaScript
+### JavaScript {#javascript}
 
 ```javascript
-async function createInvoice(apiKey, amount, memo) {
-  const response = await fetch('https://lnbits.com/api/v1/payments', {
-    method: 'POST',
-    headers: {
-      'X-Api-Key': apiKey,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      out: false,
-      amount,
-      memo
-    })
-  });
-  return response.json();
-}
+const LNBITS = 'https://lnbits.example.com'
 
-async function payInvoice(adminKey, bolt11) {
-  const response = await fetch('https://lnbits.com/api/v1/payments', {
+async function payInvoice(bolt11) {
+  const res = await fetch(`${LNBITS}/api/v1/payments`, {
     method: 'POST',
     headers: {
-      'X-Api-Key': adminKey,
+      'X-Api-Key': process.env.ADMIN_KEY,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({
-      out: true,
-      bolt11
-    })
-  });
-  return response.json();
+    body: JSON.stringify({out: true, bolt11})
+  })
+  const body = await res.json()
+  if (!res.ok) throw new Error(`${res.status}: ${body.detail}`)
+  return body // body.status is 'success' or 'pending'
 }
 ```
 
-## See Also
+## See also {#see-also}
 
 - [Wallets API](/docs/api/wallets)
 - [LNURL API](/docs/api/lnurl)
 - [Webhooks](/docs/api/webhooks)
+- [Payment architecture](/docs/architecture/payments)
+- [docs.lnbits.com: Payments](https://docs.lnbits.com/api/core/payments)
