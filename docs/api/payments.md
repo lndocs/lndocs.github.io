@@ -136,7 +136,7 @@ curl "https://lnbits.example.com/api/v1/payments?limit=20&offset=0" \
   -H "X-Api-Key: $INVOICE_KEY"
 ```
 
-This returns a JSON array of payment objects for the wallet. The invoice key is enough.
+This returns a JSON array of payment objects for the wallet. The invoice key is enough. It returns only **successful and pending** payments; failed ones are left out (`payment_api.py:92-101`). Use the [paginated list](#paginated-list) to see failed payments too.
 
 Query parameters:
 
@@ -146,7 +146,7 @@ Query parameters:
 | `sortby` | `created_at`, `updated_at`, `amount`, `fee`, `memo`, `time` (default), `tag` or `external_id`. Anything else returns 400 |
 | `direction` | `asc` or `desc` |
 | `search` | Text search over memo, amount, wallet ID, tag, status, time, labels and external ID |
-| `status` | `pending`, `success` or `failed` |
+| `status` | `pending`, `success` or `failed` (`failed` matches nothing on this route; use the paginated list) |
 | `amount[gt]=0` / `amount[lt]=0` | Incoming only / outgoing only |
 | `tag`, `external_id`, `payment_hash`, `checking_id`, `memo`, `labels`, `time` | Filter on these fields, with `=` or an operator such as `[like]`, `[ge]` or `[in]` |
 

@@ -47,7 +47,7 @@ Yes. Each wallet has its own balance, its own admin key (spend) and invoice key 
 
 ### How do I recover my account? {#how-do-i-recover-my-wallet}
 
-Log in with your username and password. If you've forgotten the password, ask the operator: the Super User can generate a one-time reset URL for your account from the Users page. A lost user-ID URL with no username or password set can't be recovered on a server you don't run.
+Log in with your username and password. If you've forgotten the password, ask the operator: the Super User can generate a reset URL for your account from the Users page. It isn't single-use: anyone holding it can set a new password until it expires, 120 seconds after it was made (`AUTH_CREDETIALS_UPDATE_THRESHOLD`), so send it over a private channel. A lost user-ID URL with no username or password set can't be recovered on a server you don't run.
 
 ### Can I stop others from creating accounts on my instance? {#can-i-prevent-others-from-creating-wallets-on-my-instance}
 

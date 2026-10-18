@@ -52,7 +52,7 @@ Then open `http://127.0.0.1:5000/first_install` (on a server, through your [reve
 
 ### Keep extensions across re-creates {#extensions-path}
 
-By default, installed Python extensions land in `/app/lnbits/extensions`, inside the container, and **disappear when the container is re-created** (for example on every image update). `LNBITS_EXTENSIONS_PATH=/app/data/extensions` puts them on the data volume instead: the code then lives in `data/extensions/extensions/<id>`, because LNbits always adds an `extensions` folder under that path. Set it from the first start. (Downloaded archives go to `data/zips/`, and `data/upgrades/` is a scratch folder emptied at every start; both are on the volume anyway.)
+By default, installed Python extensions land in `/app/lnbits/extensions`, inside the container, so the extracted code is lost when the container is re-created (for example on every image update). At the next start LNbits restores each installed extension from its archive in `data/zips/`, and downloads the archive again if it's missing (`app.py:274-409`). That needs network access and slows the start. `LNBITS_EXTENSIONS_PATH=/app/data/extensions` puts them on the data volume instead: the code then lives in `data/extensions/extensions/<id>`, because LNbits always adds an `extensions` folder under that path. Set it from the first start. (Downloaded archives go to `data/zips/`, and `data/upgrades/` is a scratch folder emptied at every start; both are on the volume anyway.)
 
 ## Docker Compose {#docker-compose}
 
