@@ -9,7 +9,7 @@ verified_with: v1.6.2
 
 # Introduction to LNbits
 
-LNbits is a free, open-source Lightning accounts system with an extension framework. It sits on top of one Lightning funding source and adds isolated user accounts and wallets, a REST API, and extensions.
+LNbits is a free, open-source (MIT) Lightning accounts system. It sits on top of one Lightning funding source and adds user accounts, wallets with their own balances and API keys, a REST API, and extensions.
 
 :::tip Current release: v1.6.2 (2026-09-18)
 These pages are checked against LNbits **v1.6.2**. v1.6.0 added sandboxed WASM extensions, Lightning Addresses in core wallets, a block explorer and the Bark funding source. v1.6.2 is a hotfix for the PostgreSQL backup. The official docs are at [docs.lnbits.com](https://docs.lnbits.com). This site is an independent, self-host-focused companion.
@@ -44,18 +44,14 @@ All wallets share the funding source's liquidity. LNbits is therefore **custodia
 
 ### Accounts and wallets {#multi-wallet-system}
 
-Create as many wallets as you like, each with its own balance. Typical uses:
-
-- Separate wallets for projects, shops or family members
-- A community wallet service, where each member has their own account
-- Testing against FakeWallet without real funds
+An account can hold as many wallets as it likes, each with its own balance, keys and history. A wallet can also be shared with another user on the same instance, with view, receive or send rights.
 
 ### Funding sources {#24-funding-sources}
 
 LNbits v1.6.2 ships about 25 funding source classes ([wallets/\_\_init\_\_.py](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/wallets/__init__.py)):
 
 - **Your own node:** LND (REST and gRPC), Core Lightning (CLNRest and RPC), Eclair, Phoenixd
-- **Services and SDKs:** Blink, ZBD, OpenNode, Strike, NWC (Nostr Wallet Connect), Spark L2, Bark, Boltz, Breez
+- **Services and other backends:** Blink, ZBD, OpenNode, Strike, NWC (Nostr Wallet Connect), Spark L2, Bark, Boltz
 - **Nested:** another LNbits instance
 - **Testing:** FakeWallet. A fresh install starts on **VoidWallet**, which can't send or receive.
 
@@ -81,11 +77,7 @@ The official registry lists about 60 Python extensions, and a separate registry 
 
 ## Use Cases {#use-cases}
 
-- **Merchants:** take Lightning payments in a shop with TPoS. See the official [merchant stack](https://docs.lnbits.com/merchant-stack/).
-- **Developers:** create invoices, check payments and receive webhooks through the [API](/docs/api/overview).
-- **Communities:** give each member their own wallet on a shared node.
-- **Content creators:** sell access with paywalls and pay links.
-- **Educators:** teach Lightning with FakeWallet, with no real funds at risk.
+Shops (TPoS, see the official [merchant stack](https://docs.lnbits.com/merchant-stack/)), apps that create invoices and receive webhooks through the [API](/docs/api/overview), community wallets on a shared node, paywalls and pay links, and teaching with FakeWallet. More in [Use Cases](/docs/guides/use-cases).
 
 ## Architecture Overview {#architecture-overview}
 

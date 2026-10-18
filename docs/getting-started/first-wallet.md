@@ -9,7 +9,7 @@ verified_with: v1.6.2
 
 # Create Your First Wallet
 
-This guide covers wallets in LNbits v1.6.2: how to create them, what their keys can do, and how to receive, send and share. It assumes you've finished the [Quick Start](/docs/getting-started/quick-start). For a UI walkthrough with screenshots, see the official [wallets and accounts guide](https://docs.lnbits.com/guide/core/wallets-and-accounts).
+Wallets in LNbits v1.6.2: creating them, what their two keys can do, and receiving, sending and sharing. It assumes you've finished the [Quick Start](/docs/getting-started/quick-start). For a UI walkthrough with screenshots, see the official [wallets and accounts guide](https://docs.lnbits.com/guide/core/wallets-and-accounts).
 
 ## Understanding wallets {#understanding-wallets}
 
@@ -32,9 +32,9 @@ Open your instance (for example `http://localhost:5000`) and log in. On a defaul
 
 ### Step 2: Add a wallet {#step-2-create-new-wallet}
 
-1. Click **Add a new wallet**.
+1. Click **Add a new wallet** in the sidebar.
 2. Enter a name, for example "Personal".
-3. Confirm.
+3. Click **Add wallet**.
 
 New accounts start with one wallet, named after `LNBITS_DEFAULT_WALLET_NAME` (default "LNbits wallet").
 
@@ -58,14 +58,14 @@ Incoming and outgoing payments, with their status (pending, success or failed), 
 
 ### API keys {#api-keys}
 
-The **Node URL, API keys and API docs** panel shows the wallet ID and both keys.
+The **Node URL, API keys and API docs** panel shows the wallet ID and both keys, and has the **Reset Keys** button ([lnbits-wallet-api-docs.vue](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/templates/components/lnbits-wallet-api-docs.vue)).
 
 ## API keys explained {#api-keys-explained}
 
 | | Admin key | Invoice key |
 |---|---|---|
 | Create invoices | ✓ | ✓ |
-| Read the balance (`GET /api/v1/wallet`) | ✓ | ✓ |
+| Read the name and balance (`GET /api/v1/wallet`); the admin key also gets the wallet `id` | ✓ | ✓ |
 | List the payment history (`GET /api/v1/payments`) | ✓ | ✓ |
 | **Send payments** | ✓ | — |
 | Change wallet settings, share the wallet | ✓ | — |
@@ -108,26 +108,26 @@ curl -X POST https://lnbits.example.com/api/v1/payments \
 
 - **Always send `"out": false`** for an invoice. When `out` is missing, it defaults to `true`, which means paying ([models/payments.py L254-276](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/models/payments.py#L254-L276)).
 - `amount` is in `unit`, which defaults to `sat`. Other units are fiat currency codes.
-- `webhook` is called when the invoice is paid. By default, LNbits refuses webhook URLs that point at private or non-global IPs, or that use a bare IP instead of a domain (`LNBITS_CALLBACK_ALLOW_PRIVATE_IPS`, `LNBITS_CALLBACK_URL_RULES`). See [Webhooks](/docs/api/webhooks).
+- `webhook` is called when the invoice is paid. By default, LNbits refuses webhook URLs that point at private or non-global IPs, or that use a bare IP instead of a domain (`LNBITS_CALLBACK_ALLOW_PRIVATE_IPS`, `LNBITS_CALLBACK_URL_RULES`). A refused URL makes the invoice request itself fail ([services/payments.py L191](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/services/payments.py#L191)). See [Webhooks](/docs/api/webhooks).
 
 ## Sending payments {#sending-payments}
 
 ### Pay an invoice {#pay-an-invoice}
 
 1. Click **Send**.
-2. Click **Paste Request** and paste the BOLT11 invoice (or scan a QR code).
+2. Paste the BOLT11 invoice into the text box (or scan a QR code), then click **Read**.
 3. Check the amount and description.
-4. Confirm.
+4. Click **Send**.
 
 ### Pay an LNURL or Lightning Address {#pay-via-lnurl}
 
-Paste the LNURL or Lightning Address in the same **Send** dialog, enter the amount, and confirm. By default, LNbits fetches LNURLs only over HTTPS from public addresses.
+Paste the LNURL or Lightning Address in the same **Send** box, click **Read**, enter the amount, and confirm. By default, LNbits fetches LNURLs only over HTTPS from public addresses (plus `.onion` through Tor) ([services/lnurl.py L435-460](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/services/lnurl.py#L435-L460)).
 
 ## Wallet settings {#wallet-settings}
 
 ### Customize the wallet {#customize-your-wallet}
 
-In the wallet's settings you can change the **name**, **icon**, **color** and **fiat currency**, and pin the wallet. If the instance allows it, you can also set a **Lightning Address**. Through the API, these are `PATCH /api/v1/wallet` with the admin key.
+In the wallet's settings you can change the **name**, **icon**, **color** and **fiat currency**, and pin the wallet. You can also set a **Lightning Address** if the admin has turned on `LNBITS_ALLOW_CUSTOM_WALLET_LIGHTNING_ADDRESSES` (off by default), and the instance may charge for it. Through the API, these are `PATCH /api/v1/wallet` with the admin key ([wallet_api.py L165-199](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/wallet_api.py#L165-L199)).
 
 ### Multiple wallets {#multiple-wallets}
 
@@ -149,7 +149,7 @@ You can share a wallet with another user on the same instance, with chosen permi
 
 ### Accept a shared wallet {#accept-a-shared-wallet}
 
-The invited user sees the invitation in their account and accepts or declines it. An accepted share shows up in their wallet list. The owner can revoke it at any time. See [Shared Wallets](/docs/guides/shared-wallets).
+The invited user sees a **Wallet Invite** badge next to **Add a new wallet** in their sidebar. They open it and accept or reject the invitation. An accepted share shows up in their wallet list. The owner can revoke it at any time. See [Shared Wallets](/docs/guides/shared-wallets).
 
 ## Wallet security {#wallet-security}
 
@@ -169,7 +169,7 @@ The invited user sees the invitation in their account and accepts or declines it
 
 ### Key rotation {#key-rotation}
 
-If a key may have leaked, rotate it yourself. Open the wallet's settings and click **Reset Keys**, or call `PUT /api/v1/wallet/reset/{wallet_id}` while logged in ([wallet_api.py L133-147](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/wallet_api.py#L133-L147)). Both keys are replaced, so update every integration that used them.
+If a key may have leaked, rotate it yourself. Click **Reset Keys** in the **Node URL, API keys and API docs** panel, or call `PUT /api/v1/wallet/reset/{wallet_id}` while logged in ([wallet_api.py L133-147](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/wallet_api.py#L133-L147)). Both keys are replaced, so update every integration that used them.
 
 ## Deleting a wallet {#deleting-a-wallet}
 
@@ -199,6 +199,8 @@ curl https://lnbits.example.com/api/v1/payments -H "X-Api-Key: <invoice key>"
 ```
 
 ### Pay an invoice {#create-payment}
+
+This spends from the wallet, so it needs the admin key.
 
 ```bash
 curl -X POST https://lnbits.example.com/api/v1/payments \

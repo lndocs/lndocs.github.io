@@ -15,9 +15,9 @@ LNbits v1.6.2 needs **Python 3.10, 3.11 or 3.12** (`requires-python = ">=3.10,<3
 
 | Method | Best for | Notes |
 |---|---|---|
-| [uv](#uv-installation) | Most self-hosters, and developers | Upstream's recommended method |
+| [uv](#uv-installation) | Most self-hosters, and developers | Replaces Poetry; upstream calls it "recommended for developers" |
 | [Docker](#docker-installation) | Servers, and Compose stacks | Pin the `v1.6.2` tag |
-| [AppImage](#appimage-linux) | A quick try on a Linux desktop | A single file |
+| [AppImage](#appimage-linux) | A quick try on a Linux desktop | A single file; upstream's first option |
 | [Nix](#nix-installation) | Nix and NixOS users | A flake in the repo |
 | [Install script](#install-script-debianubuntu) | A one-shot Debian/Ubuntu setup | Tracks `main`, binds `0.0.0.0` |
 | [Poetry](#poetry-installation-legacy) | Existing Poetry setups | Legacy, replaced by uv |
@@ -40,7 +40,8 @@ git clone https://github.com/lnbits/lnbits.git
 cd lnbits
 git checkout v1.6.2
 
-# Install the dependencies, including the optional extras (Breez, migration tool)
+# Install the dependencies, including the optional extras
+# (breez, liquid for Boltz, and migration for the SQLite-to-PostgreSQL tool)
 uv sync --all-extras --python 3.12
 
 # Configuration
@@ -50,13 +51,13 @@ cp .env.example .env
 uv run lnbits
 ```
 
-LNbits listens on `http://127.0.0.1:5000` (from `HOST` and `PORT`). To reach it from another machine, use `uv run lnbits --host 0.0.0.0 --port 5000`, ideally behind a reverse proxy with TLS ([Reverse Proxy](/docs/deployment/reverse-proxy)).
+LNbits listens on `http://127.0.0.1:5000` (from `HOST` and `PORT`). `.env.example` sets `AUTH_HTTPS_ONLY=true`, which works for `http://localhost` in Chrome and Firefox but not over plain HTTP from another machine. To reach the server from elsewhere, put it behind a reverse proxy with TLS ([Reverse Proxy](/docs/deployment/reverse-proxy)). For a LAN test only, run `uv run lnbits --host 0.0.0.0` with `AUTH_HTTPS_ONLY=false` in `.env`.
 
 Other useful commands:
 
 ```bash
 uv run lnbits --reload        # auto-reload, for development
-uv run lnbits-cli --help      # CLI: superuser, db, users, extensions, encrypt
+uv run lnbits-cli --help      # CLI: superuser, db, users, extensions, encrypt, decrypt
 uv run lnbits-cli superuser   # print the Super User ID
 ```
 
@@ -72,7 +73,7 @@ uv sync --all-extras
 uv run lnbits
 ```
 
-Back up the `data/` folder first. After an update, use **Extensions → Update All** in the UI to bring the extensions up to date.
+Back up the `data/` folder first. After an update, bring the extensions up to date: either click **Update** on each extension that shows "Update … available!" on the **Extensions** page, or stop LNbits and run `uv run lnbits-cli extensions update --all-extensions` ([commands.py L326-410](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/commands.py#L326-L410)). v1.6.2's UI has no "Update All" button, although upstream's guide mentions one.
 
 ## Docker {#docker-installation}
 
@@ -97,7 +98,7 @@ docker logs -f lnbits
 - **`/app/.env`** is the file LNbits reads in the container.
 - **`LNBITS_EXTENSIONS_PATH=/app/data/extensions`** keeps installed Python extensions on the volume. Without it they live inside the container, and LNbits has to download them again whenever the container is recreated (upstream's advice: [installation.md](https://github.com/lnbits/lnbits/blob/v1.6.2/docs/guide/installation.md)).
 - **`-p 127.0.0.1:5000:5000`** publishes the port on loopback only, for a reverse proxy on the same host. Use `-p 5000:5000` only on a trusted network, and see `FORWARDED_ALLOW_IPS` in [Security](/docs/configuration/security).
-- The image ignores `HOST` and `PORT`. Its start command uses its own host and port variables, which default to `0.0.0.0` and `5000` ([Dockerfile](https://github.com/lnbits/lnbits/blob/v1.6.2/Dockerfile)).
+- The image ignores `HOST`, `PORT` and `FORWARDED_ALLOW_IPS`. Its start command is `lnbits --port $LNBITS_PORT --host $LNBITS_HOST --forwarded-allow-ips='*'`, with `LNBITS_PORT=5000` and `LNBITS_HOST=0.0.0.0` ([Dockerfile L40-45](https://github.com/lnbits/lnbits/blob/v1.6.2/Dockerfile#L40-L45)). That's why the port is published on loopback only.
 - The image runs as root, so the data folder needs no `chown`.
 
 ### Docker Compose {#with-docker-compose}
@@ -165,11 +166,15 @@ chmod +x lnbits.sh
 - installs the build packages and uv;
 - clones the repo into `./lnbits` and checks out **`main`** (not a tag);
 - copies `.env.example` to `.env`;
-- runs `uv sync --python 3.12 --all-extras`;
+- runs `uv sync --python 3.12 --all-extras --no-dev`;
 - **opens the port in ufw**, if ufw is installed;
 - starts LNbits in the foreground on **`0.0.0.0:5000`**.
 
-It doesn't set up a systemd service. For that, see [systemd](/docs/deployment/systemd). Because it listens on all interfaces, set `FIRST_INSTALL_TOKEN` or finish `/first_install` right away.
+It doesn't set up a systemd service. For that, see [systemd](/docs/deployment/systemd).
+
+:::warning Before you run it on a reachable server
+The script listens on all interfaces over plain HTTP, so whoever opens `/first_install` first becomes the Super User. Set `FIRST_INSTALL_TOKEN` (or firewall the port) first, and finish `/first_install` right away. Because `.env.example` sets `AUTH_HTTPS_ONLY=true`, logging in from another machine over `http://` bounces you back to the login page until you add TLS or set `AUTH_HTTPS_ONLY=false`.
+:::
 
 ## Poetry (legacy) {#poetry-installation-legacy}
 
@@ -211,16 +216,15 @@ Then open `http://127.0.0.1:5000` in a browser. On a fresh install it redirects 
 ### Port already in use {#port-already-in-use}
 
 ```bash
-sudo lsof -i :5000
-# Source install: another port
-uv run lnbits --port 5001
-# Docker: map another host port
-docker run -d --name lnbits -p 127.0.0.1:5001:5000 -v "$PWD/data:/app/data" lnbits/lnbits:v1.6.2
+sudo lsof -i :5000            # what holds the port
+uv run lnbits --port 5001     # source install: use another port
 ```
+
+In Docker, change only the host side of the mapping, for example `-p 127.0.0.1:5001:5000`, and keep the other options from the `docker run` above.
 
 ### Logged straight back out after login {#logged-out-after-login}
 
-You're on plain HTTP with `AUTH_HTTPS_ONLY=true` (the default), so the browser drops the `Secure` session cookie. Use HTTPS, or for a test box set `AUTH_HTTPS_ONLY=false` in `.env` and restart. See [Authentication](/docs/configuration/authentication).
+You're on plain HTTP with `AUTH_HTTPS_ONLY=true` (the default), so the browser won't send the `Secure` session cookie back. Use HTTPS, or for a test box set `AUTH_HTTPS_ONLY=false` in `.env` and restart. `AUTH_HTTPS_ONLY` is env-only, so `.env` works even with the Admin UI on. See [Authentication](/docs/configuration/authentication).
 
 ### Python version errors {#python-version-issues}
 
