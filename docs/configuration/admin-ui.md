@@ -1,330 +1,228 @@
 ---
 sidebar_position: 4
 title: Admin UI
-description: Configure and use the LNbits Admin User Interface
+description: The LNbits v1.6.2 Admin UI, first-install flow, Super User and admin roles, and what the UI controls
+last_update:
+  date: 2026-10-18
+verified_with: v1.6.2
 ---
 
 # Admin UI
 
-The Admin UI provides a web interface for managing your LNbits instance.
+The Admin UI is the browser interface for running an LNbits instance. It's **on by default** (`LNBITS_ADMIN_UI=true`, [settings.py L1285](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/settings.py#L1285)). While it's on, most settings live in the database, and the database overrides `.env` (see [Settings precedence](/docs/configuration/environment)).
 
-## Enabling Admin UI
-
-```bash
-LNBITS_ADMIN_UI=true
-```
-
-When enabled:
-- Settings are stored in database (not just .env)
-- Super User can manage instance via browser
-- Admin users can access management features
-
-## First-Time Setup
-
-### Super User Creation
-
-On first run with Admin UI enabled:
-
-1. LNbits generates a Super User ID
-2. ID is saved to `.super_user` file
-3. ID is logged to console
-
-```bash
-# View Super User ID
-cat .super_user
-
-# Or check logs
-docker logs lnbits | grep "Super User"
-```
-
-### Access the Admin UI
-
-1. Log in with the Super User ID
-2. Navigate to `/admin/ui` in the sidebar
-3. Complete initial configuration
-
-## User Roles
-
-### Super User
-
-The instance operator with full control:
-
-| Action | Super User |
-|--------|:----------:|
-| Change funding source | Yes |
-| Restart server | Yes |
-| Credit/debit accounts | Yes |
-| All admin actions | Yes |
-
-### Admin
-
-Instance administrators (can have multiple):
-
-| Action | Admin |
-|--------|:-----:|
-| Manage users | Yes |
-| Manage wallets | Yes |
-| Install extensions | Yes |
-| Change settings | Yes |
-| View audit logs | Yes |
-
-```bash
-# Designate admin users
-LNBITS_ADMIN_USERS=user_id_1,user_id_2
-```
-
-## Admin UI Sections
-
-### Dashboard
-
-Overview of instance health:
-- Total users and wallets
-- Funding source status
-- Recent activity
-- System alerts
-
-### Users
-
-Manage user accounts:
-- View all users
-- Search and filter
-- Edit user details
-- Delete users
-- Promote to admin
-
-### Wallets
-
-Manage all wallets:
-- View wallet balances
-- View transaction history
-- Delete wallets
-- Credit/debit (Super User)
-
-### Extensions
-
-Manage extensions:
-- View installed extensions
-- Install new extensions
-- Update extensions
-- Remove extensions
-- Set default extensions
-
-### Settings
-
-Configure instance settings:
-
-**Site Settings:**
-- Site title
-- Tagline
-- Description
-- Theme options
-
-**Security Settings:**
-- Allowed users
-- Blocked IPs
-- Rate limits
-- Auth methods
-
-**Funding Source:**
-- Select backend
-- Configure credentials
-- Test connection
-
-**Fees:**
-- Service fee percentage
-- Maximum fee
-- Fee wallet
-
-### Audit Log
-
-View admin actions (if enabled):
-
-```bash
-LNBITS_AUDIT_ENABLED=true
-```
-
-Logged events:
-- User creation/deletion
-- Wallet operations
-- Setting changes
-- Funding source changes
-- Extension management
-
-## Database vs Environment
-
-When Admin UI is enabled:
-
-| Setting | Source |
-|---------|--------|
-| Database settings | Admin UI |
-| Environment variables | `.env` file |
-| **Priority** | Database wins |
-
-To override database settings:
-
-```bash
-# Add _OVERRIDE suffix
-LNBITS_SITE_TITLE_OVERRIDE="My LNbits"
-```
-
-## Funding Source Management
-
-### Changing Backend (Super User Only)
-
-1. Go to Settings > Funding Source
-2. Select new backend
-3. Enter credentials
-4. Click "Test Connection"
-5. Save changes
-6. Confirm restart
-
-:::warning
-Changing funding source affects all wallets. Ensure:
-- Backup current state
-- Test new credentials
-- Schedule during low usage
+:::danger The Super User controls the funds
+The Super User can switch the funding source, credit any wallet with sats out of thin air, restart the server and download a backup of all data. Give that account a strong, unique password, use it only for the tasks that need it, and do day-to-day work as a regular admin.
 :::
 
-### Testing Connection
+## First start {#first-time-setup}
 
-Before saving, always test:
+### Super User creation {#super-user-creation}
 
-```
-[Test Connection] → Checking...
+On the first start with an empty settings table, LNbits does the following ([services/users.py L162-221](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/services/users.py#L162-L221)):
 
-✓ Connection successful
-  Balance: 1,234,567 sats
-  Node: 03abc...def
-```
+1. It creates a Super User account with a wallet, unless `SUPER_USER` names an existing account.
+2. It copies the editable settings from the environment into the database.
+3. It writes the Super User ID to `<data folder>/.super_user`. That's `./data/.super_user` for a source install and `/app/data/.super_user` in Docker.
+4. It switches to **first-install mode**. Every page request redirects to `/first_install` until the Super User has a username and password ([middleware.py L231-240](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/middleware.py#L231-L240)).
 
-## Server Management
+Open the instance in a browser. On `/first_install`, pick the Super User's username and password. LNbits saves them (`PUT /api/v1/auth/first_install`) and logs you in ([auth_api.py L601-633](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/auth_api.py#L601-L633)). Upstream's walkthrough with screenshots is on [docs.lnbits.com](https://docs.lnbits.com/guide/installation/first-setup).
 
-### Restart Server (Super User Only)
-
-1. Go to Settings > Server
-2. Click "Restart Server"
-3. Confirm action
-4. Wait for restart
-
-Server restarts are needed after:
-- Changing funding source
-- Installing some extensions
-- Major setting changes
-
-### Server Status
-
-View current status:
-- Uptime
-- Memory usage
-- Active connections
-- Background tasks
-
-## Extension Management
-
-### Install Extension
-
-1. Go to Extensions
-2. Click "Add Source" (if needed)
-3. Browse available extensions
-4. Click "Install"
-5. Enable for users
-
-### Extension Sources
-
-Add custom manifest URLs:
-
-```json
-{
-  "extensions": [
-    {
-      "id": "custom-ext",
-      "name": "Custom Extension",
-      "version": "1.0.0",
-      "url": "https://github.com/user/repo/releases/download/v1.0.0/custom-ext.zip"
-    }
-  ]
-}
-```
-
-### Default Extensions
-
-Set extensions for new users:
+:::warning Protect `/first_install` on a reachable server
+Until someone completes `/first_install`, **whoever reaches the page first becomes the Super User**. If the server is reachable by others while you set it up, set a token in `.env` before the first start:
 
 ```bash
-LNBITS_EXTENSIONS_DEFAULT_INSTALL=tpos,lnurlp,boltz
+# Generate a token with: openssl rand -hex 16, then paste it here
+FIRST_INSTALL_TOKEN=
 ```
 
-Or via Admin UI:
-1. Go to Settings > Extensions
-2. Select default extensions
-3. Save
-
-## User Management
-
-### Credit/Debit Account (Super User Only)
-
-Adjust wallet balances without Lightning:
-
-1. Go to Wallets
-2. Find the wallet
-3. Click "Credit/Debit"
-4. Enter amount (+ or -)
-5. Add reason (logged)
-6. Confirm
-
-:::warning
-Use sparingly. Creates internal transactions without Lightning backing.
+The page then asks for that token. If you later change `FIRST_INSTALL_TOKEN` to a value different from the one that was confirmed, the next start logs "First install token is changed. Resetting admin settings.", creates a new Super User account and runs `/first_install` again ([services/users.py L188-192](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/services/users.py#L188-L192)). Upstream added this reset in v1.5.3 so that a lost Super User can be replaced.
 :::
 
-### Delete User
-
-1. Go to Users
-2. Find the user
-3. Click "Delete"
-4. Confirm (wallets are soft-deleted)
-
-## Best Practices
-
-### Security
-
-1. **Limit Super Users** - Only one trusted operator
-2. **Use Admin sparingly** - Only trusted staff
-3. **Enable audit logs** - Track all admin actions
-4. **Regular backups** - Before major changes
-
-### Operations
-
-1. **Test in staging** - Before production changes
-2. **Schedule maintenance** - Low-usage windows
-3. **Monitor after changes** - Watch for issues
-4. **Document changes** - Keep changelog
-
-### Access
+### Finding the Super User ID {#find-super-user-id}
 
 ```bash
-# Restrict admin access by IP (via reverse proxy)
-# Nginx example:
-location /admin {
-    allow 192.168.1.0/24;
+# Source install
+uv run lnbits-cli superuser
+
+# Docker (the file sits in the mounted data folder)
+docker exec lnbits cat /app/data/.super_user
+
+# Or read the file directly
+cat data/.super_user
+```
+
+The start-up log says only "Admin UI is enabled. run `uv run lnbits-cli superuser` to get the superuser". It doesn't print the ID. `lnbits-cli superuser-url` prints a `?usr=` link, but that link can't log you in: the Super User and admins must log in with a username and password ([commands.py L109-127](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/commands.py#L109-L127)).
+
+### Where things are {#access-the-admin-ui}
+
+After login, admins get extra entries in the sidebar ([generic.py L190-196](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/generic.py#L190-L196)):
+
+| Path | Page |
+|---|---|
+| `/admin` | Settings (the tabs below) |
+| `/users` | Users and their wallets |
+| `/audit` | Audit log |
+| `/node` | Node management (when `LNBITS_NODE_UI=true`) |
+| `/admin/extensions/wasm` | Installed WASM extensions and their limits |
+| `/extensions` | Install and manage extensions |
+
+## Roles {#user-roles}
+
+| Capability | Admin | Super User |
+|---|---|---|
+| Open the Admin UI, change instance settings | ✓ | ✓ |
+| Manage users and wallets, read the audit log | ✓ | ✓ |
+| Install and manage extensions | ✓ | ✓ |
+| **Change the funding source** | — | ✓ |
+| **Credit or debit a wallet** (`PUT /users/api/v1/balance`) | — | ✓ |
+| **Grant or revoke admin rights** | — | ✓ |
+| **Generate password-reset keys** | — | ✓ |
+| **Restart the server, reset settings to defaults** | — | ✓ |
+| **Download the backup** (`GET /admin/api/v1/backup`) | — | ✓ |
+
+Sources: [admin_api.py](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/admin_api.py), [user_api.py](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/user_api.py) (`check_super_user` on these routes), and the `isSuperUser` checks in the Funding tab. Upstream's role guide is [docs.lnbits.com: Super User](https://docs.lnbits.com/guide/core/super-user).
+
+### Super User {#super-user}
+
+There is exactly one Super User, and it exists only while the Admin UI is on. Admins can't demote or delete it. To make a different account the Super User, set `SUPER_USER` in `.env` to that account's ID and restart. You need shell access to the host to do this.
+
+### Admins {#admin}
+
+The Super User makes an account an admin on the **Users** page, or you list the admins in `LNBITS_ADMIN_USERS`. Before first start that's in `.env`; afterwards it's in **Settings → Users**. An admin account must have a username and password, or every admin route refuses it ([decorators.py L390-405](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/decorators.py#L390-L405)).
+
+## What the Admin UI controls {#admin-ui-sections}
+
+The tabs on `/admin` in v1.6.2 ([templates/pages/admin.vue](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/templates/pages/admin.vue)):
+
+| Tab | What it holds |
+|---|---|
+| Funding | The active funding source and its credentials (Super User only), retries, fee reserve, invoice expiry, payment timeouts, watchdog, node UI switches |
+| Fiat providers | Stripe, PayPal, Square, Revolut |
+| Users | Admin users, allowed users, account creation, activation codes |
+| Server | Service fees, Lightning Address options, currencies, payment limits, wallet limits |
+| Exchange Providers | The price aggregator and the fallback rate providers |
+| Extensions | Manifests (Python and WASM), admin-only and default-enabled extensions |
+| WASM runtime / WASM limits | Resource limits for WASM extensions |
+| Notifications | Telegram, email and Nostr notifications for admins |
+| Security | Auth methods, token expiry, SSO credentials, Nostr URLs, base URL, IP block and allow lists, rate limiter, callback and LNURL URL rules |
+| Site Customisation | Title, tagline, description, themes, logo, ads |
+| Audit | Audit log settings |
+| Assets | Upload size and type limits |
+| Block Explorer | The Electrum-based block explorer (v1.6.0+) |
+
+The toolbar has **Save**, **Restart server** (Super User only), **Download database backup** and **Reset to defaults** (Super User only).
+
+## Database versus environment {#database-vs-environment}
+
+With the Admin UI on:
+
+- **Editable settings** (all of the tabs above) are read from the database. Changing them in `.env` does nothing after the first start.
+- **Env-only settings** (`HOST`, `PORT`, `FORWARDED_ALLOW_IPS`, `AUTH_HTTPS_ONLY`, `AUTH_SECRET_KEY`, `LNBITS_DATA_FOLDER`, `LNBITS_DATABASE_URL`, `FIRST_INSTALL_TOKEN`, `SUPER_USER`, `LNBITS_ALLOWED_FUNDING_SOURCES`, `LNBITS_EXTENSIONS_DEFAULT_INSTALL` and so on) still come from the environment.
+
+To make `.env` count again:
+
+| Method | Effect |
+|---|---|
+| **Reset to defaults** (Super User) | Deletes the stored settings except the Super User, the funding-source settings and the web-push keys, then restarts ([crud/settings.py L78-87](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/crud/settings.py#L78-L87)). |
+| `lnbits-cli delete-settings` (LNbits stopped) | Deletes all stored settings. The next start copies them from the environment again and, unless `SUPER_USER` is set, creates a new Super User and runs `/first_install`. |
+| `LNBITS_ADMIN_UI=false` | LNbits ignores the stored settings and uses `.env` only. There is no Super User and no Admin UI. |
+
+There is no `_OVERRIDE` suffix or any other per-variable override.
+
+## Funding source {#funding-source-management}
+
+### Changing the backend (Super User only) {#changing-backend-super-user-only}
+
+1. Open **Settings → Funding**.
+2. Pick the funding source and fill in its fields. Only the classes in `LNBITS_ALLOWED_FUNDING_SOURCES` are offered.
+3. Click **Save**. The notice says "Restart required!".
+4. Click **Restart server**.
+
+If the backend fails to connect after `FUNDING_SOURCE_MAX_RETRIES` attempts (4), LNbits falls back to VoidWallet and logs why.
+
+### Checking the connection {#testing-connection}
+
+The Funding tab shows the active funding source class. Admins can also call `GET /api/v1/status`, which returns the funding source class and its balance for admin accounts ([api.py L46-60](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/api.py#L46-L60)).
+
+## Server management {#server-management}
+
+- **Restart:** the **Restart server** button, Super User only (`GET /admin/api/v1/restart`).
+- **Background tasks:** `GET /admin/api/v1/monitor` lists the running tasks (admin).
+- **Health:** `GET /api/v1/health` returns `server_time` and `up_time`, with no authentication.
+- **Backup:** see [Database → Backups](/docs/configuration/database).
+
+## Extensions {#extension-management}
+
+Admins install extensions from **Extensions** in the sidebar. Users can then enable them for their own account. For the full flow, see [Installing Extensions](/docs/extensions/installing).
+
+:::warning Python extensions aren't sandboxed
+A Python extension runs inside the LNbits process, with full access to the database, the funding source and the files. Installing one is the same as running its code on your server. Only install Python extensions you trust. WASM extensions (v1.6.0+) run in a sandbox with permissions that you grant at install time. The WASM registry is on by default and isn't vetted.
+:::
+
+Related settings:
+
+- `LNBITS_EXTENSIONS_DEFAULT_INSTALL` (env-only): extensions the **server** installs at startup.
+- `LNBITS_USER_DEFAULT_EXTENSIONS` (editable): extensions **enabled for new users**.
+- `LNBITS_ADMIN_EXTENSIONS` (editable): extensions only admins can use.
+- `LNBITS_EXTENSIONS_MANIFESTS` / `LNBITS_WASM_EXTENSIONS_MANIFESTS`: the registries. A manifest's entries need `id`, `name`, `version`, `archive` and `hash`. For the format, see [Extension Manifest](/docs/extensions/manifest) and [core/models/extensions.py](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/models/extensions.py).
+
+## User management {#user-management}
+
+### Credit or debit a wallet (Super User only) {#creditdebit-account-super-user-only}
+
+The Super User sees a credit/debit control next to the balance on the wallet page and on the Users page. It calls `PUT /users/api/v1/balance` with `{id, amount}`, where a negative amount debits. There is no reason field, but an admin notification is sent when notifications are configured.
+
+:::caution
+Crediting creates balance that isn't backed by your node. On a real funding source, credit only to correct errors.
+:::
+
+### Delete a user {#delete-user}
+
+On the **Users** page, deleting a user deletes their wallets and then the account. Admins can't delete the Super User, and only the Super User can delete another admin ([user_api.py L163-188](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/user_api.py#L163-L188)).
+
+## Best practices {#best-practices}
+
+### Security {#security}
+
+- Set `FIRST_INSTALL_TOKEN` on any server that others can reach during setup.
+- Use the Super User only for funding, credits, restarts and backups. Give operators admin accounts.
+- Keep the [Security](/docs/configuration/security) checklist in view.
+
+### Operations {#operations}
+
+- Before you change the funding source, download a backup.
+- After an upgrade, review **Settings**. New settings appear with their defaults, and old stored values stay as they were.
+
+### Restricting access {#access}
+
+Consider limiting the admin pages and APIs to trusted IPs at the reverse proxy. The UI calls the APIs itself, so restrict the pages and their API prefixes together:
+
+```nginx
+# Inside your LNbits server block
+location ~ ^/(admin|users|audit|node)(/|$) {
+    allow 192.168.1.0/24;   # your admin network
     deny all;
-    proxy_pass http://lnbits:5000;
+    proxy_pass http://127.0.0.1:5000;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
 }
 ```
 
-## Disabling Admin UI
+This regex also covers `/admin/api/v1/...` and `/users/api/v1/...`. Admin actions that go through `/api/v1/...` (for example extension installs) aren't covered.
 
-To disable and revert to environment-only config:
+## Disabling the Admin UI {#disabling-admin-ui}
 
-```bash
+```bash title=".env"
 LNBITS_ADMIN_UI=false
 ```
 
-:::note
-Existing database settings remain but are ignored. Environment variables take over.
-:::
+Restart LNbits. All settings then come from `.env`, there is no Super User, and the admin pages are gone. The settings already stored in the database are ignored, not deleted.
 
-## See Also
+## See Also {#see-also}
 
-- [Security Configuration](/docs/configuration/security)
 - [Environment Variables](/docs/configuration/environment)
-- [Extensions](/docs/extensions/overview)
+- [Authentication](/docs/configuration/authentication)
+- [Security](/docs/configuration/security)
+- [Official Admin dashboard guide](https://docs.lnbits.com/guide/admin-dashboard)
