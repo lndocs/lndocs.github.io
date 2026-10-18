@@ -30,10 +30,11 @@ The auth settings on this page are editable. With the Admin UI on (the default),
 | `oidc-auth` | Any OpenID Connect provider, such as Zitadel or Authentik | Off |
 
 ```bash title=".env (first start only)"
-AUTH_ALLOWED_METHODS=username-password
-# Several methods, comma-separated
+# Several methods, comma-separated. The default is username-password alone.
 AUTH_ALLOWED_METHODS=username-password,nostr-auth-nip98,google-auth
 ```
+
+On a running instance, pick the methods under **Allowed authorization methods** in **Settings → Security**; the provider fields appear once a method is selected ([security.vue](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/templates/components/admin/security.vue)).
 
 :::caution Upgraded instances
 The `username-password`-only default applies to new installs. An instance first started before v1.6.0 probably has `user-id-only` stored in its database settings, because the Admin UI copied the old default at first start. After upgrading, check **Settings → Security** in the Admin UI rather than assuming the new default. See [Upgrading](/docs/guides/upgrading).
@@ -79,7 +80,7 @@ Put any instance that holds real funds behind HTTPS and leave this setting `true
 
 ## Username and password {#usernamepassword}
 
-The default method. Passwords are hashed with bcrypt ([models/users.py](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/models/users.py)). After 5 failed attempts, logins for that account are throttled. The cooldown starts at 60 seconds and doubles each time, up to 15 minutes ([auth_api.py L83-130](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/auth_api.py#L83-L130)).
+The default method. Passwords must be 8 to 50 characters ([models/users.py L319-364](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/models/users.py#L319-L364)) and are hashed with bcrypt ([models/users.py](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/models/users.py)). After 5 failed attempts, logins for that account are throttled. The cooldown starts at 60 seconds and doubles each time, up to 15 minutes ([auth_api.py L83-130](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/auth_api.py#L83-L130)).
 
 ### Registration {#registration}
 

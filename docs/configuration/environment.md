@@ -21,7 +21,12 @@ LNbits v1.6.2 has about 430 settings. This page covers the ones most operators n
 - **Env-only settings** are always read from the environment. They cover the server, paths, the database, the auth key, the first-install token and the allowed funding sources, and they're marked **env-only** below.
 - **Editable settings** are everything else: the funding source, fees, auth methods, branding, rate limits, notifications and so on. LNbits copies them from the environment into the database **once**, on the first start, and reads them from the database after that. Changing them in `.env` then has **no effect** ([services/users.py L162-178](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/services/users.py#L162-L178)).
 
-To change an editable setting on a running instance, use the [Admin UI](/docs/configuration/admin-ui) at `/admin`. To make `.env` count again, you can set `LNBITS_ADMIN_UI=false`, which also removes the Super User. Or you can stop LNbits and run `lnbits-cli delete-settings`. That command wipes the stored settings, so the next start copies them from the environment again ([commands.py L129-135](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/commands.py#L129-L135)).
+To change an editable setting on a running instance, use the [Admin UI](/docs/configuration/admin-ui) at `/admin`. To make `.env` count again, you have two options:
+
+- Set `LNBITS_ADMIN_UI=false`. The admin pages then return 503, and admin rights come only from `SUPER_USER` and `LNBITS_ADMIN_USERS` in `.env`.
+- Stop LNbits and run `lnbits-cli delete-settings`. It wipes the stored settings ([commands.py L129-135](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/commands.py#L129-L135)), so the next start copies them from the environment again. Unless `SUPER_USER` is set, that start also creates a **new** Super User and sends you through `/first_install` again ([services/users.py L198-212](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/services/users.py#L198-L212)).
+
+The **Reset to defaults** button in the Admin UI doesn't do this. It resets editable settings to the built-in defaults in `settings.py`, not to `.env`. The same applies to settings that a new release adds: they start at their built-in default, whatever `.env` says.
 :::
 
 When a setting has more than one source, the highest one in this list wins:
@@ -102,7 +107,7 @@ Editable ([settings.py L467-497](https://github.com/lnbits/lnbits/blob/v1.6.2/ln
 
 | Variable | Default | Notes |
 |---|---|---|
-| `LNBITS_CALLBACK_URL_RULES` | one regex that allows `http(s)://` plus a domain name | The origin of a webhook or LNURL callback must match a rule. A bare IP address doesn't match the default. |
+| `LNBITS_CALLBACK_URL_RULES` | one regex that allows `http(s)://` plus a domain name | The origin of a webhook or LNURL callback must match a rule ([helpers.py L263-293](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/helpers.py#L263-L293)). A bare IP address or a single-label host doesn't match the default. |
 | `LNBITS_CALLBACK_ALLOW_PRIVATE_IPS` | `false` | LNbits refuses webhooks that resolve to private or non-global IPs. |
 | `LNBITS_LNURL_ALLOW_PRIVATE_IPS` | `false` | The same rule for LNURL requests. |
 | `LNBITS_LNURL_REDIRECT_URL_RULES` | empty | LNbits follows an LNURL HTTP redirect only to an origin that matches a rule. Empty means it follows none. |
@@ -140,7 +145,7 @@ Editable. With the Admin UI on, the Super User sets these under **Settings → F
 |---|---|---|
 | `LNBITS_BACKEND_WALLET_CLASS` | `VoidWallet` | VoidWallet can't create or pay invoices. For testing, use `FakeWallet` ([settings.py L821](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/settings.py#L821)). |
 | `LNBITS_FUNDING_SOURCE_PAY_INVOICE_WAIT_SECONDS` | `5` | How long LNbits waits before it reports an outgoing payment as pending. |
-| `FUNDING_SOURCE_MAX_RETRIES` | `4` | How many times LNbits retries the connection at startup before it falls back to VoidWallet. |
+| `FUNDING_SOURCE_MAX_RETRIES` | `4` | How many times LNbits retries the connection at startup before it falls back to VoidWallet. It's set on the Funding tab. |
 | `LIGHTNING_INVOICE_EXPIRY` | `3600` | In seconds. |
 | `FAKE_WALLET_SECRET` | `ToTheMoon1` | The secret FakeWallet signs its test invoices with. |
 | `LNBITS_DENOMINATION` | `sats` | The unit name FakeWallet uses. |
@@ -249,7 +254,7 @@ Editable. These send notifications to the **admins** (server start and stop, set
 
 ## Exchange rates {#exchange-rates}
 
-Editable ([settings.py L398-466](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/settings.py#L398-L466)). You configure the providers in **Settings → Exchange Providers**.
+Editable ([settings.py L398-466](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/settings.py#L398-L466)). You configure the providers in **Settings → Exchanges**.
 
 | Variable | Default | Notes |
 |---|---|---|
