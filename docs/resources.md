@@ -1,175 +1,121 @@
 ---
 sidebar_position: 99
 title: Resources
-description: Tutorials, guides, podcasts, and community resources for LNbits
+description: Official sites, tutorials, podcasts and community resources for LNbits
+last_update:
+  date: 2026-10-18
+verified_with: v1.6.2
 ---
 
 # Resources
 
-Community tutorials, guides, podcasts, and tools for learning LNbits.
+Official sites, community tutorials, podcasts and tools for LNbits. Every link here was checked on 2026-10-18. Community guides were written for older versions, so check them against the current docs before following them step by step.
 
-## Official Resources
+## Official {#official-resources}
 
-- [LNbits Website](https://lnbits.com) - Official homepage
-- [Demo Instance](https://demo.lnbits.com) - Try LNbits without installing
-- [GitHub Repository](https://github.com/lnbits/lnbits) - Source code
-- [Extensions Registry](https://extensions.lnbits.com) - Browse extensions
-- [LNbits Shop](https://shop.lnbits.com) - Hardware and merchandise
+- [docs.lnbits.com](https://docs.lnbits.com): the official LNbits documentation. Its source is the [`lnbits/docs`](https://github.com/lnbits/docs) repository.
+- [news.lnbits.com](https://news.lnbits.com): release announcements and project news
+- [community.lnbits.com](https://community.lnbits.com): the community forum
+- [my.lnbits.com](https://my.lnbits.com): hosted LNbits, a paid SaaS run by LNbits Inc.
+- [lnbits.com](https://lnbits.com): project homepage
+- [demo.lnbits.com](https://demo.lnbits.com): public demo instance. Don't keep real funds there.
+- [github.com/lnbits/lnbits](https://github.com/lnbits/lnbits): source code, issues and releases
+- [extensions.lnbits.com](https://extensions.lnbits.com): extension repository
+- [shop.lnbits.com](https://shop.lnbits.com): official hardware and DIY kits
 
-## Video Tutorials
+## Video and podcasts {#video-tutorials}
 
-### LNbits YouTube Channel
+The [LNbits YouTube channel](https://youtube.com/@lnbits) has intro videos, extension demos and hardware walkthroughs.
 
-The [official LNbits YouTube channel](https://youtube.com/@lnbits) features:
-- **Basics of LNbits** - 4 one-minute intro videos
-- Extension tutorials and demos
-- Hardware project walkthroughs
-- Conference presentations
-
-### Podcast Episodes
-
-| Episode | Host | Topics |
+| Episode | Show | Topics |
 |---------|------|--------|
-| [Lightning Junkies E51](https://lightningjunkies.net/lnbits-extending-the-lightning-stack-with-ben-arc-lnj051/) | Lightning Junkies | Extensions, Lightning stack |
-| [Stephan Livera E407](https://stephanlivera.com/episode/407/) | Stephan Livera | Origin story, hardware hacking |
-| [Bitcoin Takeover S16E17](https://bitcoin-takeover.com/s16-e-17-ben-arc-lnbits-v1-lightning-network/) | Bitcoin Takeover | V1 release, future of Lightning |
-| [Go Full Crypto E90](https://gofullcrypto.podbean.com/e/90-ben-arc-on-lnbits/) | Go Full Crypto | Makers, hobbyists, DIY projects |
-| [Bitcoin Takeover S14E5](https://bitcoin-takeover.com/s14-e5-ben-arc-on-lnbits-and-nostr/) | Bitcoin Takeover | LNbits and Nostr integration |
+| [Episode 407](https://www.stephanlivera.com/407) | Stephan Livera Podcast | Origin story, hardware hacking |
+| [S16 E17](https://bitcoin-takeover.com/s16-e-17-ben-arc-lnbits-v1-lightning-network/) | Bitcoin Takeover | The v1 release |
+| [S14 E5](https://bitcoin-takeover.com/s14-e5-ben-arc-on-lnbits-and-nostr/) | Bitcoin Takeover | LNbits and Nostr |
 
-## Written Guides
+## Written guides {#written-guides}
 
-### Getting Started
+### Getting started {#getting-started}
 
 | Guide | Author | Description |
 |-------|--------|-------------|
-| [Getting Started with LNbits](https://darthcoin.substack.com/p/getting-started-lnbits) | DarthCoin | Comprehensive beginner guide |
-| [LNbits Server Installation](https://ereignishorizont.xyz/lnbits-server/en/) | Ereignishorizont | In-depth server setup |
+| [Getting Started with LNbits](https://darthcoin.substack.com/p/getting-started-lnbits) | DarthCoin | Beginner guide |
+| [Build Your Own LNbits Server](https://darthcoin.substack.com/p/build-your-own-lnbits-app-server) | DarthCoin | Node and LNbits bundle |
 | [VPS Setup Guide](https://github.com/TrezorHannes/vps-lnbits) | TrezorHannes | Cloud VPS deployment |
-| [VPS with WireGuard VPN](https://github.com/TrezorHannes/vps-lnbits-wg) | TrezorHannes | Secure VPN setup |
+| [VPS with WireGuard](https://github.com/TrezorHannes/VPS-LNBits-Wireguard) | TrezorHannes | Home node exposed through a VPS tunnel |
 
-### Business & Merchants
+### Business and merchants {#business--merchants}
 
 | Guide | Author | Description |
 |-------|--------|-------------|
-| [LNbits for Small Merchants](https://darthcoin.substack.com/p/lnbits-for-small-merchants) | DarthCoin | Merchant adoption guide |
+| [LNbits for Small Merchants](https://darthcoin.substack.com/p/lnbits-for-small-merchants) | DarthCoin | Merchant adoption |
 | [The Bank of LNbits](https://darthcoin.substack.com/p/the-bank-of-lnbits) | DarthCoin | Running a community bank |
-| [LNbits SaaS for Schools](https://darthcoin.substack.com/p/lnbits-saas-a-solution-for-schools) | DarthCoin | Educational use cases |
-| [Private Banks Over Lightning](https://darthcoin.substack.com/p/bitcoin-private-banks-over-lightning) | DarthCoin | Advanced banking setups |
+| [LNbits SaaS for Schools](https://darthcoin.substack.com/p/lnbits-saas-a-solution-for-schools) | DarthCoin | Education |
+| [Private Banks over Lightning](https://darthcoin.substack.com/p/bitcoin-private-banks-over-lightning) | DarthCoin | Advanced banking setups |
 
-### Extensions & Features
+:::caution Custodial
+Running LNbits for other people makes you their custodian. Read [Security](/docs/configuration/security) before you offer wallets to anyone else.
+:::
 
-| Guide | Author | Description |
-|-------|--------|-------------|
-| [Streamer Copilot Setup](https://darthcoin.substack.com/p/lnbits-streamer-copilot) | DarthCoin | Streaming tips integration |
-| [NOSTR Market Setup](https://darthcoin.substack.com/p/lnbits-nostr-market) | DarthCoin | Nostr marketplace |
-| [LNURL QR Codes](https://kuroba.substack.com/p/how-to-receive-bitcoin-lightning) | Kuroba | Static payment links |
-| [LightningTipBot + LNbits](https://massmux.com/howto-complete-lightningtipbot-lnbits-setup-vps/) | Massmux | Telegram bot integration |
-
-### Hardware & NFC
+### Extensions {#extensions--features}
 
 | Guide | Author | Description |
 |-------|--------|-------------|
-| [NFC Vouchers & Boltcards](https://plebtag.com/write) | PlebTag | NFC card programming |
-| [Build Your Own LNbits Server](https://darthcoin.substack.com/p/build-your-own-lnbits-app-server) | DarthCoin | Bundle node setup |
+| [Streamer Copilot Setup](https://darthcoin.substack.com/p/lnbits-streamer-copilot) | DarthCoin | Streaming tips |
+| [Nostr Market Setup](https://darthcoin.substack.com/p/lnbits-nostr-market) | DarthCoin | Nostr marketplace |
 
-## Developer Resources
+### Hardware and NFC {#hardware--nfc}
 
-### Libraries & SDKs
+| Guide | Author | Description |
+|-------|--------|-------------|
+| [Write PlebTags](https://plebtag.com/write-tags/) | PlebTag | Programming NFC tags |
+| [Ereignishorizont tutorials](https://ereignishorizont.xyz) | Ereignishorizont | ATM, POS and switch builds |
 
-| Library | Language | Repository |
-|---------|----------|------------|
-| lnbits (npm) | JavaScript | [MiguelMedeiros/lnbits-js](https://github.com/MiguelMedeiros/lnbits-js) |
-| pylnbits | Python | [lightningames/pylnbits](https://github.com/lightningames/pylnbits) |
+## Developers {#developer-resources}
 
-See the [SDKs & Libraries](/docs/api/sdks) page for usage examples.
+- **API explorer:** every instance serves Swagger at `/docs`, for example [demo.lnbits.com/docs](https://demo.lnbits.com/docs).
+- **Extension template:** [lnbits/example](https://github.com/lnbits/example), with the [Extension Development](/docs/extensions/development) guide.
+- **[Lightning Decoder](https://lightningdecoder.com/):** decodes BOLT11 invoices, LNURLs and Lightning Addresses.
 
-### API Documentation
+### Client libraries {#libraries--sdks}
 
-- [Swagger API Docs](https://demo.lnbits.com/docs) - Interactive API explorer
-- [Lightning Decoder](https://lightningdecoder.com/) - LNURL/Invoice decoder tool
+| Library | Language | Repository | Status |
+|---------|----------|------------|--------|
+| lnbits (npm) | JavaScript | [MiguelMedeiros/lnbits-js](https://github.com/MiguelMedeiros/lnbits-js) | Unmaintained since 2021 |
+| pylnbits | Python | [lightningames/pylnbits](https://github.com/lightningames/pylnbits) | Archived |
 
-### Extension Development
+Neither tracks the v1.6 API. Calling the REST API directly is usually simpler. See [SDKs & Libraries](/docs/api/sdks).
 
-- [Example Extension](https://github.com/lnbits/example) - Starter template
-- [Extension Development Guide](/docs/extensions/development) - Full documentation
+## Hardware projects {#hardware-projects}
 
-## Hardware Projects
+- [MakerBits Telegram](https://t.me/makerbits): the hardware builders' group
+- [LNbits Shop](https://shop.lnbits.com): pre-built hardware and kits
+- Typical projects: TPoS and LNPoS terminals, the FOSSA ATM, Bolt Cards, Bitcoin Switch relays and Gerty displays. Most DIY builds use ESP32 boards.
 
-### Maker Resources
+## Apps that connect to LNbits {#powered-by-lnbits}
 
-| Resource | Description |
-|----------|-------------|
-| [MakerBits Telegram](https://t.me/makerbits) | Hardware builders community |
-| [LNbits Shop](https://shop.lnbits.com) | Pre-built hardware |
-| [Ereignishorizont Tutorials](https://ereignishorizont.xyz) | ATM, POS, switch guides |
+With the LNDhub extension, you can import an LNbits wallet into apps that support LNDhub accounts. The extension's README names [Alby](https://getalby.com), BitBanana, [BlueWallet](https://bluewallet.io) and [Zeus](https://zeusln.com).
 
-### Project Types
+The admin QR code gives the app full spending access to that wallet.
 
-- **Point of Sale**: TPoS terminals, beertaps, vending machines
-- **ATMs**: Fossa ATM, LightningATM
-- **NFC Devices**: Boltcards, PlebTags, NFC rings
-- **Display Devices**: Gerty, BTClock, Nerdminer
-- **Switches**: Bitcoin-activated relays, LED controllers
+### WordPress {#wordpress-plugins}
 
-### Hardware Platforms
+- [LNbits – Bitcoin Onchain and Lightning Payment Gateway](https://wordpress.org/plugins/lnbits-bitcoin-onchain-and-lightning-payment-gateway/) for WooCommerce
 
-| Platform | Use Case |
-|----------|----------|
-| ESP32 / TTGO T-Display | Most DIY projects |
-| Raspberry Pi | ATMs, full nodes |
-| M5Stack | Compact displays |
-| Arduino | Simple switches |
+## Community {#community}
 
-## Powered by LNbits
+- [community.lnbits.com](https://community.lnbits.com): forum
+- [Telegram: LNbits](https://t.me/lnbits): main chat
+- [Telegram: MakerBits](https://t.me/makerbits): hardware projects
+- [GitHub Discussions](https://github.com/lnbits/lnbits/discussions): questions and ideas
+- [news.lnbits.com](https://news.lnbits.com): announcements
 
-### Wallets & Apps
+The [LNbits GitHub wiki](https://github.com/lnbits/lnbits/wiki) has older community material, including printable flyers.
 
-- [Alby](https://getalby.com) - Browser extension wallet
-- [Zeus](https://zeusln.app) - Mobile wallet (via LNDhub)
-- [BlueWallet](https://bluewallet.io) - Mobile wallet (via LNDhub)
-- [Rayito](https://rayito.io) - Simple accountless wallet
+## Removed links {#removed-links}
 
-### Services
+These links used to be on this page and no longer work: Lightning Junkies episode 51 and rayito.io (domains gone), lightsats.com (TLS failure), the Go Full Crypto episode on Podbean and the Kuroba LNURL guide (pages removed), and LightningTipBot (decommissioned).
 
-- [Satdress](https://github.com/nbd-wtf/satdress) - Federated Lightning addresses
-- [LN VPN](https://lnvpn.net) - Lightning-only VPN
-- [Lightsats](https://lightsats.com) - Bitcoin onboarding platform
-- [BTC Map](https://btcmap.org) - Bitcoin merchant map
+## Contributing {#contributing}
 
-### Bots
-
-- [LightningTipBot](https://t.me/LightningTipBot) - Telegram tips
-- [BitcoinVoucherBot](https://t.me/BitcoinVoucherBot) - Voucher purchases
-- [LN Watchbot](https://t.me/lnwatchbot) - Node monitoring
-
-### WordPress Plugins
-
-- [LNbits – Bitcoin Lightning and Onchain Payment Gateway](https://wordpress.org/plugins/lnbits-bitcoin-onchain-and-lightning-payment-gateway/) - WooCommerce
-
-## Community
-
-### Chat & Support
-
-- [Telegram: LNbits](https://t.me/lnbits) - Main community chat
-- [GitHub Discussions](https://github.com/lnbits/lnbits/discussions) - Q&A and ideas
-- [Telegram: MakerBits](https://t.me/makerbits) - Hardware projects
-
-### Social Media
-
-- [Twitter/X: @lnbits](https://twitter.com/lnbits) - Official updates
-- [Twitter/X: @arcbtc](https://twitter.com/arcbtc) - Ben Arc (creator)
-
-## Flyers & Educational Materials
-
-Available in multiple languages:
-- [English Flyer](https://github.com/lnbits/lnbits/wiki)
-- [German Flyer](https://github.com/lnbits/lnbits/wiki)
-- [Italian Flyer](https://github.com/lnbits/lnbits/wiki)
-- [Polish Flyer](https://github.com/lnbits/lnbits/wiki)
-- [Spanish Flyer](https://github.com/lnbits/lnbits/wiki)
-
-## Contributing
-
-Want to add a resource?
-- Submit a PR to [this documentation](https://github.com/lndocs/lndocs.github.io)
-- Share in the [LNbits Telegram](https://t.me/lnbits)
+To add a resource, open a PR against [this site's repository](https://github.com/lndocs/lndocs.github.io) or suggest it in the [LNbits Telegram](https://t.me/lnbits). To improve the official docs, use [`lnbits/docs`](https://github.com/lnbits/docs).
