@@ -54,8 +54,8 @@ An admin can also charge users to enable an extension (pay to enable), and a reg
 
 ## Where extension routes live {#routes}
 
-- A Python extension's router is mounted under `/<ext_id>`. Its page is at `/<ext_id>/`, and by convention its API is at `/<ext_id>/api/v1/...`. TPoS, for example, serves `GET /tpos/api/v1/tposs`.
-- A WASM extension's pages are at `/ext/<ext_id>/...` and its API routes at `/api/v1/ext/{ext_id}/{path}`.
+- A Python extension's routes live under `/<ext_id>`. The extension's own router sets that prefix, and LNbits reads the first path segment as the extension id. Its page is at `/<ext_id>/`, and by convention its API is at `/<ext_id>/api/v1/...`. TPoS, for example, serves `GET /tpos/api/v1/tposs`.
+- A WASM extension's pages are at `/ext` plus the paths it declares, by convention `/ext/<ext_id>/...`. Its API routes are at `/api/v1/ext/{ext_id}/{path}`.
 
 Every extension's API shows up in your instance's OpenAPI docs at `/docs`.
 
