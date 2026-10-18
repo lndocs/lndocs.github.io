@@ -26,14 +26,14 @@ data/
 ├── database.sqlite3        # core: accounts, wallets, payments, settings
 ├── ext_<id>.sqlite3        # one per Python extension, e.g. ext_tpos.sqlite3
 ├── .lnbits_auth_key        # generated if AUTH_SECRET_KEY is empty
-├── .super_user             # the Super User ID (Admin UI on)
+├── .super_user             # the Super User ID, written only while the Admin UI is on
 ├── logs/
 ├── wasm_extensions/        # WASM extensions (v1.6.0+)
 ├── zips/                   # downloaded Python extension archives
 └── upgrades/               # scratch space for extension upgrades, emptied at startup
 ```
 
-A backup that copies only `database.sqlite3` misses every extension's data. Copy the whole folder.
+A backup that copies only `database.sqlite3` misses every extension's data. Copy the whole folder. The installed Python extension code isn't in it: it lives in `<LNBITS_EXTENSIONS_PATH>/extensions`, which is `lnbits/extensions` in a source checkout by default, and LNbits can download it again.
 
 SQLite is a single-writer database. It's fine for one person or a small group. For many concurrent users, or many extensions writing at once, use PostgreSQL.
 

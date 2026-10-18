@@ -98,10 +98,10 @@ For Caddy and Apache, see [Reverse Proxy](/docs/deployment/reverse-proxy).
 - **Docker:** the image's command hard-codes `--forwarded-allow-ips='*'` ([Dockerfile](https://github.com/lnbits/lnbits/blob/v1.6.2/Dockerfile)), so setting the variable in the container does nothing. Publish the port on `127.0.0.1` only (as above), so that only the proxy can reach the container. If you need a narrower value, override the command, for example in Compose:
 
   ```yaml
-  command: ["sh", "-c", "uv --offline run --no-sync lnbits --port $LNBITS_PORT --host $LNBITS_HOST --forwarded-allow-ips=172.17.0.1"]
+  command: ["uv", "--offline", "run", "--no-sync", "lnbits", "--port", "5000", "--host", "0.0.0.0", "--forwarded-allow-ips", "172.17.0.1"]
   ```
 
-  The proxy address is whatever the container sees (here, the default Docker bridge gateway). Check yours.
+  The proxy address is whatever the container sees (here, the default Docker bridge gateway on the default network; a Compose network has its own gateway). Check yours with `docker network inspect`. Don't copy the image's `sh -c "... $LNBITS_PORT ..."` form into Compose: Compose substitutes `$LNBITS_PORT` from the host environment before the container starts, so it comes out empty.
 
 ### Firewall {#firewall-rules}
 
@@ -158,7 +158,7 @@ See [Authentication](/docs/configuration/authentication).
 
 ## Accounts {#accounts}
 
-`POST /api/v1/account` creates an account and a wallet with **no credentials and no authentication**, and returns the wallet with its keys. The only thing that gates it is `LNBITS_ALLOW_NEW_ACCOUNTS` ([api.py L82-85](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/api.py#L82-L85)). On a private instance:
+`POST /api/v1/account` creates an account and a wallet with **no credentials and no authentication**, and returns the wallet with its keys ([api.py L82-85](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/api.py#L82-L85)). Only `LNBITS_ALLOW_NEW_ACCOUNTS`, `LNBITS_ALLOWED_USERS` and `LNBITS_MAX_USERS` stop it ([services/users.py L43-59](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/services/users.py#L43-L59)). On a private instance:
 
 ```bash
 # Editable: Settings → Users
@@ -203,11 +203,11 @@ See [Installing Extensions](/docs/extensions/installing).
 | ACL API token | The paths and methods its ACL grants | Grant the minimum. **Write access to `/api/v1/auth` exposes the account's wallets with their admin keys.** |
 | Session JWT | The whole account | Short lifetime, HTTPS only. |
 
-A wallet's keys are rotated with **Reset Keys** in the wallet's settings, or `PUT /api/v1/wallet/reset/{wallet_id}` as the logged-in owner ([wallet_api.py L133-147](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/wallet_api.py#L133-L147)). Integrations that use the old keys stop working. See [API Authentication](/docs/api/authentication).
+A wallet's keys are rotated with **Reset Keys** in the wallet's **Node URL, API keys and API docs** panel, or `PUT /api/v1/wallet/reset/{wallet_id}` as the logged-in owner ([wallet_api.py L133-147](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/wallet_api.py#L133-L147)). Integrations that use the old keys stop working. See [API Authentication](/docs/api/authentication).
 
 ## Funding source {#funding-source-security}
 
-With the Admin UI on, the funding-source credentials are stored in the LNbits database's settings. Protect database dumps and backups accordingly.
+With the Admin UI on, the funding-source credentials are stored in the LNbits database's settings. Every admin, not only the Super User, can read them through `GET /admin/api/v1/settings`. Protect database dumps and backups accordingly, and keep the admin list short.
 
 ### LND {#lnd-security}
 
@@ -244,7 +244,7 @@ The Alby shared wallet closed on 2025-01-04. LNPay and LN.tips are gone, c-light
 
 ## Limits {#limits}
 
-Editable, in **Settings → Server** ([settings.py L478-490](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/settings.py#L478-L490)):
+Editable, in **Settings → Payments** ([settings.py L478-490](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/settings.py#L478-L490)):
 
 ```bash
 LNBITS_WALLET_LIMIT_MAX_BALANCE=0            # sats per wallet, 0 = off
@@ -281,9 +281,10 @@ gpg -d lnbits-data-2026-10-18.tar.gz.gpg | tar xzf -
 
 ## Admin accounts {#admin-security}
 
-- Use the Super User only for its reserved tasks (funding source, credits, restarts, backups). Give operators admin accounts.
+- Use the Super User only for its reserved tasks (funding source, credits, restarts, backups). Make someone an admin only if you'd trust them with the node: the UI hides the funding source from admins, but the settings API lets any admin change it, its credentials and the admin list.
 - Give every admin a strong, unique password.
 - Restrict `/admin`, `/users`, `/audit` and `/node`, and their API prefixes, to trusted IPs at the proxy (see [Admin UI](/docs/configuration/admin-ui)).
+- Treat every admin as able to read and change the funding-source credentials. The UI hides them from admins, but `GET`, `PUT` and `PATCH /admin/api/v1/settings` don't ([admin_api.py L70-105](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/admin_api.py#L70-L105)).
 - Crediting a wallet creates sats that your node doesn't back. Only the Super User can do it, and an admin notification goes out when notifications are configured.
 
 ## Monitoring {#monitoring--alerts}
@@ -297,7 +298,7 @@ gpg -d lnbits-data-2026-10-18.tar.gz.gpg | tar xzf -
 curl -fsS https://lnbits.example.com/api/v1/health
 ```
 
-**Privacy:** by default, fiat price lookups go to `https://price.lnbits.com` (`LNBITS_PRICE_AGGREGATOR_ENABLED=true`). Turn it off in **Settings → Exchange Providers** if you'd rather not make those calls.
+**Privacy:** by default, fiat price lookups go to `https://price.lnbits.com` (`LNBITS_PRICE_AGGREGATOR_ENABLED=true`). Turn it off in **Settings → Exchanges** if you'd rather not make those calls.
 
 ## Incident response {#incident-response}
 
