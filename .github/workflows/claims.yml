@@ -1,0 +1,42 @@
+name: API claims
+
+# Starts the pinned LNbits image with FakeWallet on the runner and checks the
+# behaviour the docs describe. Nothing here touches a real Lightning node.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  claims:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Start LNbits (FakeWallet)
+        run: |
+          V=$(cat scripts/lnbits-version.txt)
+          echo "LNBITS_VERSION=$V" >> "$GITHUB_ENV"
+          docker run -d --name lnbits -p 127.0.0.1:5000:5000 \
+            -e LNBITS_BACKEND_WALLET_CLASS=FakeWallet \
+            -e FAKE_WALLET_SECRET="$(openssl rand -hex 16)" \
+            "lnbits/lnbits:$V"
+          for i in $(seq 1 60); do
+            curl -sf http://127.0.0.1:5000/api/v1/health && exit 0
+            sleep 2
+          done
+          docker logs lnbits | tail -50
+          exit 1
+      - name: Check claims
+        run: node scripts/ci-claims.mjs
+      - name: LNbits logs
+        if: failure()
+        run: docker logs lnbits | tail -100
