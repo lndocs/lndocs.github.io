@@ -110,7 +110,8 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
-          editUrl: 'https://github.com/lnbits/lnbits-docs/tree/main/',
+          editUrl: 'https://github.com/lndocs/lndocs.github.io/tree/main/',
+          showLastUpdateTime: true,
           routeBasePath: 'docs',
         },
         blog: false,
@@ -137,8 +138,8 @@ const config: Config = {
     },
 
     announcementBar: {
-      id: 'star_us',
-      content: '⚡ LNbits v1.4.1 is out! <a href="https://github.com/lnbits/lnbits/releases">Check the release notes</a>',
+      id: 'verified_v1_6_2',
+      content: 'Independent LNbits docs, checked against <a href="https://github.com/lnbits/lnbits/releases/tag/v1.6.2">v1.6.2</a>. Official docs: <a href="https://docs.lnbits.com">docs.lnbits.com</a>',
       backgroundColor: '#ffd93d',
       textColor: '#1a1a2e',
       isCloseable: true,
@@ -177,7 +178,9 @@ const config: Config = {
           label: 'Community',
           position: 'left',
           items: [
+            {label: 'Official docs', href: 'https://docs.lnbits.com'},
             {label: 'Telegram', href: 'https://t.me/lnbits'},
+            {label: 'Forum', href: 'https://community.lnbits.com'},
             {label: 'GitHub Discussions', href: 'https://github.com/lnbits/lnbits/discussions'},
             {type: 'html', value: '<hr style="margin: 0.5rem 0;">'},
             {label: 'Demo Instance', href: 'https://demo.lnbits.com'},
@@ -218,12 +221,15 @@ const config: Config = {
           items: [
             {label: 'Telegram', href: 'https://t.me/lnbits'},
             {label: 'GitHub Discussions', href: 'https://github.com/lnbits/lnbits/discussions'},
-            {label: 'Twitter', href: 'https://twitter.com/lnlounge'},
+            {label: 'Forum', href: 'https://community.lnbits.com'},
+            {label: 'X', href: 'https://x.com/lnbits'},
           ],
         },
         {
           title: 'Resources',
           items: [
+            {label: 'Official docs', href: 'https://docs.lnbits.com'},
+            {label: 'News', href: 'https://news.lnbits.com'},
             {label: 'Demo Instance', href: 'https://demo.lnbits.com'},
             {label: 'LNbits Shop', href: 'https://shop.lnbits.com'},
             {label: 'my.lnbits.com', href: 'https://my.lnbits.com'},
@@ -231,7 +237,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} LNbits. Built with Docusaurus. Licensed under MIT.`,
+      copyright: `Independent documentation for <a href="https://lnbits.com">LNbits</a>, verified against v1.6.2. Content MIT licensed. Built with Docusaurus.`,
     },
 
     prism: {

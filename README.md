@@ -1,41 +1,45 @@
-# Website
+# lndocs
 
-This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
+Independent documentation for [LNbits](https://github.com/lnbits/lnbits), published at https://lndocs.github.io. The official docs live at https://docs.lnbits.com.
 
-## Installation
+Every page is checked against a pinned LNbits release, set in `scripts/lnbits-version.txt` (currently v1.6.2).
 
-```bash
-yarn
-```
-
-## Local Development
+## Develop
 
 ```bash
-yarn start
+npm ci
+npm start        # dev server
+npm run build    # fails on broken links or anchors
 ```
 
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
+## Snippet gate
 
-## Build
+`scripts/check-snippets.mjs` checks the docs against the pinned release's source code, which it parses as text and never runs. It checks:
+
+- env vars against `lnbits/settings.py`;
+- `/api/v1/...` paths and methods against the core routes;
+- funding source classes and login method names;
+- copy-paste install targets against `scripts/install-allowlist.json`, where each entry records a verified owner.
 
 ```bash
-yarn build
+git clone --depth 1 -b v1.6.2 https://github.com/lnbits/lnbits.git /tmp/lnbits
+LNBITS_SRC=/tmp/lnbits node scripts/check-snippets.mjs
 ```
 
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
+CI runs the gate on every PR (`.github/workflows/snippets.yml`). It becomes blocking once the repository variable `SNIPPETS_STRICT=1` is set. To exempt an intentional "wrong" example, put `{/* snippet:skip: reason */}` on the line before its fence.
 
-## Deployment
+## Page front matter
 
-Using SSH:
+Re-verified pages carry:
 
-```bash
-USE_SSH=true yarn deploy
+```yaml
+last_update:
+  date: 2026-10-18
+verified_with: v1.6.2
 ```
 
-Not using SSH:
+## Bumping LNbits
 
-```bash
-GIT_USER=<Your GitHub username> yarn deploy
-```
-
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+1. Change `scripts/lnbits-version.txt`.
+2. Run the gate.
+3. Fix the pages it flags, re-verify them, update `verified_with`, and merge.
