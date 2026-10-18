@@ -1,24 +1,27 @@
 ---
 sidebar_position: 1
 title: Contributing
-description: How to contribute to LNbits
+description: How to contribute code, docs and extensions to LNbits
+last_update:
+  date: 2026-10-18
+verified_with: v1.6.2
 ---
 
 # Contributing to LNbits
 
-We welcome contributions to LNbits! Here's how to get involved.
+LNbits is MIT-licensed and developed on GitHub at [lnbits/lnbits](https://github.com/lnbits/lnbits). This page covers the workflow. The official docs at [docs.lnbits.com](https://docs.lnbits.com) are the reference for end users.
 
-## Ways to Contribute
+## Ways to contribute {#ways-to-contribute}
 
-- **Code**: Fix bugs, add features
-- **Documentation**: Improve docs, add examples
-- **Extensions**: Create new extensions
-- **Testing**: Report bugs, test PRs
-- **Community**: Help users, answer questions
+- **Code:** fix bugs and add features in core
+- **Extensions:** build Python or WASM extensions (see [Extension Development](/docs/extensions/development))
+- **Documentation:** the official docs live in the [`lnbits/docs`](https://github.com/lnbits/docs) repository; this site lives in [`lndocs/lndocs.github.io`](https://github.com/lndocs/lndocs.github.io)
+- **Testing:** reproduce bugs and test open pull requests
+- **Community:** help others on [Telegram](https://t.me/lnbits) and the [community forum](https://community.lnbits.com)
 
-## Getting Started
+## Getting started {#getting-started}
 
-### Fork & Clone
+### Fork and clone {#fork--clone}
 
 ```bash
 # Fork on GitHub, then:
@@ -27,74 +30,62 @@ cd lnbits
 git remote add upstream https://github.com/lnbits/lnbits.git
 ```
 
-### Development Setup
+The default branch is **`dev`**. Branch from it and open pull requests against it. `main` only moves at releases.
+
+### Development setup {#development-setup}
 
 ```bash
-# Install UV
 curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Install dependencies
 uv sync --all-extras --dev
+npm install
 
-# Install pre-commit hooks
-make install-pre-commit-hook
-
-# Run in development mode
-make dev
+make install-pre-commit-hook   # black, ruff, prettier and basic hygiene hooks
+make dev                       # uv run lnbits --reload
 ```
 
-## Making Changes
+The full walkthrough is in [Development Setup](/docs/development/setup).
 
-### Create a Branch
+## Making changes {#making-changes}
+
+### Create a branch {#create-a-branch}
 
 ```bash
-git checkout -b feature/my-feature
+git fetch upstream
+git checkout -b fix/my-change upstream/dev
 ```
 
-### Code Quality
+### Code quality {#code-quality}
 
 ```bash
-# Format code
-make format
-
-# Run linting
-make lint
-
-# Type checking
-make mypy
-
-# All checks
-make all
+make format   # rewrite files: prettier, black, ruff --fix
+make check    # mypy, pyright, black/ruff/prettier checks, bundle check
 ```
 
-### Testing
+`make all` is `format` followed by `check`. It does **not** run tests. There is no `make lint` target.
+
+### Testing {#testing}
 
 ```bash
-# Run tests
-make test
-
-# With coverage
-make test-cov
+make test-unit
+make test-api
+make test-wallets
 ```
 
-## Pull Request Process
+Coverage is collected on every pytest run (`--cov=lnbits` in `pyproject.toml`), so there is no separate coverage target. `make test` also runs the regtest suite, which needs the Docker regtest stack. See [Testing](/docs/development/testing).
 
-1. **Ensure tests pass**: `make all`
-2. **Update documentation** if needed
-3. **Write clear commit messages**
-4. **Create PR** against `main` branch
-5. **Respond to feedback**
+## Pull request process {#pull-request-process}
 
-### PR Guidelines
+1. Run `make format`, `make check` and the test targets that cover your change.
+2. Add or update tests for new behaviour.
+3. Update documentation if behaviour or settings change.
+4. Open the PR against **`dev`**, with a clear description and links to related issues.
+5. Respond to review feedback.
 
-- Keep PRs focused on one change
-- Reference related issues
-- Include tests for new features
-- Update docs if needed
+Upstream's [`AGENTS.md`](https://github.com/lnbits/lnbits/blob/v1.6.2/AGENTS.md) asks for small, surgical changes, no new dependencies without approval, and extra care around payments, balances, keys, authentication and migrations. It is written for AI agents but applies to anyone.
 
-## Commit Messages
+### Commit messages {#commit-messages}
 
-Follow conventional commits:
+Upstream commits mostly use conventional prefixes:
 
 ```
 feat: add new payment feature
@@ -104,27 +95,17 @@ refactor: simplify payment logic
 test: add tests for extension
 ```
 
-## Code Style
+## Security issues {#security-issues}
 
-- Use Black for formatting
-- Follow PEP 8
-- Type hints required
-- Docstrings for public functions
+Don't open a public issue, discussion or PR for a vulnerability. Report it privately through [GitHub's vulnerability reporting](https://github.com/lnbits/lnbits/security/advisories/new), as described in [`SECURITY.md`](https://github.com/lnbits/lnbits/blob/v1.6.2/SECURITY.md). Security fixes are provided for the current release and the `dev` branch only.
 
-## Extension Contributions
+## Community {#community}
 
-Extensions can be:
-- Added to official registry
-- Hosted independently
+- **Telegram:** [t.me/lnbits](https://t.me/lnbits)
+- **Forum:** [community.lnbits.com](https://community.lnbits.com)
+- **Issues:** [github.com/lnbits/lnbits/issues](https://github.com/lnbits/lnbits/issues), for bug reports and feature requests
+- **Discussions:** [github.com/lnbits/lnbits/discussions](https://github.com/lnbits/lnbits/discussions), for questions and ideas
 
-See [Extension Development](/docs/extensions/development).
+## License {#license}
 
-## Community
-
-- **Telegram**: [t.me/lnbits](https://t.me/lnbits)
-- **GitHub Issues**: Bug reports, feature requests
-- **Discussions**: Questions, ideas
-
-## License
-
-Contributions are licensed under MIT.
+LNbits is released under the [MIT License](https://github.com/lnbits/lnbits/blob/v1.6.2/LICENSE). Contributions are accepted under the same license.
