@@ -9,7 +9,11 @@
     "curl:https://astral.sh/uv/install.sh": "Astral, the official uv installer",
     "curl:https://fly.io/install.sh": "Fly.io, the official flyctl installer",
     "npm:lnbits": "MiguelMedeiros/lnbits-js. Community package, last published 2022",
-    "pip:pylnbits": "bitkarrot/pylnbits. Community package"
+    "pip:pylnbits": "bitkarrot/pylnbits. Community package",
+    "wp:lnbits-bitcoin-onchain-and-lightning-payment-gateway": "WordPress.org, profile bclnbits (LNbits); v1.0.4 checked 2026-10-18",
+    "docker:acinq/phoenixd": "Docker Hub, ACINQ (official phoenixd image)",
+    "docker:elementsproject/lightningd": "Docker Hub, Blockstream/ElementsProject (official CLN image)",
+    "curl:https://install.python-poetry.org": "python-poetry org, the official Poetry installer"
   },
   "denied": {}
 }

@@ -2,7 +2,9 @@
 // Checks docs snippets against the pinned LNbits release (scripts/lnbits-version.txt):
 //   env      KEY=value assignments and `LNBITS_*`-style names must be settings fields
 //   api      /api/v1/... paths (and methods, when given) must be real core routes
-//   install  pip/npm/npx/docker/git clone/curl|sh targets must be in install-allowlist.json
+//   wallet   LNBITS_BACKEND_WALLET_CLASS values and `XWallet` names must be real funding source classes
+//   auth     AUTH_ALLOWED_METHODS values and `*-auth` strings must be AuthMethods values
+//   install  pip/npm/npx/docker run/image:/git clone/curl|sh/wordpress.org targets must be in install-allowlist.json
 // Upstream source is parsed as text, never executed. Point LNBITS_SRC at a checkout of the
 // pinned tag (CI downloads the tag tarball). Opt out per fence with `{/* snippet:skip: reason */}`
 // or `<!-- snippet:skip: reason -->` on the line before it.
@@ -45,6 +47,13 @@ for (const f of fs.readdirSync(viewsDir).filter((f) => f.endsWith('.py'))) {
   }
 }
 
+// Funding source classes (LNBITS_BACKEND_WALLET_CLASS values) and login method strings.
+const walletClasses = new Set(
+  [...fs.readFileSync(path.join(src, 'lnbits/wallets/__init__.py'), 'utf8').matchAll(/\b([A-Z][A-Za-z0-9]*Wallet)\b/g)].map((m) => m[1]),
+);
+const authBlock = settingsPy.match(/class AuthMethods\(Enum\):([\s\S]*?)\n\n/)[1];
+const authMethods = new Set([...authBlock.matchAll(/=\s*"([a-z0-9-]+)"/g)].map((m) => m[1]));
+
 const allow = JSON.parse(fs.readFileSync(path.join(root, 'scripts/install-allowlist.json'), 'utf8'));
 
 // ---- scan ---------------------------------------------------------------
@@ -73,11 +82,14 @@ function routeOk(method, p) {
 }
 
 const findings = [];
+const unverified = []; // pages without `verified_with` front matter
+const dockerArgFlags = new Set(['-p', '-v', '-e', '-w', '-u', '-l', '--name', '--env-file', '--network', '--restart', '--user', '--entrypoint', '--mount', '--label', '--platform', '--publish', '--volume', '--env', '--workdir', '--hostname', '-h', '--add-host', '--cpus', '--memory', '-m']);
 const add = (file, line, kind, what, why) => findings.push({ file: path.relative(root, file), line, kind, what, why });
 
 for (const file of walk(path.join(root, 'docs'))) {
   const lines = fs.readFileSync(file, 'utf8').split('\n');
   let inFence = false, skip = false, lang = '';
+  if (!/^---[\s\S]*?\nverified_with:/.test(lines.join('\n'))) unverified.push(path.relative(root, file));
   lines.forEach((text, i) => {
     const n = i + 1;
     const fence = text.match(/^\s*(```|~~~)(\S*)/);
@@ -94,6 +106,22 @@ for (const file of walk(path.join(root, 'docs'))) {
     if (inFence) for (const m of text.matchAll(/(?:^|[\s"'-])(?:export\s+|-e\s+)?([A-Z][A-Z0-9_]{2,})=/g)) envHits.add(m[1]);
     for (const m of text.matchAll(/`([A-Z][A-Z0-9]*_[A-Z0-9_]+)(?:=[^`]*)?`/g)) envHits.add(m[1]);
     for (const k of envHits) if (!envKeys.has(k) && !envAllow.has(k)) add(file, n, 'env', k, 'not a settings field in LNbits ' + version);
+
+    // funding source classes and login methods
+    for (const m of text.matchAll(/LNBITS_BACKEND_WALLET_CLASS\s*[=:]\s*["']?([A-Za-z0-9]+)/g))
+      if (!walletClasses.has(m[1])) add(file, n, 'wallet', m[1], 'not a funding source class in LNbits ' + version);
+    for (const m of text.matchAll(/`([A-Z][A-Za-z0-9]*Wallet)`/g))
+      if (!walletClasses.has(m[1])) add(file, n, 'wallet', m[1], 'not a funding source class in LNbits ' + version);
+    const authList = text.match(/AUTH_ALLOWED_METHODS\s*[=:]\s*(.*)$/);
+    const authHits = authList ? [...authList[1].matchAll(/[a-z][a-z0-9]*(?:-[a-z0-9]+)+/g)].map((m) => m[0]) : [];
+    for (const m of text.matchAll(/`([a-z0-9]+(?:-[a-z0-9]+)*-(?:auth(?:-[a-z0-9]+)?|only|password))`/g)) authHits.push(m[1]);
+    for (const a of authHits) if (!authMethods.has(a)) add(file, n, 'auth', a, 'not an AuthMethods value in LNbits ' + version);
+
+    // install targets in prose: wordpress.org plugin links
+    for (const m of text.matchAll(/wordpress\.org\/plugins\/([a-z0-9-]+)/g)) {
+      const t = 'wp:' + m[1];
+      if (!(t in allow.allowed)) add(file, n, 'install', t, 'not in scripts/install-allowlist.json');
+    }
 
     // api
     const method = (text.match(/\b(GET|POST|PUT|PATCH|DELETE)\b/) || [])[1]
@@ -113,7 +141,19 @@ for (const file of walk(path.join(root, 'docs'))) {
     for (const m of text.matchAll(/\b(?:npm (?:i|install|add)|yarn add|pnpm add)\s+((?:-\S+\s+)*)(@?[\w.\-/]+)/g)) targets.push('npm:' + m[2].replace(/(.)@.*$/, '$1'));
     for (const m of text.matchAll(/\bnpx\s+(?:-\S+\s+)*(@?[\w.\-/]+)/g)) targets.push('npm:' + m[1].replace(/(.)@.*$/, '$1'));
     for (const m of text.matchAll(/\bgit clone\s+(?:-\S+\s+)*(\S+)/g)) if (!/YOUR_|<|\$/.test(m[1])) targets.push('git:' + m[1]);
-    for (const m of text.matchAll(/\bcurl\b[^|]*?(https?:\/\/\S+)\s*\|\s*(?:ba|z)?sh/g)) targets.push('curl:' + m[1]);
+    for (const m of text.matchAll(/\b(?:curl|wget)\b[^|]*?(https?:\/\/\S+)\s*\|\s*(?:sudo\s+)?(?:ba|z)?sh|\b(?:curl|wget)\b[^|]*?(https?:\/\/\S+)\s*\|\s*(?:sudo\s+)?python3?/g)) targets.push('curl:' + (m[1] || m[2]));
+    for (const m of text.matchAll(/^\s*image:\s*["']?([^\s"':]+)/g)) targets.push('docker:' + m[1]);
+    if (/\bdocker run\b/.test(text)) {
+      let cmd = text, j = i;
+      while (/\\\s*$/.test(lines[j]) && j + 1 < lines.length) cmd = cmd.replace(/\\\s*$/, ' ') + lines[++j];
+      const toks = cmd.split(/\bdocker run\b/)[1].trim().split(/\s+/);
+      for (let k = 0; k < toks.length; k++) {
+        const t = toks[k];
+        if (t.startsWith('-')) { if (dockerArgFlags.has(t)) k++; continue; }
+        if (/^[a-z0-9][a-z0-9.\-/]*(:[\w.\-]+)?$/.test(t)) targets.push('docker:' + t.replace(/:.*$/, ''));
+        break;
+      }
+    }
     for (const m of text.matchAll(/\bdocker pull\s+(\S+)/g)) targets.push('docker:' + m[1].replace(/:.*$/, ''));
     for (const t of targets) {
       if (t in allow.denied) add(file, n, 'install', t, 'DENIED: ' + allow.denied[t]);
@@ -125,13 +165,14 @@ for (const file of walk(path.join(root, 'docs'))) {
 // ---- report ---------------------------------------------------------------
 const byKind = findings.reduce((a, f) => ((a[f.kind] = (a[f.kind] || 0) + 1), a), {});
 if (args.has('--json')) {
-  console.log(JSON.stringify({ version, routes: routes.length, envKeys: envKeys.size, counts: byKind, findings }, null, 2));
+  console.log(JSON.stringify({ version, routes: routes.length, envKeys: envKeys.size, counts: byKind, unverified, findings }, null, 2));
 } else {
   let last = '';
   for (const f of findings) {
     if (f.file !== last) console.log('\n' + f.file), (last = f.file);
     console.log(`  L${f.line}  [${f.kind}] ${f.what} — ${f.why}`);
   }
+  console.log(`\n${unverified.length} pages without verified_with front matter`);
   console.log(`\n${findings.length} findings ${JSON.stringify(byKind)} (checked against ${routes.length} routes, ${envKeys.size} settings)`);
 }
 process.exit(strict && findings.length ? 1 : 0);
