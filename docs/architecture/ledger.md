@@ -264,7 +264,7 @@ Each row has `time`, `created_at` and `updated_at`, and nothing more: LNbits kee
 |---------|--------------|
 | `lnbits-cli db check-payments` | Lists incoming payments that are `success` in LNbits but still pending on the funding source (last 3 days by default; options `-d`, `-l`, `-w`, `-v`). It changes nothing |
 | `lnbits-cli db mark-payment-pending -c <checking_id>` | Sets one payment back to `pending` |
-| `lnbits-cli db delete-wallet-payment -w <wallet> -c <checking_id>` | Meant to delete one row. In v1.6.2 it fails, because its SQL still uses the old column name `wallet` (`delete_wallet_payment` in `lnbits/core/crud/payments.py`) |
+| `lnbits-cli db delete-wallet-payment -w <wallet> -c <checking_id>` | Meant to delete one row. In v1.6.2 it fails with `no such column: wallet`, because its SQL still uses the column name that migration m023 renamed to `wallet_id` (`delete_wallet_payment` in `lnbits/core/crud/payments.py`; proven in CI). See [Troubleshooting](/docs/guides/troubleshooting) for a manual alternative |
 
 ## Reconciliation {#balance-reconciliation}
 

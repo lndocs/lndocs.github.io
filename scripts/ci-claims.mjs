@@ -160,7 +160,7 @@ await claim('faq', 'A Super User reset key is not single-use: it works twice wit
   expect(login.status === 200, `login: ${JSON.stringify(login)}`);
 });
 
-await claim('architecture/users', 'Deactivating a user: a wallet key used just before keeps working (auth cache); an unused key is refused', async () => {
+await claim('architecture/users', 'Deactivating a user refuses their wallet keys at once, even one used just before (despite the key cache)', async () => {
   const c = (await call('POST', '/api/v1/account', { body: { name: 'deact' } })).data;
   const warm = await call('GET', '/api/v1/wallet', { key: c.adminkey });
   expect(warm.status === 200, `warm: ${JSON.stringify(warm)}`);
@@ -169,11 +169,11 @@ await claim('architecture/users', 'Deactivating a user: a wallet key used just b
   const cached = await call('GET', '/api/v1/wallet', { key: c.adminkey });
   const cold = await call('GET', '/api/v1/wallet', { key: c.inkey });
   const detail = `cached key → ${cached.status}, unused key → ${cold.status}`;
-  expect(cached.status === 200 && cold.status >= 400, detail);
+  expect(cached.status >= 400 && cold.status >= 400, detail);
   return detail;
 });
 
-await claim('configuration/admin-ui', 'A non-super admin can change funding-source settings through PATCH /admin/api/v1/settings', async () => {
+await claim('configuration/admin-ui', 'A non-super admin can read and change funding-source credentials through /admin/api/v1/settings', async () => {
   const u = await register('adminci');
   const t = await call('PUT', `/users/api/v1/user/${u.id}/admin`, { bearer: su });
   expect(t.status === 200, `make admin: ${JSON.stringify(t)}`);
@@ -181,6 +181,8 @@ await claim('configuration/admin-ui', 'A non-super admin can change funding-sour
   expect(p.status === 200, `patch as admin: ${JSON.stringify(p)}`);
   const g = await call('GET', '/admin/api/v1/settings', { bearer: su });
   expect(g.data.fake_wallet_secret === 'changed-by-admin', `secret now ${g.data.fake_wallet_secret}`);
+  const ga = await call('GET', '/admin/api/v1/settings', { bearer: u.token });
+  expect(ga.status === 200 && ga.data.fake_wallet_secret === 'changed-by-admin', `admin read: ${ga.status} ${ga.data && ga.data.fake_wallet_secret}`);
 });
 
 await claim('architecture/ledger', '`lnbits-cli db delete-wallet-payment` fails in v1.6.2 (its SQL uses the renamed column `wallet`)', async () => {

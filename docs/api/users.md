@@ -160,13 +160,13 @@ The body also takes `password`, `password_repeat`, `pubkey`, `external_id` and `
 
 ### Reset a password {#reset-password}
 
-`PUT /users/api/v1/user/{user_id}/reset_password` returns a string starting `reset_key_`. Give it to the user, who sets a new password with `PUT /api/v1/auth/reset` and body `{"reset_key": "...", "password": "...", "password_repeat": "..."}`. The key is only valid for `AUTH_CREDETIALS_UPDATE_THRESHOLD` seconds after it was generated (120 by default), so generate it when the user is ready. The Super User's own password can't be reset this way.
+`PUT /users/api/v1/user/{user_id}/reset_password` returns a string starting `reset_key_`. Give it to the user, who sets a new password with `PUT /api/v1/auth/reset` and body `{"reset_key": "...", "password": "...", "password_repeat": "..."}`. The key is only valid for `AUTH_CREDETIALS_UPDATE_THRESHOLD` seconds after it was generated (120 by default), so generate it when the user is ready. Within that window it is **not single-use**: CI shows the same key setting a password twice, so send it privately. The Super User's own password can't be reset this way.
 
 ### Deactivate a user {#deactivate-user}
 
 `PUT /users/api/v1/user/{user_id}/activate` flips the account between activated and deactivated, and returns `User activated.` or `User deactivated.` You can't deactivate yourself or the Super User. A deactivated user's wallet keys and logins are refused.
 
-From reading the v1.6.2 code (not tested): LNbits caches key and token lookups for `AUTH_AUTHENTICATION_CACHE_MINUTES` (10 by default), and deactivation doesn't seem to clear that cache. Credentials used in the last few minutes may keep working until the cache expires. The cache is in memory, so restarting LNbits clears it.
+This takes effect at once, even for a wallet key used seconds before, despite the key cache (`AUTH_AUTHENTICATION_CACHE_MINUTES`). This site's CI checks it against the v1.6.2 image: both a just-used and an unused key get 404 right after deactivation.
 
 ### Delete a user {#delete-user-admin}
 

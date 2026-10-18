@@ -73,14 +73,17 @@ To check one payment now, call `GET /api/v1/payments/{payment_hash}`. It asks th
 
 **Known v1.6.2 bug:** if the invoice was created on the same LND node that LNbits uses as its funding source, the payment stays pending forever, even across restarts ([#4240](https://github.com/lnbits/lnbits/issues/4240); fixed on `dev` by [#4241](https://github.com/lnbits/lnbits/pull/4241), unreleased). Pay such invoices from another wallet.
 
-:::caution Deleting a payment changes balances by hand
-First confirm on the node that a pending payment never left. For LND, `lncli trackpayment <payment_hash>` returns `payment isn't initiated`. Then you can delete its row, so its amount and fee reserve stop counting against the wallet:
+:::caution Marking a payment failed changes balances by hand
+First confirm on the node that a pending payment never left. For LND, `lncli trackpayment <payment_hash>` returns `payment isn't initiated`. Then mark its row `failed`. The wallet balance counts outgoing payments only while they are `pending` or `success` (the `balances` view, migration m025), so its amount and fee reserve are released, and the record stays for your books.
+
+`lnbits-cli db delete-wallet-payment` is not an option in v1.6.2: it fails with `no such column: wallet` (proven in this site's CI). Stop LNbits, back up the data folder, then on SQLite:
 
 ```bash
-uv run lnbits-cli db delete-wallet-payment -w <wallet_id> -c <checking_id>
+sqlite3 data/database.sqlite3 \
+  "UPDATE apipayments SET status = 'failed' WHERE checking_id = '<checking_id>' AND wallet_id = '<wallet_id>' AND status = 'pending';"
 ```
 
-This deletes the record without asking the node. If the payment did go out, you have just given the user free money. Back up first.
+On PostgreSQL, run the same `UPDATE` with `psql`. Start LNbits again; restarting also clears its in-memory wallet cache. This changes the record without asking the node. If the payment did go out, you have just given the user free money. To undo, run `lnbits-cli db mark-payment-pending -c <checking_id>`.
 :::
 
 `lnbits-cli db check-payments` does **not** fix stuck payments. It checks the other direction: it lists incoming payments that LNbits marked as paid but the funding source still reports as pending (by default from the last 3 days). It changes nothing.
