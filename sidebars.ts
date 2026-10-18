@@ -55,6 +55,8 @@ const sidebars: SidebarsConfig = {
         'funding-sources/phoenixd',
         'funding-sources/custodial',
         'funding-sources/fake-wallet',
+        'funding-sources/others',
+        'funding-sources/fiat-providers',
       ],
     },
     {

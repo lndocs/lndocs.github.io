@@ -2,226 +2,97 @@
 sidebar_position: 6
 title: Fake Wallet
 description: Use Fake Wallet for testing and development
+last_update:
+  date: 2026-10-18
+verified_with: v1.6.2
 ---
 
 # Fake Wallet
 
-Fake Wallet is a testing backend that simulates Lightning payments without real money.
+`FakeWallet` is a testing backend. There is no Lightning node and no Bitcoin behind it: LNbits signs invoices with a made-up node key, and balances are only numbers in the LNbits database. Upstream describes it as minting "accounting units".
 
-## What is Fake Wallet?
+:::danger Never on a public instance
+On a FakeWallet instance, balances can be created out of nothing (the Super User can credit any wallet), and nothing they "pay" is real. Don't run it where real users could mistake it for a real wallet, and don't connect it to anything that hands out goods or real sats for those balances.
+:::
 
-Fake Wallet is an in-memory Lightning simulation:
-- No real Lightning network
-- No real Bitcoin
-- Instant "payments"
-- Perfect for testing
-
-## Configuration
+## Configuration {#configuration}
 
 ```bash title=".env"
 LNBITS_BACKEND_WALLET_CLASS=FakeWallet
-
-# Optional: Enable fake invoices
-FAKE_WALLET_INVOICES=true
+# Optional, both shown with their defaults:
+FAKE_WALLET_SECRET=ToTheMoon1
+LNBITS_DENOMINATION=sats
 ```
 
-## How It Works
+- `FAKE_WALLET_SECRET` is the seed for the fake node key that signs FakeWallet invoices.
+- `LNBITS_DENOMINATION` is the unit name the UI shows. Anything other than `sats` is displayed as a currency with two decimals.
 
-### Creating Invoices
+With the Admin UI on (the default), these are set in **Settings → Funding** after the first start; `.env` changes are ignored then. See [Funding sources overview](/docs/funding-sources/overview).
 
-When you create an invoice:
-1. LNbits generates a fake BOLT11
-2. Payment hash is stored in memory
-3. Invoice is immediately "payable"
+## How it works {#how-it-works}
 
-### Paying Invoices
+- **Creating invoices:** LNbits builds a BOLT11 invoice signed with the fake key and remembers its preimage in memory.
+- **Paying invoices from the same instance:** works. LNbits settles payments between its own wallets internally, so the sender's balance goes down and the receiver's goes up at once.
+- **Paying anything else:** fails with `Only internal invoices can be used!`. FakeWallet can't pay external invoices, and no payment leaves the instance.
+- **Funding status:** FakeWallet always reports a balance of 1,000,000,000 msat (1,000,000 sats), whatever the wallets hold.
 
-When you pay an invoice:
-1. If it's an internal (Fake Wallet) invoice, it's marked paid
-2. Sender balance decreases
-3. Receiver balance increases
-4. Instant settlement
+Wallets, balances and payment history live in the database and survive restarts like on any other backend.
 
-### External Invoices
+## Funding test wallets {#funding-fake-wallets}
 
-Fake Wallet can "pay" external invoices too:
-- Decodes the BOLT11
-- Generates fake preimage
-- Marks as successful
+New wallets start at 0. To give one a balance:
 
-:::warning
-External invoice payments are simulated - no real payment occurs!
-:::
+- As the Super User, use **Credit / Debit** on the wallet in the UI, or call `PUT /users/api/v1/balance`.
+- Then pay other wallets on the same instance from it.
 
-## Use Cases
-
-### Development
-
-Test your LNbits integration without:
-- Running a Lightning node
-- Using real funds
-- Network latency
-
-### Demos
-
-Show LNbits features to users:
-- Create wallets instantly
-- Send/receive "payments"
-- Test extensions
-
-### CI/CD Testing
-
-Automated tests without Lightning infrastructure:
+## Simulating payments with the API {#simulating-payments}
 
 ```bash
-# In test environment
-LNBITS_BACKEND_WALLET_CLASS=FakeWallet
-pytest tests/
-```
-
-### Training
-
-Teach Lightning concepts:
-- Wallet creation
-- Invoice workflow
-- Payment mechanics
-
-## Simulating Payments
-
-### From UI
-
-1. Create invoice in one wallet
-2. Copy the BOLT11
-3. Pay from another wallet
-4. Both balances update
-
-### Via API
-
-```bash
-# Create invoice
-INVOICE=$(curl -s -X POST http://localhost:5000/api/v1/payments \
-  -H "X-Api-Key: $ADMIN_KEY" \
+# Create an invoice in wallet B (its invoice key is enough)
+bolt11=$(curl -s -X POST http://localhost:5000/api/v1/payments \
+  -H "X-Api-Key: $WALLET_B_INVOICE_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"out": false, "amount": 1000, "memo": "Test"}' | jq -r .payment_request)
+  -d '{"out": false, "amount": 1000, "memo": "Test"}' | jq -r .bolt11)
 
-# Pay invoice from another wallet
+# Pay it from wallet A (needs A's admin key)
 curl -X POST http://localhost:5000/api/v1/payments \
-  -H "X-Api-Key: $OTHER_ADMIN_KEY" \
+  -H "X-Api-Key: $WALLET_A_ADMIN_KEY" \
   -H "Content-Type: application/json" \
-  -d "{\"out\": true, \"bolt11\": \"$INVOICE\"}"
+  -d "{\"out\": true, \"bolt11\": \"$bolt11\"}"
 ```
 
-## Differences from Real Lightning
+Always send `"out": false` to create an invoice: if you leave `out` out, LNbits treats the request as a payment.
 
-| Aspect | Fake Wallet | Real Lightning |
-|--------|-------------|----------------|
-| Speed | Instant | Seconds |
-| Fees | None | Variable |
-| Failures | Never | Possible |
-| Routing | N/A | Required |
-| Channels | N/A | Required |
+## Use cases {#use-cases}
 
-## Funding Fake Wallets
+- **Development:** build and test extensions and integrations without a node.
+- **Demos and training:** show the wallet, invoice and payment flow.
+- **Automated tests:** LNbits' own test suite runs on FakeWallet. The `Makefile` sets it for `make test-unit`, `make test-api` and `make test-wallets`, and `tests/conftest.py` has the fixtures. See [Testing](/docs/development/testing).
 
-Fake wallets start with 0 balance. To add funds:
+## Differences from real Lightning {#differences}
 
-### Option 1: Super User Credit
+| | Fake Wallet | Real Lightning |
+|---|---|---|
+| Speed | Instant | Usually seconds |
+| Fees | None | Routing fees |
+| External invoices | Fail | Paid over the network |
+| Failures | Only bad, expired or external invoices | Routing, liquidity, timeouts |
+| Channels | None | Required |
 
-If Admin UI enabled:
-1. Go to Admin > Wallets
-2. Find the wallet
-3. Click Credit/Debit
-4. Add desired amount
+## Switching to a real backend {#switching-to-real-backend}
 
-### Option 2: Topup Extension
-
-Install the Topup extension for self-service funding.
-
-### Option 3: Pay from Funded Wallet
-
-1. Fund one wallet via admin
-2. Create invoices from other wallets
-3. Pay from funded wallet
-
-## Persistence
-
-Fake Wallet data persists in the database:
-- Wallets survive restarts
-- Transactions are recorded
-- Balances are maintained
-
-Only the "funding source state" is in-memory.
-
-## Switching to Real Backend
-
-When ready for production:
-
-1. Update configuration:
-```bash
-LNBITS_BACKEND_WALLET_CLASS=LndRestWallet
-LND_REST_ENDPOINT=...
-```
-
-2. Restart LNbits
-
-3. Fund wallets with real sats
+Select the new funding source in **Settings → Funding**, enter its credentials, save, and restart. See the per-backend pages and [Switching funding sources](/docs/funding-sources/overview).
 
 :::warning
-Fake Wallet balances don't transfer! You're starting fresh with real Lightning.
+FakeWallet balances don't become real. If you switch an instance that has fake balances to a real node, those balances become claims on real sats that don't exist. Start the real instance with a fresh database, or zero the test wallets first.
 :::
 
-## VoidWallet Alternative
+## VoidWallet {#voidwallet-alternative}
 
-VoidWallet is similar but always fails payments:
+`VoidWallet` is the default backend of a fresh install. It refuses to create invoices or pay, so every Lightning action fails. LNbits can also switch to it on its own: the watchdog does that when the LNbits balances run too far ahead of the funding source, if you turn the option on.
 
-```bash
-LNBITS_BACKEND_WALLET_CLASS=VoidWallet
-```
+## See also
 
-Use VoidWallet when:
-- You need a valid backend but no payments
-- Testing error handling
-- Placeholder during setup
-
-## Testing Scripts
-
-### Test Suite Setup
-
-```python
-# conftest.py
-import pytest
-from lnbits.settings import settings
-
-@pytest.fixture(autouse=True)
-def setup_fake_wallet():
-    settings.lnbits_backend_wallet_class = "FakeWallet"
-```
-
-### Payment Test
-
-```python
-async def test_internal_payment():
-    # Create wallets
-    wallet1 = await create_wallet()
-    wallet2 = await create_wallet()
-
-    # Fund wallet1
-    await credit_wallet(wallet1.id, 10000)
-
-    # Create invoice
-    invoice = await create_invoice(wallet2, 1000)
-
-    # Pay
-    payment = await pay_invoice(wallet1, invoice.bolt11)
-
-    # Verify
-    assert payment.status == "success"
-    assert await get_balance(wallet1) == 9000
-    assert await get_balance(wallet2) == 1000
-```
-
-## See Also
-
-- [Funding Sources Overview](/docs/funding-sources/overview)
-- [Development Setup](/docs/development/setup)
+- [Funding sources overview](/docs/funding-sources/overview)
+- [Development setup](/docs/development/setup)
 - [Testing](/docs/development/testing)

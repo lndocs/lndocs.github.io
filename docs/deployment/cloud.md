@@ -1,182 +1,95 @@
 ---
 sidebar_position: 5
 title: Cloud Deployment
-description: Deploy LNbits on cloud platforms
+description: Run the LNbits container on a cloud container host such as Fly.io
+last_update:
+  date: 2026-10-18
+verified_with: v1.6.2
 ---
 
 # Cloud Deployment
 
-Deploy LNbits on various cloud platforms.
+LNbits runs on any platform that can run the `lnbits/lnbits` container and give it persistent storage. This page lists what every platform needs, then shows Fly.io, the one platform upstream documents. Platform UIs, prices and free tiers change often; check the platform's own docs for those.
 
-## Fly.io
+## What any container host needs {#requirements}
 
-Fly.io offers a free tier suitable for small deployments.
+1. **The image, pinned:** `lnbits/lnbits:v1.6.2`.
+2. **The right port.** The image listens on port **5000** inside the container. It ignores `PORT` and `HOST`: its start command passes `--port $LNBITS_PORT --host $LNBITS_HOST`, with LNBITS_PORT=5000 and LNBITS_HOST=0.0.0.0. So either tell the platform the container port is 5000, or, if the platform insists on its own port, set LNBITS_PORT to it. A platform-provided `PORT` variable alone does nothing.
+3. **Persistent storage for `/app/data`.** It holds the SQLite database (if you don't use PostgreSQL), `.lnbits_auth_key`, `.super_user`, uploads, logs and extensions. On a platform with an ephemeral filesystem, every redeploy or restart without a volume loses all wallets. If the platform has no volumes, use a managed PostgreSQL (`LNBITS_DATABASE_URL=postgres://...`), and accept that extensions and the generated auth key will be lost on redeploy unless you set `AUTH_SECRET_KEY` as a secret (`openssl rand -hex 32`).
+4. **Extensions on the volume:** `LNBITS_EXTENSIONS_PATH=/app/data/extensions`.
+5. **Exactly one instance.** LNbits' double-spend protection uses in-process locks, so never scale to several replicas or machines on one database, and turn off autoscaling.
+6. **HTTPS at the platform's edge**, with the platform's proxy the only thing that can reach port 5000. The image trusts forwarded headers from any client (`--forwarded-allow-ips='*'`), which is fine only when the container port isn't reachable directly.
+7. **Secrets as platform secrets,** not in config files you commit: funding-source credentials, `LNBITS_DATABASE_URL`, `FIRST_INSTALL_TOKEN`.
 
-### Setup
+After the first deploy, open `/first_install` to set the Super User, ideally protected by a `FIRST_INSTALL_TOKEN` secret, because the instance is on the internet from its first second. Then configure the funding source in the Admin UI (**Settings → Funding**); environment variables for funding only apply on the first start.
+
+:::danger FakeWallet on a public host
+Examples elsewhere use `FakeWallet` for testing. On a public instance, a FakeWallet balance is free money that looks real. Don't leave a public demo on FakeWallet without making that obvious to every visitor, and never connect it to anything that pays out real value.
+:::
+
+## Fly.io {#flyio}
+
+Install `flyctl` and log in:
 
 ```bash
-# Install flyctl
 curl -L https://fly.io/install.sh | sh
-
-# Login
 fly auth login
-
-# Initialize (in lnbits directory)
-fly launch
 ```
 
-### fly.toml
+Create a `fly.toml` in an empty directory:
 
-```toml
+```toml title="fly.toml"
 app = "my-lnbits"
 primary_region = "ams"
+kill_timeout = 30
 
 [build]
-  image = "lnbits/lnbits:latest"
+  image = "lnbits/lnbits:v1.6.2"
 
 [env]
-  HOST = "0.0.0.0"
-  PORT = "8080"
-  LNBITS_BACKEND_WALLET_CLASS = "FakeWallet"
-
-[[services]]
-  http_checks = []
-  internal_port = 8080
-  protocol = "tcp"
-
-  [[services.ports]]
-    handlers = ["http"]
-    port = 80
-
-  [[services.ports]]
-    handlers = ["tls", "http"]
-    port = 443
+  LNBITS_EXTENSIONS_PATH = "/app/data/extensions"
 
 [mounts]
   source = "lnbits_data"
   destination = "/app/data"
+
+[http_service]
+  internal_port = 5000
+  force_https = true
+  auto_stop_machines = "off"
+  min_machines_running = 1
 ```
 
-### Deploy
+Then create the app, the volume (in the same region) and any secrets, and deploy:
 
 ```bash
-# Create volume
-fly volumes create lnbits_data --size 1
-
-# Deploy
+fly apps create my-lnbits
+fly volumes create lnbits_data --size 1 --region ams
+fly secrets set FIRST_INSTALL_TOKEN=$(openssl rand -hex 16)
 fly deploy
-
-# Set secrets
-fly secrets set AUTH_SECRET_KEY=$(openssl rand -hex 32)
+fly scale count 1
 ```
 
-## Railway
+- `internal_port = 5000` is what matters: it must match the port LNbits listens on in the image.
+- Keep one machine: a Fly volume belongs to one machine, and LNbits must not run twice on one database anyway.
+- `fly logs` shows the logs; `fly ssh console` opens a shell in the machine.
+- Set secrets before the first deploy, or re-deploy after setting them. Leave `AUTH_SECRET_KEY` unset: LNbits generates it on the volume.
 
-### Setup
+Upstream's own Fly instructions build from a git checkout and use `/data` as the mount with `LNBITS_DATA_FOLDER="/data"`; that works too, as long as the volume path and `LNBITS_DATA_FOLDER` match.
 
-1. Fork lnbits/lnbits on GitHub
-2. Connect Railway to your fork
-3. Add environment variables
-4. Deploy
+## Other platforms {#other-platforms}
 
-### Environment Variables
+Railway, Render, DigitalOcean App Platform, Google Cloud Run, AWS ECS and similar services all work if they meet the [requirements](#requirements) above. Watch out for:
 
-```
-HOST=0.0.0.0
-PORT=$PORT
-LNBITS_BACKEND_WALLET_CLASS=FakeWallet
-# Set AUTH_SECRET_KEY in the dashboard to the output of: openssl rand -hex 32
-```
+- **Port detection:** platforms that inject a `PORT` variable need either their container port set to 5000, or LNBITS_PORT set to their port.
+- **Ephemeral storage:** if the platform has no persistent volumes on your plan (Cloud Run, App Platform, and some free tiers), use a managed PostgreSQL and understand what is lost on redeploy.
+- **Autoscaling and multiple instances:** turn them off. Request-based platforms that scale to zero or to many instances (Cloud Run, for example) need a fixed single instance (`min = max = 1`).
+- **Building from the repo:** platforms that build from a git repository use the repo's `Dockerfile`, which behaves like the published image.
 
-## Render
+We don't keep per-platform config files here because we can't test them. If you have a tested one, contribute it to the upstream docs at [docs.lnbits.com](https://docs.lnbits.com).
 
-### render.yaml
+## See also
 
-```yaml
-services:
-  - type: web
-    name: lnbits
-    env: docker
-    dockerfilePath: ./Dockerfile
-    envVars:
-      - key: HOST
-        value: 0.0.0.0
-      - key: PORT
-        value: 10000
-      - key: LNBITS_DATA_FOLDER
-        value: /app/data
-    disk:
-      name: lnbits-data
-      mountPath: /app/data
-      sizeGB: 1
-```
-
-## DigitalOcean App Platform
-
-### app.yaml
-
-```yaml
-name: lnbits
-services:
-  - name: lnbits
-    image:
-      registry_type: DOCKER_HUB
-      registry: lnbits
-      repository: lnbits
-      tag: latest
-    http_port: 5000
-    envs:
-      - key: HOST
-        value: "0.0.0.0"
-      - key: LNBITS_DATA_FOLDER
-        value: "/app/data"
-```
-
-## Heroku
-
-:::warning
-Heroku's ephemeral filesystem requires external PostgreSQL.
-:::
-
-```bash
-heroku create my-lnbits
-heroku addons:create heroku-postgresql:mini
-heroku config:set LNBITS_DATABASE_URL=$(heroku config:get DATABASE_URL)
-git push heroku main
-```
-
-## AWS (ECS/Fargate)
-
-Use the Docker image with ECS:
-
-1. Create ECR repository or use Docker Hub
-2. Create ECS cluster
-3. Create task definition with lnbits/lnbits image
-4. Create service with load balancer
-5. Add EFS for persistent storage
-
-## Google Cloud Run
-
-```bash
-gcloud run deploy lnbits \
-  --image lnbits/lnbits:latest \
-  --port 5000 \
-  --set-env-vars HOST=0.0.0.0,LNBITS_BACKEND_WALLET_CLASS=FakeWallet
-```
-
-Note: Cloud Run is stateless. Use Cloud SQL for database.
-
-## Cost Considerations
-
-| Platform | Free Tier | Notes |
-|----------|-----------|-------|
-| Fly.io | Yes | Good for small instances |
-| Railway | Limited | Easy setup |
-| Render | Yes | With limitations |
-| Heroku | No longer | Requires paid plan |
-| DigitalOcean | $5/mo | App Platform |
-
-## See Also
-
-- [Docker Deployment](/docs/deployment/docker)
-- [Database Configuration](/docs/configuration/database)
+- [Docker deployment](/docs/deployment/docker)
+- [Database configuration](/docs/configuration/database)
+- [Security](/docs/configuration/security)
