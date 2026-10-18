@@ -32,6 +32,17 @@ function expect(cond, msg) { if (!cond) throw new Error(msg); }
 
 let a, b, invoice;
 
+await claim('getting-started/quick-start', 'A fresh install redirects every request (even /api/v1/health) to /first_install (307)', async () => {
+  const r = await call('GET', '/api/v1/health');
+  expect(r.status === 307, `status ${r.status}`);
+});
+
+await claim('configuration/admin-ui', 'PUT /api/v1/auth/first_install sets the Super User username and password', async () => {
+  const password = 'ci-' + Math.random().toString(36).slice(2) + 'X9';
+  const r = await call('PUT', '/api/v1/auth/first_install', { body: { username: 'superci', password, password_repeat: password } });
+  expect(r.status === 200, JSON.stringify(r));
+});
+
 await claim('api/overview', 'GET /api/v1/health returns server_time and up_time', async () => {
   const r = await call('GET', '/api/v1/health');
   expect(r.status === 200 && 'server_time' in r.data && 'up_time' in r.data, JSON.stringify(r));
