@@ -63,6 +63,7 @@ const sidebars: SidebarsConfig = {
       collapsed: true,
       items: [
         'extensions/overview',
+        'extensions/wasm',
         'extensions/installing',
         'extensions/development',
         'extensions/manifest',
