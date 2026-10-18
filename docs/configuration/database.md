@@ -51,7 +51,7 @@ CREATE DATABASE lnbits OWNER lnbits;
 SQL
 ```
 
-Replace `CHANGE_ME` with a generated password (`openssl rand -hex 24` gives one with no characters that need URL-encoding).
+Replace the placeholder password with a generated one (`openssl rand -hex 24` gives one with no characters that need URL-encoding).
 
 ### Connection URL {#configuration}
 
