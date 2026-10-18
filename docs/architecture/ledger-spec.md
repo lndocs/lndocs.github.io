@@ -1,18 +1,47 @@
 ---
 sidebar_position: 7
 title: Ledger Specification
-description: A standardized ledger specification for Lightning Network wallet systems
+description: An independent lndocs proposal for a Lightning wallet ledger format. Not part of LNbits.
+last_update:
+  date: 2026-10-18
+verified_with: v1.6.2
 ---
 
-# Lightning Wallet Ledger Specification
+# Lightning Wallet Ledger Specification (proposal)
 
-:::info Draft Proposal
-This specification documents the LNbits ledger system as a potential standard for Lightning Network wallet accounting. It aims to provide a common framework for balance tracking, payment recording, and audit trails across Lightning wallet implementations.
+:::info Independent proposal by lndocs, not LNbits behaviour
+This page is an **original proposal written for this site**. It is not an LNbits document, LNbits has not adopted it, and LNbits does not implement it. Nothing in the LNbits repository refers to a ledger specification.
+
+The proposal borrows LNbits' balance rules, but LNbits v1.6.2 differs from it in several important ways, listed in [How LNbits v1.6.2 differs](#how-lnbits-differs). For what LNbits actually does, read [Ledger System](/docs/architecture/ledger).
 :::
+
+## How LNbits v1.6.2 differs {#how-lnbits-differs}
+
+Checked against the LNbits v1.6.2 source (`lnbits/core/migrations.py`, `lnbits/core/services/payments.py`, `lnbits/db.py`).
+
+| Topic | This proposal | LNbits v1.6.2 |
+|-------|---------------|---------------|
+| Table and field names | `ledger_entries`, `amount_msat`, `fee_msat`, `expires_at`, `id` | `apipayments`, `amount`, `fee`, `expiry`; no `id` column. LNbits also has `time`, `webhook`, `webhook_status`, `tag`, `extension`, `labels`, `fiat_provider`, `external_id` |
+| Primary key and uniqueness | `id` primary key; `UNIQUE(wallet_id, payment_hash, entry_type)` | No primary key; `UNIQUE(wallet_id, checking_id)` |
+| Entry type | `entry_type` enum (invoice, payment, internal_*, fees, credit/debit, swaps) | **No `entry_type`.** Direction comes from the sign of `amount`; kind is inferred from `checking_id` prefixes (`internal_`, `service_fee_`, `fiat_`) and `extra`. Admin credit/debit are ordinary rows with the memo "Admin credit" / "Admin debit". Swaps are not part of core |
+| Fee sign | `fee_msat` MUST be ≤ 0 | Not normalised: external outgoing rows store a negative fee, the internal sender row stores a positive (usually zero) fee. The view uses `ABS(fee)` |
+| Balance formula | `SUM(amount_msat + fee_msat)` | `SUM(amount - ABS(fee))` in the `balances` view, joined to `wallets` and excluding deleted wallets |
+| Inclusion rules | Credits on SUCCESS; debits on PENDING or SUCCESS | **Same** |
+| Internal transfer atomicity | MUST be atomic, all or nothing | **Not atomic.** Every statement commits on its own; the sender row is committed before the receiver row is updated. Ordering is protected only by in-process `asyncio` locks |
+| Internal transfer id | `internal_{payment_hash}` | Sender row only; the receiver row keeps its original `checking_id` |
+| Internal transfer fees | 0 | 0 routing fee and no reserve, but a service fee is possible if `LNBITS_SERVICE_FEE_IGNORE_INTERNAL=false` |
+| Terminal states | SUCCESS and FAILED are terminal | **FAILED → SUCCESS happens** when a payment is retried and the funding source reports the earlier attempt as paid. Expired incoming invoices become FAILED with the label `expired` |
+| Immutability | SUCCESS and FAILED rows are immutable | **SUCCESS rows are still updated**: labels, new `extra` keys, and hold-invoice flags. Pending rows also change `fee` and `checking_id` |
+| Fee breakdown | `FeeBreakdown` with routing, service and reserve | One `fee` column; the service fee also appears as a separate `service_fee_{hash}` row in the fee wallet (this part matches) |
+| Fiat keys in `extra` | `fiat_amount`, `fiat_currency`, `exchange_rate` | `fiat_amount`, `fiat_currency`, `fiat_rate`, `btc_rate`, plus `wallet_fiat_*` |
+| Status history audit | Full history of status changes | None. LNbits' `audit` table logs HTTP requests, not ledger changes |
+| Export | JSON Lines export | No JSONL export in the core API |
+| Reconciliation | Σ balances ≤ funding source, MUST provide tooling | Monitored, not enforced: `GET /admin/api/v1/audit` and the balance watchdog |
+| Statuses and 64-bit amounts | pending/success/failed; 64-bit | **Same** |
 
 ## Abstract
 
-This document specifies a standardized ledger system for Lightning Network wallets. It defines data structures, balance calculation rules, and accounting principles that enable interoperability, auditability, and consistency across wallet implementations.
+This document proposes a standardized ledger system for Lightning Network wallets. It defines data structures, balance calculation rules, and accounting principles that enable interoperability, auditability, and consistency across wallet implementations.
 
 ## Motivation
 
@@ -118,19 +147,26 @@ Where qualifying entries are determined by asymmetric status rules.
 
 ```mermaid
 flowchart TB
+    Balance["Wallet Balance"]
+
     subgraph Credits["Credits (amount > 0)"]
-        C1["PENDING"] -.->|"Excluded"| Balance
-        C2["SUCCESS"] -->|"Included"| Balance
-        C3["FAILED"] -.->|"Excluded"| Balance
+        C1["PENDING"]
+        C2["SUCCESS"]
+        C3["FAILED"]
     end
 
     subgraph Debits["Debits (amount < 0)"]
-        D1["PENDING"] -->|"Included"| Balance
-        D2["SUCCESS"] -->|"Included"| Balance
-        D3["FAILED"] -.->|"Excluded"| Balance
+        D1["PENDING"]
+        D2["SUCCESS"]
+        D3["FAILED"]
     end
 
-    Balance["Wallet Balance"]
+    C1 -.->|"Excluded"| Balance
+    C2 -->|"Included"| Balance
+    C3 -.->|"Excluded"| Balance
+    D1 -->|"Included"| Balance
+    D2 -->|"Included"| Balance
+    D3 -.->|"Excluded"| Balance
 ```
 
 | Direction | Status | Include in Balance? | Rationale |
@@ -142,7 +178,9 @@ flowchart TB
 | Debit (amount < 0) | SUCCESS | Yes | Confirmed expense |
 | Debit (amount < 0) | FAILED | No | Refund reserved funds |
 
-#### 2.3 SQL Reference Implementation
+#### 2.3 SQL Example {#23-sql-reference-implementation}
+
+An illustrative view for the schema in Appendix A. LNbits' own view is different (see [Ledger System](/docs/architecture/ledger)).
 
 ```sql
 CREATE VIEW wallet_balances AS
@@ -202,6 +240,10 @@ sequenceDiagram
 ```
 
 Both entries succeed or both fail. Partial completion is not permitted.
+
+:::note
+LNbits v1.6.2 does not meet this requirement: it commits the two rows separately and relies on in-process locks.
+:::
 
 #### 3.4 Internal Transfer Properties
 
@@ -271,6 +313,8 @@ stateDiagram-v2
     note right of FAILED: Immutable
 ```
 
+LNbits v1.6.2 does not follow these lifecycle rules: it allows FAILED → SUCCESS and updates SUCCESS rows (see the table at the top).
+
 #### 5.2 Immutability Rules
 
 | Status | Mutable Fields | Immutable Fields |
@@ -326,7 +370,7 @@ The following keys are reserved for future standardization:
   "id": "abc123def456",
   "payment_hash": "a1b2c3d4e5f6...",
   "wallet_id": "wallet_xyz",
-  "amount_msat": 10000000,
+  "amount_msat": -10000000,
   "fee_msat": -100000,
   "status": "success",
   "entry_type": "payment",
@@ -379,14 +423,9 @@ The sum of all wallet balances MUST NOT exceed the funding source balance:
 
 Implementations MUST provide reconciliation tooling.
 
-### 9. Reference Implementation
+### 9. Relationship to LNbits {#9-reference-implementation}
 
-The LNbits project provides a reference implementation:
-- Repository: [github.com/lnbits/lnbits](https://github.com/lnbits/lnbits)
-- Key files:
-  - `lnbits/core/models/payments.py` - Entry model
-  - `lnbits/core/crud/payments.py` - CRUD operations
-  - `lnbits/core/migrations.py` - Database schema
+There is no reference implementation. The balance inclusion rules in section 2.2 come from LNbits ([github.com/lnbits/lnbits](https://github.com/lnbits/lnbits), `lnbits/core/migrations.py`), but LNbits uses a different schema and does not satisfy sections 3.3, 4.2, 5 or 10.1. See [How LNbits v1.6.2 differs](#how-lnbits-differs).
 
 ### 10. Compatibility
 
@@ -473,6 +512,6 @@ def verify_balance(wallet_id: str, expected_balance_msat: int) -> bool:
 
 ## See Also
 
-- [Ledger System](/docs/architecture/ledger) - LNbits implementation details
+- [Ledger System](/docs/architecture/ledger) - what LNbits actually does
 - [Payments Architecture](/docs/architecture/payments) - Payment flow documentation
 - [BOLT 11](https://github.com/lightning/bolts/blob/master/11-payment-encoding.md) - Invoice specification
