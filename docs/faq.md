@@ -37,7 +37,7 @@ The Alby shared wallet closed on 2025-01-04, the LNPay and LN.tips services are 
 
 ### How do I create an account and a wallet? {#how-do-i-create-a-wallet}
 
-Since v1.6.0 the default login method is **username and password** only (`AUTH_ALLOWED_METHODS=username-password`). Register on the instance's home page, if the operator allows sign-ups, then log in. Your first wallet is created with the account, and you can add more from the wallet menu.
+Register on the instance's home page, if the operator allows new accounts, then log in. Your first wallet is created with the account, and you can add more from the wallet menu. Since v1.6.0 the default login method is **username and password** only (`AUTH_ALLOWED_METHODS=username-password`).
 
 The old model, where a secret `?usr=` URL *was* the login, is the `user-id-only` method. It is off by default since v1.6.0 (#4132). An operator can turn it back on, but anyone who sees that URL owns the account. See [Upgrading](/docs/guides/upgrading).
 
