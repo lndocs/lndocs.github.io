@@ -1,179 +1,153 @@
 ---
 sidebar_position: 3
 title: Quick Start
-description: Get LNbits running in 5 minutes with this quick start guide
+description: Run LNbits v1.6.2, create the Super User, switch from VoidWallet to FakeWallet, and make a test payment
+last_update:
+  date: 2026-10-18
+verified_with: v1.6.2
 ---
 
 # Quick Start
 
-Get LNbits running in 5 minutes with this quick start guide.
+This guide takes a fresh LNbits v1.6.2 from start-up to a test payment on your own machine. It runs over plain `http://localhost` and uses **FakeWallet**, so no real funds are involved.
 
-## Step 1: Start LNbits
+## Step 1: Start LNbits {#step-1-start-lnbits}
 
-The fastest way to start is with Docker:
+With Docker:
 
 ```bash
-docker run -d --name lnbits -p 5000:5000 lnbits/lnbits
+mkdir -p lnbits-data
+docker run -d --name lnbits \
+  -p 127.0.0.1:5000:5000 \
+  -v "$PWD/lnbits-data:/app/data" \
+  -e AUTH_HTTPS_ONLY=false \
+  lnbits/lnbits:v1.6.2
 ```
 
-Or with UV (for development):
+Or from source with [uv](/docs/getting-started/installation):
 
 ```bash
 git clone https://github.com/lnbits/lnbits.git
 cd lnbits
-curl -LsSf https://astral.sh/uv/install.sh | sh
-uv sync && uv run lnbits
+git checkout v1.6.2
+uv sync --all-extras --python 3.12
+cp .env.example .env
+AUTH_HTTPS_ONLY=false uv run lnbits
 ```
 
-## Step 2: Open the Web Interface
+`AUTH_HTTPS_ONLY=false` lets the login cookie work over plain HTTP. **Remove it** once you serve LNbits over HTTPS ([Authentication](/docs/configuration/authentication)).
 
-Navigate to **http://localhost:5000** in your browser.
+## Step 2: Create the Super User {#step-2-open-the-web-interface}
 
-You'll see the LNbits login screen.
+Open **http://localhost:5000**. A fresh install redirects every page to **`/first_install`** ([middleware.py L231-240](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/middleware.py#L231-L240)).
 
-## Step 3: Create an Account
+1. Choose a **username** and a **password**, then repeat the password.
+2. If the server has `FIRST_INSTALL_TOKEN` set, enter that token as well.
+3. Click **Login**.
 
-By default, LNbits uses "user-id-only" authentication:
+You're now logged in as the **Super User**, the account that controls the instance, with one empty wallet.
 
-1. Click **"Add a new wallet"**
-2. Enter a wallet name (e.g., "My First Wallet")
-3. Click **"Create wallet"**
-
-:::tip
-Save your wallet URL! It contains your unique user ID. Bookmark it for easy access.
+:::warning Keep these credentials safe
+The Super User can change the funding source and credit any wallet. It can't log in with a user ID, only with this username and password. To read its ID later, run `lnbits-cli superuser`, or look in `data/.super_user`. See [Admin UI](/docs/configuration/admin-ui).
 :::
 
-## Step 4: Explore Your Wallet
+## Step 3: Notice VoidWallet {#step-3-create-an-account}
 
-You now have a wallet with:
+A fresh install runs on **VoidWallet** (`LNBITS_BACKEND_WALLET_CLASS` defaults to `VoidWallet`, [settings.py L821](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/settings.py#L821)). VoidWallet has no Lightning connection. If you try to receive now, LNbits shows "VoidWallet cannot create invoices." ([wallets/void.py](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/wallets/void.py)). That's expected.
 
-- **Admin Key**: Full control (send/receive/manage)
-- **Invoice Key**: Create invoices only (safe to share)
-- **Balance**: 0 sats (connected to Fake Wallet by default)
+## Step 4: Switch to FakeWallet {#step-4-explore-your-wallet}
 
-### Wallet Dashboard
+The Admin UI is on by default. The funding source is stored in the database, so you change it in the browser, not in `.env`:
 
-The wallet dashboard shows:
-- Current balance
-- Recent transactions
-- QR code for receiving
-- API key access
+1. Open **Settings** in the sidebar (`/admin`). It opens on the **Funding** tab.
+2. Under the funding sources, select **FakeWallet**.
+3. Click **Save**. The notice says "Restart required!".
+4. Click **Restart server**.
 
-### Create an Invoice
+After the restart, the Funding tab shows `Funding source: FakeWallet`.
 
-1. Click **"Receive"**
-2. Enter an amount in sats
-3. Add an optional memo
-4. Click **"Create Invoice"**
-5. Copy the BOLT11 invoice or scan the QR code
-
-### Pay an Invoice
-
-1. Click **"Send"**
-2. Paste a BOLT11 invoice
-3. Click **"Pay Invoice"**
-
-:::info
-The default Fake Wallet simulates payments without real Lightning. Perfect for testing!
+:::info What FakeWallet does
+FakeWallet creates real-looking BOLT11 invoices, but it can only pay invoices created by this same LNbits instance. Paying any other invoice fails with "Only internal invoices can be used!" ([wallets/fake.py](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/wallets/fake.py)). That makes it good for UI, API and extension testing, and useless for real payments.
 :::
 
-## Step 5: Enable Extensions
+## Step 5: Make a test payment {#create-an-invoice}
 
-Extensions add powerful features to LNbits:
+1. **Create a second wallet:** click **Add a new wallet** in the sidebar and name it, for example "Shop".
+2. **Fund the first wallet:** as the Super User, you see a credit/debit control next to the balance. Credit your first wallet with, say, 10,000 sats. (Crediting creates sats from nothing, so only do it on a test instance.)
+3. **Create an invoice:** in the "Shop" wallet, click **Receive**, enter 1000 sats and a memo, then **Create Invoice**. Copy the BOLT11 string.
+4. **Pay it:** switch to the first wallet, click **Send**, click **Paste Request**, paste the invoice and confirm.
 
-1. Click **"Extensions"** in the sidebar
-2. Browse available extensions
-3. Click **"Enable"** on an extension (try TPoS!)
-4. Configure the extension in its settings
+Both balances update, and both wallets list the payment.
 
-### Popular Extensions
+## Step 6: Try the API {#quick-reference}
 
-| Extension | Purpose |
-|-----------|---------|
-| TPoS | Point of sale for merchants |
-| LNURL-pay | Static payment links |
-| Paywall | Monetize content |
-| SatsPay | Payment processor |
+Each wallet has two keys. You'll find them under the wallet's **Node URL, API keys and API docs** panel:
 
-## Step 6: Connect a Real Funding Source
+| Key | Can do |
+|---|---|
+| **Invoice key** | Create invoices, **and read the balance and the payment history** |
+| **Admin key** | Everything, including **sending payments** |
 
-To use real Lightning payments, connect a funding source:
-
-### Option A: LND
+The invoice key can't spend, but it isn't private: whoever holds it sees all the wallet's activity. Never share the admin key.
 
 ```bash
-# In your .env file
-LNBITS_BACKEND_WALLET_CLASS=LndRestWallet
-LND_REST_ENDPOINT=https://your-lnd:8080
-LND_REST_CERT=/path/to/tls.cert
-LND_REST_MACAROON_ENCRYPTED=your-macaroon
-```
+# Wallet name and balance (balance is in msat)
+curl http://localhost:5000/api/v1/wallet -H "X-Api-Key: <invoice key>"
 
-### Option B: Core Lightning
-
-```bash
-LNBITS_BACKEND_WALLET_CLASS=CLNRestWallet
-CLNREST_URL=https://your-cln:3010
-CLNREST_RUNE=your-rune
-```
-
-### Option C: Custodial Service
-
-```bash
-# Example: Alby
-LNBITS_BACKEND_WALLET_CLASS=AlbyWallet
-ALBY_API_ENDPOINT=https://api.getalby.com
-ALBY_ACCESS_TOKEN=your-token
-```
-
-After updating `.env`, restart LNbits:
-
-```bash
-docker restart lnbits
-```
-
-## Quick Reference
-
-### API Endpoints
-
-| Endpoint | Description |
-|----------|-------------|
-| `GET /api/v1/wallet` | Get wallet info |
-| `POST /api/v1/payments` | Create invoice |
-| `GET /api/v1/payments/{hash}` | Check payment status |
-
-### Example API Call
-
-```bash
-# Create an invoice
+# Create an invoice. Always send "out": false: if you leave "out" out, it defaults to paying.
 curl -X POST http://localhost:5000/api/v1/payments \
-  -H "X-Api-Key: YOUR_ADMIN_KEY" \
+  -H "X-Api-Key: <invoice key>" \
   -H "Content-Type: application/json" \
-  -d '{"out": false, "amount": 1000, "memo": "Test payment"}'
+  -d '{"out": false, "amount": 1000, "unit": "sat", "memo": "Test payment"}'
+
+# Check a payment
+curl http://localhost:5000/api/v1/payments/<payment_hash> -H "X-Api-Key: <invoice key>"
 ```
 
-### Environment Variables
+The interactive API docs are at **http://localhost:5000/docs**. See also the [API overview](/docs/api/overview).
 
-```bash
-# Essential settings
-HOST=0.0.0.0
-PORT=5000
-LNBITS_ADMIN_UI=true
-LNBITS_BACKEND_WALLET_CLASS=FakeWallet
-```
+## Step 7: Extensions {#step-5-enable-extensions}
 
-## Next Steps
+Extensions take two steps:
 
-You're now running LNbits! Here's what to explore next:
+1. **An admin installs** the extension. Open **Extensions** in the sidebar, find it in the list (try **TPoS**), and click **Install**.
+2. **Each user enables** it for their own account, on the same page.
 
-1. **[Create Your First Wallet](/docs/getting-started/first-wallet)** - Detailed wallet walkthrough
-2. **[Configuration Guide](/docs/configuration/environment)** - Customize your instance
-3. **[Funding Sources](/docs/funding-sources/overview)** - Connect real Lightning
-4. **[Extensions](/docs/extensions/overview)** - Add powerful features
-5. **[API Reference](/docs/api/overview)** - Build integrations
+Admins can make an extension available to everyone, or limit it to admins. See [Installing Extensions](/docs/extensions/installing) and the [catalogue on docs.lnbits.com](https://docs.lnbits.com/guide/using-extensions).
 
-## Getting Help
+:::warning
+Python extensions run inside LNbits with full access to the data and the funding source. Install only extensions you trust.
+:::
 
-- **Demo**: Experiment at [demo.lnbits.com](https://demo.lnbits.com)
-- **Community**: Join [t.me/lnbits](https://t.me/lnbits)
-- **Issues**: Report bugs at [GitHub](https://github.com/lnbits/lnbits/issues)
+## Step 8: Connect a real funding source {#step-6-connect-a-real-funding-source}
+
+When you're ready for real sats, go back to **Settings → Funding** as the Super User, pick your backend, fill in its fields, **Save**, and **Restart server**. Each backend's fields are described on its own page:
+
+- [LND](/docs/funding-sources/lnd): REST endpoint, TLS cert and macaroon (it needs one that can both create and pay invoices)
+- [Core Lightning](/docs/funding-sources/cln): CLNRest URL, CA/cert, and the three runes (read-only, invoice, pay)
+- [Phoenixd](/docs/funding-sources/phoenixd)
+- [Custodial services](/docs/funding-sources/custodial)
+- [All funding sources](/docs/funding-sources/overview)
+
+Before you do this:
+
+- Put LNbits behind HTTPS and **remove `AUTH_HTTPS_ONLY=false`**.
+- Mount a `.env` file and the data folder as shown in [Installation](/docs/getting-started/installation), and back up `data/`.
+- Work through the [Security checklist](/docs/configuration/security).
+
+:::note `.env` versus the Admin UI
+Settings such as `LNBITS_BACKEND_WALLET_CLASS` in `.env` are only read on the **first** start while the Admin UI is on. After that, the Admin UI is the source of truth. See [Settings precedence](/docs/configuration/environment).
+:::
+
+## Next Steps {#next-steps}
+
+1. **[Create Your First Wallet](/docs/getting-started/first-wallet):** wallets, keys and sharing in detail.
+2. **[Environment Variables](/docs/configuration/environment):** what `.env` still controls.
+3. **[Admin UI](/docs/configuration/admin-ui):** roles and settings.
+4. **[API Reference](/docs/api/overview):** build integrations.
+
+## Getting Help {#getting-help}
+
+- **Official docs:** [docs.lnbits.com](https://docs.lnbits.com)
+- **Community:** [t.me/lnbits](https://t.me/lnbits)
+- **Bugs:** [GitHub issues](https://github.com/lnbits/lnbits/issues). Report security problems [privately](https://github.com/lnbits/lnbits/security/advisories/new).

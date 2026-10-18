@@ -1,122 +1,116 @@
 ---
 sidebar_position: 1
 title: Introduction to LNbits
-description: Learn what LNbits is and how it can power your Lightning Network applications
+description: What LNbits is, what it does, and how these docs relate to the official LNbits documentation
+last_update:
+  date: 2026-10-18
+verified_with: v1.6.2
 ---
 
 # Introduction to LNbits
 
-LNbits is a free, open-source Lightning Network accounts system with a powerful extension framework. It acts as a layer on top of your Lightning funding source, providing isolated wallet accounts, a clean REST API, and modular extensions.
+LNbits is a free, open-source Lightning accounts system with an extension framework. It sits on top of one Lightning funding source and adds isolated user accounts and wallets, a REST API, and extensions.
 
-:::tip LNbits v1.0.0 Released
-After five years and 6,000+ commits, LNbits reached v1.0.0 in April 2025. The software is now **stable, hardened, and production-ready** with Vue 3, WebSocket payments, Nostr login, and Access Control Lists.
+:::tip Current release: v1.6.2 (2026-09-18)
+These pages are checked against LNbits **v1.6.2**. v1.6.0 added sandboxed WASM extensions, Lightning Addresses in core wallets, a block explorer and the Bark funding source. v1.6.2 is a hotfix for the PostgreSQL backup. The official docs are at [docs.lnbits.com](https://docs.lnbits.com). This site is an independent, self-host-focused companion.
 :::
 
-## What is LNbits?
+## What is LNbits? {#what-is-lnbits}
 
-Think of LNbits as a **Lightning wallet multiplexer**. You connect it to a single Lightning node or custodial service (the "funding source"), and LNbits creates multiple isolated wallet accounts on top. Each wallet has:
+Think of LNbits as a **Lightning wallet multiplexer**. You connect it to a single Lightning node or service (the "funding source"), and LNbits keeps many separate wallet accounts on top of it:
 
-- Its own balance (tracked internally)
-- Separate API keys (admin key and invoice key)
-- Independent permissions
-- Custom extensions enabled/disabled per wallet
+- **Accounts** log in (by default with a username and password) and can hold several wallets.
+- **Wallets** each have their own balance, kept in LNbits' own ledger in millisatoshis, and their own pair of API keys (an admin key and an invoice key).
+- **Extensions** are enabled per account and add features such as point of sale, pay links and paywalls.
 
 ```mermaid
 flowchart TB
-    subgraph LNbits["⚡ LNbits"]
-        W1["Wallet 1<br/>50k sats"]
-        W2["Wallet 2<br/>10k sats"]
-        W3["Wallet 3<br/>100 sats"]
-        Wn["..."]
+    subgraph LNbits["LNbits"]
+        A1["Account A"] --> W1["Wallet 1"]
+        A1 --> W2["Wallet 2"]
+        A2["Account B"] --> W3["Wallet 3"]
     end
 
-    subgraph FS["Funding Source"]
-        Node["LND / CLN / Phoenixd / etc."]
+    subgraph FS["Funding source"]
+        Node["LND / Core Lightning / Phoenixd / ..."]
     end
 
-    W1 & W2 & W3 & Wn --> Node
+    LNbits --> Node
 ```
 
-## Key Features
+All wallets share the funding source's liquidity. LNbits is therefore **custodial**: whoever runs the instance controls the funds in every wallet on it.
 
-### Multi-Wallet System
-Create unlimited wallets with isolated balances. Perfect for:
-- Running a custodial service for your community
-- Separating funds for different projects
-- Testing without risking real funds
+## Key Features {#key-features}
 
-### 24+ Funding Sources
-Connect to virtually any Lightning backend:
-- **Self-hosted**: LND, Core Lightning, Phoenixd, Eclair
-- **Custodial**: Alby, OpenNode, Blink, ZBD
-- **Nested**: Use another LNbits instance as a funding source
-- **Testing**: Fake Wallet for development
+### Accounts and wallets {#multi-wallet-system}
 
-### 100+ Extensions
-Extend functionality without touching code:
-- **TPoS**: Point-of-sale for merchants
-- **LNURL-pay**: Lightning Addresses and static QR codes
-- **Paywall**: Monetize content with Lightning
-- **Jukebox**: Let customers pay to play music
-- And many more...
+Create as many wallets as you like, each with its own balance. Typical uses:
 
-### Developer Friendly
-Build Lightning apps with ease:
-- Clean REST API with OpenAPI documentation
-- Webhook support for real-time notifications
-- LNURL protocol support
-- Python SDK for extensions
+- Separate wallets for projects, shops or family members
+- A community wallet service, where each member has their own account
+- Testing against FakeWallet without real funds
 
-### Production Ready
-Deploy with confidence:
-- Docker and systemd deployment options
-- PostgreSQL for high-load environments
-- Admin UI for instance management
-- Audit logs for compliance
+### Funding sources {#24-funding-sources}
 
-## Use Cases
+LNbits v1.6.2 ships about 25 funding source classes ([wallets/\_\_init\_\_.py](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/wallets/__init__.py)):
 
-### For Merchants
-Accept Bitcoin payments at your store with the TPoS extension. Generate QR codes, handle NFC payments, and print receipts.
+- **Your own node:** LND (REST and gRPC), Core Lightning (CLNRest and RPC), Eclair, Phoenixd
+- **Services and SDKs:** Blink, ZBD, OpenNode, Strike, NWC (Nostr Wallet Connect), Spark L2, Bark, Boltz, Breez
+- **Nested:** another LNbits instance
+- **Testing:** FakeWallet. A fresh install starts on **VoidWallet**, which can't send or receive.
 
-### For Developers
-Build Lightning-enabled applications using the LNbits API. Create invoices, check payments, and handle webhooks.
+Some older options have since died or been deprecated (the Alby shared wallet, LNPay, LN.tips, c-lightning-REST, Breez Greenlight and Liquid). See [Funding Sources](/docs/funding-sources/overview).
 
-### For Communities
-Run a custodial wallet service for your community. Each member gets their own wallet with isolated funds.
+### Extensions {#100-extensions}
 
-### For Content Creators
-Monetize your content with paywalls. Unlock articles, videos, or downloads for Lightning micropayments.
+The official registry lists about 60 Python extensions, and a separate registry lists about 20 WASM extensions. They include TPoS (point of sale), LNURLp (pay links and Lightning Addresses), Paywall, Withdraw and many more. Python extensions run inside the LNbits process with full access. WASM extensions (since v1.6.0) run in a sandbox. For the catalogue, see [docs.lnbits.com](https://docs.lnbits.com/guide/using-extensions).
 
-### For Educators
-Teach Lightning Network concepts with a safe, sandboxed environment. Use the Fake Wallet for risk-free testing.
+### For developers {#developer-friendly}
 
-## Architecture Overview
+- A REST API with OpenAPI docs at `/docs` on every instance
+- Webhooks and websockets for payment updates
+- LNURL support
+- An extension framework (Python, or sandboxed WASM)
 
-LNbits is built with modern technologies:
+### For operators {#production-ready}
+
+- Docker, uv, AppImage and Nix installs
+- SQLite by default, with PostgreSQL for busy instances
+- An Admin UI (on by default) for funding, users, extensions and settings
+- An audit log, rate limits and wallet limits
+
+## Use Cases {#use-cases}
+
+- **Merchants:** take Lightning payments in a shop with TPoS. See the official [merchant stack](https://docs.lnbits.com/merchant-stack/).
+- **Developers:** create invoices, check payments and receive webhooks through the [API](/docs/api/overview).
+- **Communities:** give each member their own wallet on a shared node.
+- **Content creators:** sell access with paywalls and pay links.
+- **Educators:** teach Lightning with FakeWallet, with no real funds at risk.
+
+## Architecture Overview {#architecture-overview}
 
 | Component | Technology |
-|-----------|------------|
-| Backend | Python 3.10+, FastAPI |
-| Database | SQLite, PostgreSQL, CockroachDB |
-| Frontend | Vue.js, Quasar Framework |
-| API | REST with OpenAPI/Swagger docs |
+|---|---|
+| Backend | Python 3.10 to 3.12 (`>=3.10,<3.13`), FastAPI. The Docker image uses Python 3.12. |
+| Database | SQLite (default), PostgreSQL, CockroachDB |
+| Frontend | Vue 3, Quasar |
+| API | REST, with OpenAPI/Swagger docs |
 
-## Getting Started
+More in [Architecture](/docs/architecture/overview).
 
-Ready to dive in? Here's your path:
+## Getting Started {#getting-started}
 
-1. **[Installation](/docs/getting-started/installation)** - Set up LNbits on your machine
-2. **[Quick Start](/docs/getting-started/quick-start)** - Get running in 5 minutes
-3. **[Create Your First Wallet](/docs/getting-started/first-wallet)** - Start using LNbits
+1. **[Installation](/docs/getting-started/installation):** install LNbits with uv, Docker, the AppImage or Nix.
+2. **[Quick Start](/docs/getting-started/quick-start):** first start, the Super User, and a FakeWallet test.
+3. **[Create Your First Wallet](/docs/getting-started/first-wallet):** wallets, keys and payments.
 
-## Community & Support
+## Community & Support {#community--support}
 
-- **Demo**: Try LNbits at [demo.lnbits.com](https://demo.lnbits.com)
-- **Telegram**: Join the community at [t.me/lnbits](https://t.me/lnbits)
-- **GitHub**: Contribute at [github.com/lnbits/lnbits](https://github.com/lnbits/lnbits)
-- **Documentation**: You're already here!
+- **Official docs:** [docs.lnbits.com](https://docs.lnbits.com)
+- **Demo:** [demo.lnbits.com](https://demo.lnbits.com). It's a public test server, so don't keep real funds there.
+- **Telegram:** [t.me/lnbits](https://t.me/lnbits)
+- **GitHub:** [github.com/lnbits/lnbits](https://github.com/lnbits/lnbits)
 
-## License
+## License {#license}
 
-LNbits is released under the [MIT License](https://opensource.org/licenses/MIT). Free to use, modify, and distribute.
+LNbits is released under the [MIT License](https://github.com/lnbits/lnbits/blob/v1.6.2/LICENSE).

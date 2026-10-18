@@ -1,326 +1,199 @@
 ---
 sidebar_position: 2
 title: Database
-description: Configure SQLite, PostgreSQL, or CockroachDB for LNbits
+description: Configure SQLite, PostgreSQL, or CockroachDB for LNbits v1.6.2, migrate from SQLite, and back up safely
+last_update:
+  date: 2026-10-18
+verified_with: v1.6.2
 ---
 
 # Database Configuration
 
-LNbits supports multiple database backends for different scale requirements.
+LNbits stores its data in SQLite by default. It also supports PostgreSQL and CockroachDB ([db.py L31-45](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/db.py#L31-L45)). Both database settings are env-only, so the Admin UI never overrides them.
 
-## Supported Databases
+| Database | Set with | Good for |
+|---|---|---|
+| SQLite | `LNBITS_DATA_FOLDER` (default `./data`) | Personal and small instances, development |
+| PostgreSQL | `LNBITS_DATABASE_URL=postgres://...` | Busy or multi-user instances |
+| CockroachDB | `LNBITS_DATABASE_URL=cockroachdb://...` | Distributed setups |
 
-| Database | Best For | Requirements |
-|----------|----------|--------------|
-| SQLite | Development, small deployments | None (default) |
-| PostgreSQL | Production, high traffic | PostgreSQL 12+ |
-| CockroachDB | Distributed deployments | CockroachDB cluster |
+## SQLite (default) {#sqlite-default}
 
-## SQLite (Default)
+With `LNBITS_DATABASE_URL` unset, LNbits keeps one SQLite file for the core and one per extension, all in the data folder ([db.py L306-308](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/db.py#L306-L308)):
 
-SQLite is the default database, requiring no external setup.
-
-### Configuration
-
-```bash
-# Data folder contains the SQLite database
-LNBITS_DATA_FOLDER="./data"
+```text
+data/
+├── database.sqlite3        # core: accounts, wallets, payments, settings
+├── ext_<id>.sqlite3        # one per Python extension, e.g. ext_tpos.sqlite3
+├── .lnbits_auth_key        # generated if AUTH_SECRET_KEY is empty
+├── .super_user             # the Super User ID (Admin UI on)
+├── logs/
+├── wasm_extensions/        # WASM extensions (v1.6.0+)
+├── zips/                   # downloaded Python extension archives
+└── upgrades/               # scratch space for extension upgrades, emptied at startup
 ```
 
-The database file is created at `./data/lnbits.sqlite3`.
+A backup that copies only `database.sqlite3` misses every extension's data. Copy the whole folder.
 
-### Pros and Cons
+SQLite is a single-writer database. It's fine for one person or a small group. For many concurrent users, or many extensions writing at once, use PostgreSQL.
 
-**Pros:**
-- Zero configuration
-- Single file backup
-- Works everywhere
+## PostgreSQL {#postgresql-recommended-for-production}
 
-**Cons:**
-- Single writer (limited concurrency)
-- Not suitable for high traffic
-- No horizontal scaling
-
-### Best Practices
+### Create the database {#installation}
 
 ```bash
-# Backup the database
-cp ./data/lnbits.sqlite3 ./backup/lnbits-$(date +%Y%m%d).sqlite3
+# Debian/Ubuntu
+sudo apt install postgresql
 
-# Check database integrity
-sqlite3 ./data/lnbits.sqlite3 "PRAGMA integrity_check;"
+sudo -u postgres psql <<'SQL'
+CREATE USER lnbits WITH PASSWORD 'CHANGE_ME';
+CREATE DATABASE lnbits OWNER lnbits;
+SQL
 ```
 
-## PostgreSQL (Recommended for Production)
+Replace the placeholder password with a generated one (`openssl rand -hex 24` gives one with no characters that need URL-encoding).
 
-PostgreSQL handles concurrent users and high transaction volumes.
+### Connection URL {#configuration}
 
-### Installation
+```bash title=".env"
+LNBITS_DATABASE_URL=postgres://lnbits:CHANGE_ME@localhost:5432/lnbits
+```
+
+- The scheme must be `postgres://`. LNbits refuses to start with `postgresql://` ("Please use the 'postgres://...' format for the database URL", [db.py L36-40](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/db.py#L36-L40)).
+- LNbits swaps the scheme for `postgresql+asyncpg://` and hands the URL to SQLAlchemy with no pool options ([db.py L290-319](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/db.py#L290-L319)). It documents no connection-pool or TLS query parameters, so don't rely on them. Keep the database on localhost or a private network.
+- The asyncpg driver ships with LNbits. The `migration` extra (`psycopg2-binary`) is needed only by the SQLite-to-PostgreSQL tool, and `uv sync --all-extras` installs it.
+
+## CockroachDB {#cockroachdb}
+
+```bash title=".env"
+LNBITS_DATABASE_URL=cockroachdb://lnbits:CHANGE_ME@localhost:26257/lnbits
+```
+
+LNbits maps this to `cockroachdb+asyncpg://` ([db.py L296-304](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/db.py#L296-L304)). The built-in backup doesn't dump CockroachDB, so use CockroachDB's own backup tools. For cluster setup, see the [CockroachDB docs](https://www.cockroachlabs.com/docs/).
+
+## Migrating from SQLite to PostgreSQL {#migration-from-sqlite-to-postgresql}
+
+v1.6.2 has one supported path: the [`tools/conv.py`](https://github.com/lnbits/lnbits/blob/v1.6.2/tools/conv.py) script in a source checkout, which `make migration` also runs. It copies the core database and every `ext_*.sqlite3` file into PostgreSQL, and it checks first that the schema versions on both sides match. `lnbits-cli` has no migration command.
+
+1. **Back up** the whole data folder (see [Backups](#backup-strategies)).
+2. Stop LNbits.
+3. Create an empty PostgreSQL database (see [Create the database](#installation)).
+4. Set `LNBITS_DATABASE_URL` in `.env`. Spell out the user, password, host **and port**, because `conv.py` splits the URL by hand and fails without a port.
+5. Start LNbits **once** so that it creates the schema in PostgreSQL, then stop it again.
+6. Run the converter from the LNbits directory. `LNBITS_DATA_FOLDER` must still point at the SQLite folder.
+
+   ```bash
+   uv run python tools/conv.py
+   # or: make migration
+   ```
+
+   Optional flags: a path argument (a SQLite folder or a single `ext_*.sqlite3`), `-e` (extensions only), `-s` (skip extensions with no migration) and `-i` (don't stop on errors). Run `uv run python tools/conv.py --help` for details.
+7. Start LNbits and check the wallets, balances and extensions before you delete the SQLite files.
+
+Upstream's write-up of the same steps is in [docs/guide/installation.md](https://github.com/lnbits/lnbits/blob/v1.6.2/docs/guide/installation.md#sqlite--postgresql-migration). Don't use `sqlite3 .dump | psql` instead: it skips the extension databases, and the column types don't match.
+
+## Schema migrations {#migrations}
+
+LNbits migrates the core schema and every installed extension's schema automatically at startup, and records each module's version in the `dbversions` table. The core migrations live in [core/migrations.py](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/migrations.py). Two CLI commands help ([commands.py L138-151](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/commands.py#L138-L151)):
 
 ```bash
-# Ubuntu/Debian
-sudo apt install postgresql postgresql-contrib
-
-# Create database
-sudo -u postgres psql
-postgres=# CREATE USER lnbits WITH PASSWORD 'secure_password';
-postgres=# CREATE DATABASE lnbits OWNER lnbits;
-postgres=# \q
+uv run lnbits-cli db versions   # show the version of each module
+uv run lnbits-cli db migrate    # run pending migrations without starting the server
 ```
 
-### Configuration
-
-```bash
-# Connection URL format
-LNBITS_DATABASE_URL="postgres://user:password@host:port/database"
-
-# Example
-LNBITS_DATABASE_URL="postgres://lnbits:secure_password@localhost:5432/lnbits"
-```
-
-### Connection Pool Settings
-
-PostgreSQL connections are pooled automatically. For high-traffic instances:
-
-```bash
-# Increase pool size (default: 5)
-# Set via SQLAlchemy connection string
-LNBITS_DATABASE_URL="postgres://user:pass@host:5432/db?pool_size=20&max_overflow=10"
-```
-
-### SSL Connections
-
-```bash
-# Require SSL
-LNBITS_DATABASE_URL="postgres://user:pass@host:5432/db?sslmode=require"
-
-# With certificate
-LNBITS_DATABASE_URL="postgres://user:pass@host:5432/db?sslmode=verify-full&sslrootcert=/path/to/ca.pem"
-```
-
-## CockroachDB
-
-For distributed, highly available deployments.
-
-### Configuration
-
-```bash
-LNBITS_DATABASE_URL="cockroachdb://user:password@host:26257/lnbits?sslmode=verify-full"
-```
-
-### Cluster Setup
-
-CockroachDB provides automatic failover and horizontal scaling. Consult [CockroachDB documentation](https://www.cockroachlabs.com/docs/) for cluster setup.
-
-## Migration from SQLite to PostgreSQL
-
-### Using the Conversion Tool
-
-```bash
-# Set the target database URL
-export LNBITS_DATABASE_URL="postgres://lnbits:password@localhost:5432/lnbits"
-
-# Run the migration tool
-uv run python tools/conv.py
-```
-
-### Manual Migration
-
-1. Export data from SQLite:
-```bash
-sqlite3 ./data/lnbits.sqlite3 ".dump" > lnbits_backup.sql
-```
-
-2. Convert SQL syntax (SQLite → PostgreSQL differences)
-
-3. Import into PostgreSQL:
-```bash
-psql lnbits < lnbits_backup.sql
-```
-
-:::warning
-Test migrations on a copy first. Some data types and constraints may need adjustment.
+:::danger Don't edit `dbversions` by hand
+Deleting or lowering a row in `dbversions` makes LNbits rerun every migration for that module, starting at the first one, against tables that already exist. That can fail halfway and leave the schema broken. If a migration fails, restore your backup and report the error upstream.
 :::
 
-## Database Schema
+## Backups {#backup-strategies}
 
-### Core Tables
+Back up the **data folder** whatever database you use. Even on PostgreSQL it holds `.lnbits_auth_key`, `.super_user`, the WASM extensions and the logs, and none of these are in the database. For the full procedure, see [Backup & Restore](/docs/guides/backup-restore).
 
-```sql
--- User accounts
-CREATE TABLE accounts (
-    id TEXT PRIMARY KEY,
-    username TEXT,
-    email TEXT,
-    password_hash TEXT,
-    pubkey TEXT,
-    extra TEXT,
-    created_at TIMESTAMP,
-    updated_at TIMESTAMP
-);
+### Built-in backup (Super User) {#built-in-backup}
 
--- Wallets
-CREATE TABLE wallets (
-    id TEXT PRIMARY KEY,
-    name TEXT,
-    user_id TEXT REFERENCES accounts(id),
-    adminkey TEXT,
-    inkey TEXT,
-    deleted BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP,
-    updated_at TIMESTAMP
-);
+In the Admin UI, the Super User can click **Download database backup**, which calls `GET /admin/api/v1/backup` ([admin_api.py L137-174](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/admin_api.py#L137-L174)). The response is a zip of the whole data folder. On PostgreSQL, LNbits first runs `pg_dump --format=c` into the folder, so the zip also contains `lnbits-database.dmp`. Admins see the button too, but only the Super User can use it. v1.6.2 fixed a regression from v1.6.0 that broke this backup on PostgreSQL. A failed dump now returns an error ("PostgreSQL database backup failed.") instead of an incomplete zip.
 
--- Payments
-CREATE TABLE apipayments (
-    checking_id TEXT PRIMARY KEY,
-    payment_hash TEXT,
-    wallet_id TEXT REFERENCES wallets(id),
-    amount INTEGER,
-    fee INTEGER,
-    bolt11 TEXT,
-    status TEXT,
-    memo TEXT,
-    preimage TEXT,
-    extra TEXT,
-    created_at TIMESTAMP,
-    updated_at TIMESTAMP
-);
+:::caution PostgreSQL 15+ and the Docker image
+The `lnbits/lnbits` image installs `postgresql-client-14` ([Dockerfile](https://github.com/lnbits/lnbits/blob/v1.6.2/Dockerfile)). `pg_dump` refuses to dump a server with a newer major version, so the built-in backup **fails** when the container talks to PostgreSQL 15 or newer. Until the image changes, run `pg_dump` from the database container, or from a host whose client version matches the server. Outside Docker, the LNbits host needs a `pg_dump` at least as new as the server.
+:::
 
--- Extension state
-CREATE TABLE extensions (
-    user_id TEXT,
-    extension TEXT,
-    active BOOLEAN,
-    PRIMARY KEY (user_id, extension)
-);
-```
-
-### Indexes
-
-Important indexes for performance:
-
-```sql
-CREATE INDEX idx_payments_wallet ON apipayments(wallet_id);
-CREATE INDEX idx_payments_status ON apipayments(status);
-CREATE INDEX idx_payments_created ON apipayments(created_at);
-CREATE INDEX idx_wallets_user ON wallets(user_id);
-```
-
-## Migrations
-
-LNbits uses automatic migrations on startup.
-
-### How Migrations Work
-
-```python
-# Migrations are versioned functions
-async def m001_initial(db):
-    """Create initial tables"""
-    await db.execute("""
-        CREATE TABLE IF NOT EXISTS accounts (...)
-    """)
-
-async def m002_add_email(db):
-    """Add email column"""
-    await db.execute("""
-        ALTER TABLE accounts ADD COLUMN email TEXT
-    """)
-```
-
-### Migration Tracking
-
-Migrations are tracked in the `dbversions` table:
-
-```sql
-SELECT * FROM dbversions;
--- db        | version
--- core      | 15
--- tpos      | 3
--- lnurlp    | 5
-```
-
-### Force Re-run Migration
+### SQLite {#sqlite}
 
 ```bash
-# Reset a specific extension's migrations
-psql lnbits -c "DELETE FROM dbversions WHERE db = 'extension_name'"
+# Simplest: stop LNbits, copy the folder, start it again
+sudo systemctl stop lnbits
+tar czf lnbits-data-$(date +%F).tar.gz -C /path/to/lnbits data
+sudo systemctl start lnbits
+
+# Hot copy of one file while LNbits runs (repeat for each ext_*.sqlite3)
+sqlite3 data/database.sqlite3 ".backup 'backup/database.sqlite3'"
 ```
 
-## Backup Strategies
-
-### SQLite
+### PostgreSQL {#postgresql}
 
 ```bash
-# Simple file copy (while LNbits is stopped)
-cp ./data/lnbits.sqlite3 ./backup/
+# Dump (custom format)
+pg_dump -h localhost -U lnbits -Fc lnbits > lnbits-$(date +%F).dump
 
-# Hot backup with sqlite3
-sqlite3 ./data/lnbits.sqlite3 ".backup ./backup/lnbits.sqlite3"
+# Restore into an empty database
+pg_restore -h localhost -U lnbits -d lnbits lnbits-2026-10-18.dump
+
+# With PostgreSQL in Docker Compose (service name "postgres")
+docker compose exec -T postgres pg_dump -U lnbits -Fc lnbits > lnbits-$(date +%F).dump
 ```
 
-### PostgreSQL
+### Automated backups {#automated-backups}
 
-```bash
-# Full backup
-pg_dump lnbits > lnbits_backup.sql
-
-# Compressed backup
-pg_dump lnbits | gzip > lnbits_backup.sql.gz
-
-# Restore
-psql lnbits < lnbits_backup.sql
-```
-
-### Automated Backups
-
-```bash
+```bash title="backup.sh"
 #!/bin/bash
-# backup.sh - Run daily via cron
-
-BACKUP_DIR="/var/backups/lnbits"
+# Run daily from cron. Paths are examples.
+set -euo pipefail
+BACKUP_DIR=/var/backups/lnbits
 DATE=$(date +%Y%m%d)
+mkdir -p "$BACKUP_DIR"
 
-# PostgreSQL backup
-pg_dump lnbits | gzip > "$BACKUP_DIR/lnbits-$DATE.sql.gz"
+# PostgreSQL dump (skip this on SQLite)
+pg_dump -h localhost -U lnbits -Fc lnbits > "$BACKUP_DIR/db-$DATE.dump"
 
-# Keep last 30 days
-find $BACKUP_DIR -name "lnbits-*.sql.gz" -mtime +30 -delete
+# Data folder: auth key, super user, extension databases, WASM extensions
+tar czf "$BACKUP_DIR/data-$DATE.tar.gz" -C /home/lnbits/lnbits data
+
+# Keep the last 30 days
+find "$BACKUP_DIR" -type f -mtime +30 -delete
 ```
 
-## Troubleshooting
+On SQLite, a `tar` of a folder whose files are being written can catch them mid-write. Stop LNbits first, or use `sqlite3 .backup` for each file. Copy backups off the machine, and encrypt them: they contain wallet data, the auth key and any funding-source credentials stored in the settings.
 
-### Connection Refused
+## Troubleshooting {#troubleshooting}
+
+### Connection refused {#connection-refused}
 
 ```bash
-# Check PostgreSQL is running
 sudo systemctl status postgresql
-
-# Check connection
-psql -U lnbits -h localhost lnbits
+psql "postgres://lnbits:CHANGE_ME@localhost:5432/lnbits" -c 'select 1'
 ```
 
-### Migration Errors
+### Migration errors {#migration-errors}
 
 ```bash
-# Check migration status
-psql lnbits -c "SELECT * FROM dbversions"
-
-# View migration logs
-LNBITS_LOG_LEVEL=DEBUG uv run lnbits
+uv run lnbits-cli db versions
 ```
 
-### Database Locked (SQLite)
+Set `DEBUG=true` for verbose logs and `DEBUG_DATABASE=true` to log every SQL statement. Don't "fix" a failed migration by editing `dbversions` (see [Schema migrations](#migrations)).
+
+### Database locked (SQLite) {#database-locked-sqlite}
+
+Only one process should have the files open. Make sure no second LNbits instance or `sqlite3` shell is using `data/database.sqlite3`:
 
 ```bash
-# Check for processes holding the lock
-fuser ./data/lnbits.sqlite3
-
-# Wait for lock release or restart LNbits
+fuser data/database.sqlite3
 ```
 
-## See Also
+If locking keeps happening under load, move to PostgreSQL.
+
+## See Also {#see-also}
 
 - [Environment Variables](/docs/configuration/environment)
 - [Backup & Restore](/docs/guides/backup-restore)
-- [Troubleshooting](/docs/guides/troubleshooting)
+- [Docker Deployment](/docs/deployment/docker)
+- [Upstream PostgreSQL guide](https://docs.lnbits.com/guide/installation/postgresql)
