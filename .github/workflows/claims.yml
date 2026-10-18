@@ -37,6 +37,8 @@ jobs:
           exit 1
       - name: Check claims
         run: node scripts/ci-claims.mjs
+        env:
+          LNBITS_CONTAINER: lnbits
       - name: LNbits logs
         if: failure()
         run: docker logs lnbits | tail -100
