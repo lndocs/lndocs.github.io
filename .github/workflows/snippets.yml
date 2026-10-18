@@ -1,0 +1,31 @@
+name: Snippet gate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  snippets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Fetch pinned LNbits source (parsed as text, never run)
+        run: |
+          V=$(cat scripts/lnbits-version.txt)
+          mkdir -p "$RUNNER_TEMP/lnbits"
+          curl -sSL "https://codeload.github.com/lnbits/lnbits/tar.gz/refs/tags/$V" | tar xz -C "$RUNNER_TEMP/lnbits" --strip-components=1
+      - name: Check snippets
+        env:
+          LNBITS_SRC: ${{ runner.temp }}/lnbits
+          SNIPPETS_STRICT: ${{ vars.SNIPPETS_STRICT }}
+        run: |
+          set -o pipefail
+          { echo '## Snippet gate'; echo '```'; node scripts/check-snippets.mjs; echo '```'; } | tee -a "$GITHUB_STEP_SUMMARY"
