@@ -122,8 +122,9 @@ LNBITS_RATE_LIMIT_UNIT=minute
 ## Authentication
 
 ```bash
-# Secret key for JWT tokens (REQUIRED for production!)
-AUTH_SECRET_KEY=your-very-secret-key-here
+# Secret key that signs login tokens. If empty, LNbits generates a random one
+# and stores it in data/.lnbits_auth_key. To set your own: openssl rand -hex 32
+AUTH_SECRET_KEY=
 
 # Token expiration (minutes)
 AUTH_TOKEN_EXPIRE_MINUTES=525600  # 1 year
@@ -286,7 +287,9 @@ LND_REST_MACAROON=/path/to/admin.macaroon
 
 # Admin
 LNBITS_ADMIN_UI=true
-AUTH_SECRET_KEY=change-this-to-a-random-string
+# Leave empty to have LNbits generate a random key in data/.lnbits_auth_key,
+# or set your own with: openssl rand -hex 32. Never use a placeholder: this key signs login tokens.
+AUTH_SECRET_KEY=
 
 # Security
 LNBITS_ALLOW_NEW_ACCOUNTS=true

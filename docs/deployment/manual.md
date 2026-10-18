@@ -72,7 +72,9 @@ LNBITS_DATA_FOLDER=./data
 LNBITS_BACKEND_WALLET_CLASS=FakeWallet
 
 # Security
-AUTH_SECRET_KEY=your-random-secret-key
+# Leave empty to have LNbits generate a random key in data/.lnbits_auth_key,
+# or set your own with: openssl rand -hex 32. Never use a placeholder: this key signs login tokens.
+AUTH_SECRET_KEY=
 
 # Admin (optional)
 LNBITS_ADMIN_UI=true

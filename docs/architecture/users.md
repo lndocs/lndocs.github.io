@@ -141,7 +141,7 @@ AUTH_KEYCLOAK_DISCOVERY_URL="..."
 Sessions use JWT with configurable expiry:
 
 ```python
-AUTH_SECRET_KEY="your-secret-key"  # Required!
+AUTH_SECRET_KEY=""                 # empty: LNbits generates one in data/.lnbits_auth_key
 AUTH_TOKEN_EXPIRE_MINUTES=525600   # 1 year default
 ```
 

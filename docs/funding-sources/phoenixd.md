@@ -45,10 +45,18 @@ cd phoenix-*
 ```bash
 docker run -d \
   --name phoenixd \
-  -p 9740:9740 \
-  -v phoenixd-data:/data \
+  -p 127.0.0.1:9740:9740 \
+  -v phoenixd-data:/phoenix/.phoenix \
   acinq/phoenixd
 ```
+
+:::danger Followed an earlier version of this page?
+Before October 2026 this example mounted `/data`. The image doesn't use that path, so your seed is in an anonymous Docker volume, and `docker rm -v` or `docker volume prune` would delete it. Copy it out before you change anything:
+
+```bash
+docker cp phoenixd:/phoenix/.phoenix ./phoenixd-backup
+```
+:::
 
 ## LNbits Configuration
 
@@ -141,9 +149,10 @@ services:
   phoenixd:
     image: acinq/phoenixd:latest
     volumes:
-      - phoenixd-data:/root/.phoenix
-    ports:
-      - "9740:9740"
+      # The image keeps its seed and channel data here. Back this volume up.
+      - phoenixd-data:/phoenix/.phoenix
+    # No published port: LNbits reaches phoenixd over the compose network,
+    # and phoenixd listens on all interfaces inside the container.
 
 volumes:
   phoenixd-data:
