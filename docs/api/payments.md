@@ -32,7 +32,7 @@ POST /api/v1/payments
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `out` | boolean | Yes | `false` for invoice |
+| `out` | boolean | No, but always send it | Defaults to `true`. If you leave it out with an admin key, the request **pays** instead of creating an invoice. Send `false` to create one. |
 | `amount` | integer | Yes | Amount (in unit) |
 | `memo` | string | No | Invoice description |
 | `unit` | string | No | `sat` (default) or `msat` |
