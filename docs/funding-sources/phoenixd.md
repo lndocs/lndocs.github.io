@@ -127,11 +127,12 @@ LNbits can also keep a copy: if `PHOENIXD_DATA_DIR` points at a phoenixd data di
 ## Testing the connection {#testing-connection}
 
 ```bash
-curl -u :$PHOENIXD_API_PASSWORD http://127.0.0.1:9740/getinfo
-curl -u :$PHOENIXD_API_PASSWORD http://127.0.0.1:9740/getbalance
+PHOENIXD_API_PASSWORD='paste-the-full-access-password'
+curl -u ":$PHOENIXD_API_PASSWORD" http://127.0.0.1:9740/getinfo
+curl -u ":$PHOENIXD_API_PASSWORD" http://127.0.0.1:9740/getbalance
 ```
 
-The user name is empty; the password follows the colon. Then restart LNbits and check **Settings → Funding** for the balance.
+The user name is empty; the password follows the colon. LNbits' status check calls `/getinfo` and reads the first channel's balance. Then restart LNbits and check **Settings → Funding** for the balance.
 
 ## Troubleshooting {#troubleshooting}
 
