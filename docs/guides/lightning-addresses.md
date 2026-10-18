@@ -15,7 +15,7 @@ Since **v1.6.0** ([#4035](https://github.com/lnbits/lnbits/pull/4035)) every LNb
 
 - When core addresses are allowed, each new wallet gets a random address name. Existing wallets get one the first time they are loaded.
 - A payer's wallet looks up `https://<your domain>/.well-known/lnurlp/<name>` (LUD-16), then calls back to `/api/v1/lnurl/wallet/<name>/cb?amount=<msat>` for an invoice.
-- The minimum payment is 1 sat (1000 msat). Payers can attach a comment of up to 799 characters.
+- The minimum payment is 1 sat (1000 msat). Payers can attach a comment of up to 799 characters. The payment is a normal incoming invoice on the wallet, with the memo `Payment to <name>@<domain>`.
 - `name+tag@domain` also works. The tag is stored with the payment (`extra.lnaddress_tag`), which helps you tell payment sources apart.
 - The domain in the address is the host the request arrived on. LNbits must therefore be served from the **root** of the domain (not a sub-path), and a reverse proxy must pass the original `Host` header.
 
@@ -35,11 +35,9 @@ All of these are in the Admin UI (`/admin`). As with other editable settings, af
 
 - **`extension_first`** (default): if an extension that serves `/.well-known/lnurlp` (such as LNURLp) answers for the name, its response wins. Otherwise the core wallet address answers.
 - **`extension_only`**: core addresses are switched off. New wallets get no address, nobody can set one, and the core lookup answers "Lightning addresses are not supported on this instance." when no extension answers.
-- **`core_first`**: core addresses answer.
+- **`core_first`**: only core wallet addresses answer. Extensions are never asked, so an LNURLp-extension address with no matching core wallet gets "Lightning address not found." In v1.6.2 the extension redirect for `/.well-known/lnurlp` is skipped by design, and the core route only consults extensions in the other two modes.
 
-:::caution `core_first` is untested here
-Reading the v1.6.2 code, in `core_first` mode the core route never asks extensions at all, so an LNURLp-extension address with no matching core wallet would get "Lightning address not found." We have not tested this. If you rely on LNURLp-extension addresses, keep the default `extension_first`, or test `core_first` before you switch.
-:::
+If you rely on LNURLp-extension addresses, keep the default `extension_first`.
 
 ## Changing an address {#changing-an-address}
 
@@ -51,7 +49,7 @@ curl -X PATCH https://your-lnbits.example/api/v1/wallet \
   -d '{"lightning_address": "alice"}'
 ```
 
-If custom addresses are not allowed, this returns 403 "Users cannot specify Lightning Addresses."
+If custom addresses are not allowed, this returns 403 `Users cannot specify Lightning Addresses.` Other refusals come back as 400 with a message such as `Lightning Address is already taken.` or `Lightning Address contains a reserved word.`
 
 Names are lower-cased. They can contain only lowercase letters, digits, `.`, `_` and `-`, up to 210 characters, and must be unique on the instance. Send only the part before `@`.
 

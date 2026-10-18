@@ -47,7 +47,7 @@ Yes. Each wallet has its own balance, its own admin key (spend) and invoice key 
 
 ### How do I recover my account? {#how-do-i-recover-my-wallet}
 
-Log in with your username and password. If you've forgotten the password, ask the operator: the Super User can generate a one-time reset key for your account. On demo and public servers, a lost user-ID URL with no username can't be recovered.
+Log in with your username and password. If you've forgotten the password, ask the operator: the Super User can generate a one-time reset URL for your account from the Users page. A lost user-ID URL with no username or password set can't be recovered on a server you don't run.
 
 ### Can I stop others from creating accounts on my instance? {#can-i-prevent-others-from-creating-wallets-on-my-instance}
 
@@ -71,13 +71,13 @@ Payments between wallets on the same instance are internal: no routing fee and n
 
 ### Can I deposit on-chain bitcoin? {#can-i-deposit-on-chain-btc-to-lnbits}
 
-Not into a Lightning wallet balance directly in v1.6.2. The [Boltz extension](https://github.com/lnbits/boltz) does submarine swaps between on-chain and Lightning. The **Watch Only** extension (`watchonly`) tracks a separate on-chain wallet from an xpub; it doesn't add to your LNbits balance.
+Not into a Lightning wallet balance directly in v1.6.2. The [Boltz extension](https://github.com/lnbits/boltz) swaps between on-chain bitcoin and Lightning. The **Watch Only** extension (`watchonly`) tracks a separate on-chain wallet from an xpub; it doesn't add to your LNbits balance.
 
 A core on-chain wallet type exists only on the unreleased `dev` branch. See [Unreleased](/docs/guides/unreleased).
 
 ### How do I enable comments on LNURL-pay links? {#how-do-i-enable-comments-on-lnurl-p-payments}
 
-In the LNURLp extension, set the comment length on the pay link. It accepts 0 to 799 characters, and 0 turns comments off.
+In the LNURLp extension, set the comment length on the pay link: 0 to 799 characters, where 0 (the default) turns comments off. Core wallet [Lightning Addresses](/docs/guides/lightning-addresses) always accept comments of up to 799 characters.
 
 ### Does every wallet get a Lightning Address? {#lightning-address}
 
@@ -85,7 +85,11 @@ Since v1.6.0, core wallets can have a Lightning Address without the LNURLp exten
 
 ### How do I fund my LNbits wallet from my own node? {#how-do-i-fund-my-lnbits-wallet-from-my-own-node}
 
-If LNbits runs on the same LND node you are paying from, the payment is a circular self-payment, which LND refuses by default. LNbits v1.6.x has `LND_REST_ALLOW_SELF_PAYMENT` and `LND_GRPC_ALLOW_SELF_PAYMENT` (both default `false`) for this case. The simplest alternative is to pay the invoice from another wallet or node.
+With an LND funding source, an LNbits invoice is an invoice of your own node. Paying it from that same node is a circular self-payment: LND refuses it unless you allow it (`lncli payinvoice --allow_self_payment`), and then it needs a route out and back through your channels and costs routing fees. The simplest way is to pay from another wallet or node.
+
+The Super User can also credit a wallet directly, with the **+** button next to the wallet's balance or `PUT /users/api/v1/balance`. That moves no sats on the node: only credit funds the node really holds and no other wallet is owed, or the [balance watchdog](/docs/architecture/ledger) will flag the difference.
+
+The other direction has a v1.6.2 bug: an LNbits wallet paying an invoice created on LNbits' own LND node stays pending forever ([#4240](https://github.com/lnbits/lnbits/issues/4240), fixed on `dev`). `LND_REST_ALLOW_SELF_PAYMENT` and `LND_GRPC_ALLOW_SELF_PAYMENT` (both default `false`) let LNbits make such circular payments.
 
 ## Extensions {#extensions}
 

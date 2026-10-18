@@ -13,61 +13,50 @@ Move LNbits from SQLite to PostgreSQL, or from one server to another. **Make a f
 
 ## SQLite to PostgreSQL {#sqlite-to-postgresql}
 
-LNbits ships a converter, `tools/conv.py`. It copies the core and extension SQLite databases from the data folder into PostgreSQL. It needs `psycopg2`, which comes with the `migration` extra.
+LNbits ships a converter, `tools/conv.py`, in the source checkout. It copies `database.sqlite3` and every `ext_<id>.sqlite3` from the data folder into PostgreSQL, table by table, overwriting rows that already exist. It needs `psycopg2`, which comes with the `migration` extra. The commands below are for a source install. The Docker image already contains `tools/conv.py` and all extras, so on Docker run the same commands inside the container, for example `docker compose run --rm lnbits uv --offline run --no-sync python tools/conv.py`, with the database reachable from the container.
 
-1. **Stop LNbits.**
-2. **Create** an empty PostgreSQL database and user for LNbits.
-3. **Set** `LNBITS_DATABASE_URL` in `.env`. Include the port: the converter splits the URL by hand and expects `user:password@host:port/dbname`.
+1. **Stop LNbits** and make a full backup.
+2. **Create** an empty PostgreSQL database and a user that owns it.
+3. **Set** `LNBITS_DATABASE_URL` in `.env`. It must start with `postgres://` (LNbits refuses anything else) and include the port, because the converter splits the URL by hand:
    ```bash
    LNBITS_DATABASE_URL="postgres://lnbits:YOUR_PASSWORD@localhost:5432/lnbits"
    ```
-4. **Start LNbits once, then stop it.** This creates the schema in PostgreSQL. The converter checks that the SQLite and PostgreSQL schema versions match, so run the same LNbits version for both.
-5. **Install the extra and run the converter** from the LNbits source folder:
+4. **Create the schema** by starting LNbits once against the empty database, then stop it. Upstream's own migration test (`make test-migration`) does this first start with the Admin UI off, so that no new Super User and settings are created in PostgreSQL:
    ```bash
-   uv sync --extra migration
-   uv run python tools/conv.py
-   # or
-   make migration
+   LNBITS_ADMIN_UI=false uv run lnbits   # wait for "Application startup complete", then Ctrl+C
    ```
-   By default it reads the data folder. `--extensions-only` migrates only the `ext_*.sqlite3` files, and `-i` keeps going past errors (`uv run python tools/conv.py --help`).
-6. **Start LNbits** and check wallets, balances and extensions.
+5. **Install the extra and run the converter.** Use `--all-extras` (it includes `migration`): a plain `uv sync --extra migration` uninstalls any other extras you had.
+   ```bash
+   uv sync --all-extras
+   uv run python tools/conv.py
+   ```
+   It first checks that every schema version in SQLite matches PostgreSQL, so keep the same LNbits version throughout. `-i` logs failed rows and keeps going; `uv run python tools/conv.py --help` lists the rest.
+6. **Migrate the extensions.** In step 4 PostgreSQL had no installed extensions, so their tables don't exist yet and the converter logs `Failed to migrate extension <id>` for each one. Now that the core data (including the list of installed extensions) is in PostgreSQL, start LNbits once more so it creates those tables, stop it, and run:
+   ```bash
+   uv run python tools/conv.py --extensions-only
+   ```
+7. **Start LNbits** normally and check users, wallets, balances and extension data.
 
-Keep the old data folder. It still holds `.lnbits_auth_key`, `upgrades/` and `wasm_extensions/`, which LNbits needs on PostgreSQL too.
+Steps 4 and 6 follow from reading `tools/conv.py` and the startup code in v1.6.2; we have not run this procedure end to end. Check the converter's log for `🛑` lines before you delete anything.
 
-:::note
-`postgres://` is the scheme LNbits expects. The built-in backup only adds a database dump when the URL starts with `postgres://`.
-:::
+Keep the data folder. On PostgreSQL it still holds `.lnbits_auth_key`, `zips/` and `wasm_extensions/`. Keep the old `*.sqlite3` files too until you are sure the migration is complete.
 
 ## Between instances {#between-instances}
 
+:::danger One instance per funding source
+Never run the old and new instance against the same funding source at the same time. Each keeps its own copy of every balance, so users could spend the same node funds twice. Stop the old one before you start the new one.
+:::
+
 1. **Stop** LNbits on the old server.
-2. **Back up** the whole data folder, plus the database if you use PostgreSQL (`pg_dump --format=c "$LNBITS_DATABASE_URL"`). Or download the Super User backup from `/admin`.
+2. **Back up** the whole data folder, plus the database if you use PostgreSQL. Or download the Super User backup from `/admin`. See [Backup & Restore](/docs/guides/backup-restore).
 3. **Install** the same LNbits version on the new server (for Docker, pin the tag, e.g. `lnbits/lnbits:v1.6.2`).
 4. **Restore** the data folder and database there. See [Restore](/docs/guides/backup-restore).
 5. **Update** funding-source settings if the node's address or credentials changed. With the Admin UI on, these are stored in the database and override `.env`, so change them in `/admin`.
-6. **Verify** wallet balances against your node before you shut down the old server for good.
-
-Never run both instances against the same funding source at the same time. Each one keeps its own balances, and both could spend the same node funds.
+6. **Verify** wallet balances against your node before you delete the old server.
 
 ## Version upgrades {#version-upgrades}
 
-LNbits runs its database migrations automatically at startup. Back up first, read the [upgrade notes](/docs/guides/upgrading) for every release you skip, and pin the version you move to:
-
-```bash
-# Back up first, then:
-docker pull lnbits/lnbits:v1.6.2
-# set image: lnbits/lnbits:v1.6.2 in docker-compose.yml, then
-docker compose up -d
-```
-
-For a source install, check out the release tag rather than tracking a branch:
-
-```bash
-git fetch --tags && git checkout v1.6.2
-uv sync --all-extras
-```
-
-Migrations only go forward. To roll back, restore the backup you made before upgrading.
+LNbits runs its database migrations automatically at startup, and they only go forward. To roll back, restore the backup you made before upgrading. See [Upgrading](/docs/guides/upgrading) for the steps and the per-release notes.
 
 ## See Also
 

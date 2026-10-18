@@ -13,7 +13,7 @@ verified_with: v1.6.2
 Everything on this page is merged into LNbits' **`dev`** branch only. **None of it is in v1.6.2**, the latest release as of 2026-10-18, and none of it is on `main`. **Any of it may change, or be dropped, before release.** No version number or date has been announced. Don't run `dev` in production, and don't plan around these details until they ship in a tagged release.
 :::
 
-The repository's default branch on GitHub is `dev`, so links to "the code" or upstream docs often show unreleased behaviour. The rest of this site describes **v1.6.2**. Status was checked against [compare v1.6.2...dev](https://github.com/lnbits/lnbits/compare/v1.6.2...dev) on 2026-10-18.
+The repository's default branch on GitHub is `dev`, so links to "the code" or upstream docs often show unreleased behaviour. The rest of this site describes **v1.6.2**. Status was checked against [compare v1.6.2...dev](https://github.com/lnbits/lnbits/compare/v1.6.2...dev) on 2026-10-18: `dev` is 91 commits ahead of v1.6.2 (some appear twice after a rebase), the newest from 2026-10-16, and `main` is identical to v1.6.2. The version in `dev`'s `pyproject.toml` is still 1.6.2.
 
 ## TOTP two-factor authentication {#totp-2fa}
 
@@ -85,6 +85,12 @@ PR [#4164](https://github.com/lnbits/lnbits/pull/4164). *May change before relea
 
 `BoltzWallet` is "temporarily excluded" from the default allowed funding sources, and its CI tests are skipped while their regtest backend is failing. The code is still there. If you use the Boltz funding source, check the release notes of the next version before upgrading. This is about the Boltz **funding source**, not the Boltz swap extension.
 
+## Super User can change a payment's status {#payment-status}
+
+PR [#4243](https://github.com/lnbits/lnbits/pull/4243). *May change before release.*
+
+A **Change Status** action on a payment in the Super User's payments view. It only changes the stored status: it sends no notifications and fires no webhooks.
+
 ## Fixes for v1.6.2 bugs {#fixes}
 
 These fix problems you may hit on v1.6.2 today. See [Upgrading](/docs/guides/upgrading) for workarounds.
@@ -94,6 +100,9 @@ These fix problems you may hit on v1.6.2 today. See [Upgrading](/docs/guides/upg
 - [#4148](https://github.com/lnbits/lnbits/pull/4148): internal payments notify the receiver only once.
 - [#4193](https://github.com/lnbits/lnbits/pull/4193): the service fee is credited only after the payment succeeds.
 - [#4248](https://github.com/lnbits/lnbits/pull/4248): login tokens are invalidated when a password changes or is reset.
+- [#4241](https://github.com/lnbits/lnbits/pull/4241): paying an invoice created on LNbits' own LND node no longer leaves the payment pending forever ([#4240](https://github.com/lnbits/lnbits/issues/4240)).
+- [#4197](https://github.com/lnbits/lnbits/pull/4197): expired incoming invoices are failed in one database pass, even on `VoidWallet`. In v1.6.2 the pending check handles only 10 payments per run.
+- An unnumbered security merge (2026-09-14) validates the username and requires the repeated password to match on first install and on password change.
 
 ## See Also
 

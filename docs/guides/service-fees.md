@@ -35,10 +35,10 @@ The Admin UI is on by default (`LNBITS_ADMIN_UI=true`). After the first start th
 
 When a wallet pays an invoice:
 
-1. LNbits calculates the fee as `amount × LNBITS_SERVICE_FEE / 100`, capped at `LNBITS_SERVICE_FEE_MAX` sats when the cap is above 0.
-2. The sender needs enough balance for the amount **plus** the routing fee reserve **plus** the service fee.
+1. LNbits calculates the fee as `amount × LNBITS_SERVICE_FEE / 100` (rounded down to the msat), capped at `LNBITS_SERVICE_FEE_MAX` sats when the cap is above 0.
+2. The sender needs enough balance for the amount **plus** the routing fee reserve (by default the larger of 2 sats or 1%) **plus** the service fee. Otherwise the payment fails with `You must reserve at least (N  sat) to cover potential routing fees.`
 3. The recipient receives the full invoice amount.
-4. The sender's payment row records the routing fee plus the service fee in its `fee` column.
+4. When an external payment succeeds, the sender's payment row records the routing fee plus the service fee in its `fee` column. While it is pending, `fee` holds the reserve.
 5. The fee wallet gets a separate, already-settled incoming payment of the service fee, with the checking ID `service_fee_<payment_hash>`.
 
 Internal payments (between wallets on this instance) are skipped while `LNBITS_SERVICE_FEE_IGNORE_INTERNAL` is true. Set it to `false` to charge them as well.
@@ -60,7 +60,7 @@ Fee wallet:         +50 sats
 
 ## Fee Wallet Setup {#fee-wallet-setup}
 
-1. Create a dedicated wallet for fees, owned by an admin account.
+1. Create a dedicated wallet for fees, owned by an admin account. Anyone with its admin key can spend the collected fees.
 2. Copy its wallet ID.
 3. Set it as the service fee wallet in the Admin UI (or `LNBITS_SERVICE_FEE_WALLET` before the first start).
 4. Set the fee rate and cap.

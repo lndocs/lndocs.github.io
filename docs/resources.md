@@ -81,8 +81,8 @@ Running LNbits for other people makes you their custodian. Read [Security](/docs
 
 | Library | Language | Repository | Status |
 |---------|----------|------------|--------|
-| lnbits (npm) | JavaScript | [MiguelMedeiros/lnbits-js](https://github.com/MiguelMedeiros/lnbits-js) | Unmaintained since 2021 |
-| pylnbits | Python | [lightningames/pylnbits](https://github.com/lightningames/pylnbits) | Archived |
+| lnbits (npm) | JavaScript | [MiguelMedeiros/lnbits-js](https://github.com/MiguelMedeiros/lnbits-js) | Last commit 2023, last npm release 2022 |
+| pylnbits | Python | [lightningames/pylnbits](https://github.com/lightningames/pylnbits) | Archived on GitHub |
 
 Neither tracks the v1.6 API. Calling the REST API directly is usually simpler. See [SDKs & Libraries](/docs/api/sdks).
 
@@ -100,7 +100,7 @@ The admin QR code gives the app full spending access to that wallet.
 
 ### WordPress {#wordpress-plugins}
 
-- [LNbits – Bitcoin Onchain and Lightning Payment Gateway](https://wordpress.org/plugins/lnbits-bitcoin-onchain-and-lightning-payment-gateway/) for WooCommerce
+- [LNbits – Bitcoin Lightning and Onchain Payment Gateway](https://wordpress.org/plugins/lnbits-bitcoin-onchain-and-lightning-payment-gateway/) for WooCommerce (version 1.0.4, updated 2026-09-02)
 
 ## Community {#community}
 
@@ -112,9 +112,7 @@ The admin QR code gives the app full spending access to that wallet.
 
 The [LNbits GitHub wiki](https://github.com/lnbits/lnbits/wiki) has older community material, including printable flyers.
 
-## Removed links {#removed-links}
-
-These links used to be on this page and no longer work: Lightning Junkies episode 51 and rayito.io (domains gone), lightsats.com (TLS failure), the Go Full Crypto episode on Podbean and the Kuroba LNURL guide (pages removed), and LightningTipBot (decommissioned).
+<a id="removed-links"></a>
 
 ## Contributing {#contributing}
 

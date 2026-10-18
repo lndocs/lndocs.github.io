@@ -21,9 +21,12 @@ An LNbits backup has up to three parts: the **data folder**, the **PostgreSQL da
 | `ext_<id>.sqlite3` | One database per Python extension. Only present on SQLite. |
 | `.lnbits_auth_key` | The key that signs login tokens when `AUTH_SECRET_KEY` is empty. Without it, existing logins stop working. |
 | `.super_user` | A copy of the Super User ID. LNbits rewrites it from the database at every start. |
-| `upgrades/` | Temporary unpack folder, cleared at every start (`lnbits/app.py:426`). No need to back it up. The running Python extension code lives in `{LNBITS_EXTENSIONS_PATH}/extensions`, downloaded zips in `zips/`, and the list of installed extensions in the database. |
+| `zips/` | Downloaded Python extension archives. At startup LNbits reinstalls any installed extension whose code is missing, from these zips or by downloading again. |
 | `wasm_extensions/` | Installed WASM extensions. |
-| `logs/` | Log files. |
+| `logs/` | `lnbits.log` and `debug.log`. Not needed for a restore. |
+| `upgrades/`, `unzip-temp/` | Scratch folders. `upgrades/` is emptied at every start. Not needed. |
+
+The running Python extension code is **not** in the data folder by default: it is in `lnbits/extensions` (or `{LNBITS_EXTENSIONS_PATH}/extensions`). You don't need to back it up, because LNbits rebuilds it from `zips/` and the list of installed extensions in the database.
 
 **Your configuration:** `.env` (or your Docker `environment:` block). With the Admin UI on (the default), most settings live in the database, so the database backup carries them too.
 
@@ -38,24 +41,24 @@ The data folder and the database contain every wallet's admin key, the auth sign
 The Super User can download a backup from the Admin UI (**Download database backup** on the `/admin` page) or from the API:
 
 ```bash
-# Log in as the Super User to get a bearer token
+# Log in as the Super User to get a bearer token (jq builds the JSON, so quotes in the password are safe)
 read -rp "Username: " u; read -rsp "Password: " p; echo
-token=$(curl -s -X POST https://your-lnbits.example/api/v1/auth \
-  -H "Content-Type: application/json" \
-  -d "{\"username\":\"$u\",\"password\":\"$p\"}" | jq -r .access_token)
+token=$(jq -n --arg u "$u" --arg p "$p" '{username: $u, password: $p}' \
+  | curl -sf -X POST https://your-lnbits.example/api/v1/auth \
+      -H "Content-Type: application/json" -d @- | jq -r .access_token)
 
-# Download the backup zip
-curl -s -H "Authorization: Bearer $token" \
+# Download the backup zip. --fail stops curl saving an error message as the zip.
+curl -sf -H "Authorization: Bearer $token" \
   -o lnbits-backup-$(date +%Y%m%d).zip \
   https://your-lnbits.example/admin/api/v1/backup
 ```
 
-`GET /admin/api/v1/backup` returns a zip of the whole data folder. Only the Super User can call it.
+`GET /admin/api/v1/backup` returns a zip of the whole data folder, with the files at the top level of the zip. Only the Super User can call it.
 
 When `LNBITS_DATABASE_URL` starts with `postgres://`, LNbits first runs `pg_dump --format=c` and adds the dump to the zip as `lnbits-database.dmp`. It takes the host, port, user, password and database name from `LNBITS_DATABASE_URL`, so `pg_dump` must be installed where LNbits runs.
 
 :::note PostgreSQL backups and v1.6.2
-The v1.6.0 hardening broke PostgreSQL backups, and v1.6.2 is the hotfix ([#4187](https://github.com/lnbits/lnbits/pull/4187)). If you run v1.6.0 or v1.6.1 on PostgreSQL, upgrade before you rely on this endpoint. Since v1.6.2 a failed dump returns the error "PostgreSQL database backup failed." instead of a zip without the database.
+The v1.6.0 hardening broke PostgreSQL backups, and v1.6.2 is the hotfix ([#4187](https://github.com/lnbits/lnbits/pull/4187)). If you run v1.6.0 or v1.6.1 on PostgreSQL, upgrade before you rely on this endpoint. Since v1.6.2 a failed dump returns HTTP 400 with `{"detail": "PostgreSQL database backup failed."}` instead of a zip without the database.
 :::
 
 :::caution Docker image and PostgreSQL 15 or later
@@ -131,25 +134,28 @@ A built-in backup zip holds the dump as `lnbits-database.dmp`. Restore that file
 A backup you have never restored may not work. Test a restore at least once, and again after each upgrade:
 
 1. Restore onto a separate machine or container, with a **separate** database.
-2. Start it with `LNBITS_BACKEND_WALLET_CLASS=VoidWallet` so the copy cannot pay through your real node. With the Admin UI on, the funding source stored in the restored database overrides `.env`, so check `/admin` before connecting it to anything.
-3. Log in, and check that wallets, balances, payment history and extensions are all there.
+2. Start it with `LNBITS_ADMIN_UI=false` and `LNBITS_BACKEND_WALLET_CLASS=VoidWallet` in its `.env`. With the Admin UI off, LNbits ignores the settings stored in the database, so the copy cannot load your real funding-source credentials and pay through your node. Setting only `LNBITS_BACKEND_WALLET_CLASS` is not enough: with the Admin UI on, the restored database overrides it.
+3. Log in with a normal user account, and check that wallets, balances, payment history and extensions are all there.
 4. Delete the test copy afterwards. It holds live admin keys.
 
 ## Automated Backups {#automated-backups}
 
+For PostgreSQL, a daily cron job can dump the database and archive the data folder:
+
 ```bash
 #!/bin/bash
-# /etc/cron.daily/lnbits-backup
+# /etc/cron.daily/lnbits-backup  (no dot in the name, or run-parts skips it)
 set -euo pipefail
+umask 077   # backups hold admin keys: readable by root only
 
 BACKUP_DIR=/var/backups/lnbits
 DATE=$(date +%Y%m%d)
-set -a; . /opt/lnbits/.env; set +a
+mkdir -p "$BACKUP_DIR"
 
-# PostgreSQL
-pg_dump --format=c --file="$BACKUP_DIR/lnbits-$DATE.dmp" "$LNBITS_DATABASE_URL"
+# Read the database URL from LNbits' .env (adjust the path)
+db_url=$(grep -E '^LNBITS_DATABASE_URL=' /opt/lnbits/.env | cut -d= -f2- | tr -d '"')
 
-# Data folder (auth key, extensions)
+pg_dump --format=c --file="$BACKUP_DIR/lnbits-$DATE.dmp" "$db_url"
 tar -czf "$BACKUP_DIR/lnbits-data-$DATE.tar.gz" -C /opt/lnbits data
 
 # Keep 30 days
