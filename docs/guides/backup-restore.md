@@ -153,9 +153,9 @@ DATE=$(date +%Y%m%d)
 mkdir -p "$BACKUP_DIR"
 
 # Read the database URL from LNbits' .env (adjust the path)
-DB_URL=$(grep -E '^LNBITS_DATABASE_URL=' /opt/lnbits/.env | cut -d= -f2- | tr -d '"')
+db_url=$(grep -E '^LNBITS_DATABASE_URL=' /opt/lnbits/.env | cut -d= -f2- | tr -d '"')
 
-pg_dump --format=c --file="$BACKUP_DIR/lnbits-$DATE.dmp" "$DB_URL"
+pg_dump --format=c --file="$BACKUP_DIR/lnbits-$DATE.dmp" "$db_url"
 tar -czf "$BACKUP_DIR/lnbits-data-$DATE.tar.gz" -C /opt/lnbits data
 
 # Keep 30 days
