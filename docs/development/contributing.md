@@ -34,16 +34,7 @@ The default branch is **`dev`**. Branch from it and open pull requests against i
 
 ### Development setup {#development-setup}
 
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-uv sync --all-extras --dev
-npm install
-
-make install-pre-commit-hook   # black, ruff, prettier and basic hygiene hooks
-make dev                       # uv run lnbits --reload
-```
-
-The full walkthrough is in [Development Setup](/docs/development/setup).
+Install uv, then `uv sync --all-extras --dev` and `npm install`, and start with `make dev`. Run `make install-pre-commit-hook` once: it installs pre-commit hooks for Black, Ruff, Prettier and basic file hygiene. The full walkthrough is in [Development Setup](/docs/development/setup).
 
 ## Making changes {#making-changes}
 
@@ -56,26 +47,15 @@ git checkout -b fix/my-change upstream/dev
 
 ### Code quality {#code-quality}
 
-```bash
-make format   # rewrite files: prettier, black, ruff --fix
-make check    # mypy, pyright, black/ruff/prettier checks, bundle check
-```
-
-`make all` is `format` followed by `check`. It does **not** run tests. There is no `make lint` target.
+`make format` rewrites files (Prettier, Black, `ruff --fix`). `make check` runs mypy, Pyright, the Black, Ruff and Prettier checks and the bundle check, without changing files. `make all` runs both, and **no tests**. See [Code Style](/docs/development/code-style).
 
 ### Testing {#testing}
 
-```bash
-make test-unit
-make test-api
-make test-wallets
-```
-
-Coverage is collected on every pytest run (`--cov=lnbits` in `pyproject.toml`), so there is no separate coverage target. `make test` also runs the regtest suite, which needs the Docker regtest stack. See [Testing](/docs/development/testing).
+Run the targeted suites, `make test-unit`, `make test-api` and `make test-wallets`. `make test` also runs the regtest suite, which needs the Docker regtest stack. See [Testing](/docs/development/testing).
 
 ## Pull request process {#pull-request-process}
 
-1. Run `make format`, `make check` and the test targets that cover your change.
+1. Run `make format`, `make check` and the test targets that cover your change. CI runs the same lint targets, then the unit, API and wallet tests on Python 3.10 and 3.12, each against SQLite and PostgreSQL.
 2. Add or update tests for new behaviour.
 3. Update documentation if behaviour or settings change.
 4. Open the PR against **`dev`**, with a clear description and links to related issues.
@@ -85,14 +65,12 @@ Upstream's [`AGENTS.md`](https://github.com/lnbits/lnbits/blob/v1.6.2/AGENTS.md)
 
 ### Commit messages {#commit-messages}
 
-Upstream commits mostly use conventional prefixes:
+Most upstream commits use conventional prefixes (`feat:`, `fix:`, `perf:`, `chore:`, `chore(deps):`), and the squash-merged PR number ends the subject. Real examples from `dev`:
 
-```
-feat: add new payment feature
-fix: resolve wallet balance issue
-docs: update API documentation
-refactor: simplify payment logic
-test: add tests for extension
+```text
+fix: invalidate jwt token on password reset (#4248)
+feat: allow a webhook on outgoing payments (#4113)
+perf: cache WASM extension compilation across restarts (#4221)
 ```
 
 ## Security issues {#security-issues}

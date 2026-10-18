@@ -34,10 +34,13 @@ uv sync --all-extras --dev   # Python deps, all extras, and the dev group
 npm install                  # Prettier, Pyright and the bundler
 
 cp .env.example .env
+# edit .env now (see "Configuration while developing" below), before the first start
 make dev                     # = uv run lnbits --reload
 ```
 
 LNbits listens on `http://127.0.0.1:5000`. On first start, open it in a browser: you are sent to `/first_install` to set the Super User's username and password. `uv run lnbits-cli superuser` prints the Super User ID.
+
+`.env.example` sets `LNBITS_EXTENSIONS_DEFAULT_INSTALL="tpos"`, so the first start downloads TPoS from GitHub. Empty that line if you work offline or don't want it.
 
 :::note Branches
 The default branch on GitHub is **`dev`**, and pull requests target it. `main` only moves when a release is cut, so code on `dev` can differ from the release these docs describe.
@@ -45,7 +48,7 @@ The default branch on GitHub is **`dev`**, and pull requests target it. `main` o
 
 ## Make targets {#development-commands}
 
-These are the targets in the v1.6.2 `Makefile`:
+The main targets in the v1.6.2 `Makefile`:
 
 | Target | What it does |
 |---|---|
@@ -71,14 +74,14 @@ There is no `make lint` or `make test-cov`. Upstream's `AGENTS.md` recommends th
 
 ## Configuration while developing {#configuration}
 
+- **The Admin UI is on by default** (`LNBITS_ADMIN_UI=true`). On the first start LNbits copies the editable settings from `.env` into the database. From then on the database values, including the funding source, **override `.env`**. So set your development values in `.env` before the first start, and change them later in `/admin`. To start again from `.env`, stop LNbits and delete the data folder (`./data`), which also deletes your test wallets.
 - **Funding source.** The default is `LNBITS_BACKEND_WALLET_CLASS=VoidWallet`, which can't send or receive. For local work set `FakeWallet`. It issues invoices signed with `FAKE_WALLET_SECRET` and can only "pay" invoices it issued itself.
-- **The Admin UI is on by default** (`LNBITS_ADMIN_UI=true`). After the first start, editable settings, including the funding source, are stored in the database and **override `.env`**. Change them in `/admin`, or set `LNBITS_ADMIN_UI=false` while developing so that `.env` stays authoritative.
+- **`LNBITS_ADMIN_UI=false`** makes `.env` authoritative again, but it also turns off the Admin UI and the `/first_install` flow. Use it only if you don't need the Admin UI.
 - **Cookies.** `AUTH_HTTPS_ONLY=true` (the default) marks auth cookies `Secure`. Browsers normally accept that on `http://localhost`. If you reach the dev server by a LAN IP over plain HTTP, set `AUTH_HTTPS_ONLY=false`, for development only.
 - **Logs** go to the console and to `LNBITS_DATA_FOLDER/logs/`. `DEBUG=true` turns on debug logging.
 
-```bash title=".env (development)"
+```bash title=".env (development, set before the first start)"
 LNBITS_BACKEND_WALLET_CLASS=FakeWallet
-LNBITS_ADMIN_UI=false
 DEBUG=true
 ```
 
@@ -91,14 +94,14 @@ To develop against PostgreSQL:
 ```bash
 docker run -d --name lnbits-pg -p 5432:5432 \
   -e POSTGRES_USER=lnbits -e POSTGRES_PASSWORD=lnbits -e POSTGRES_DB=lnbits \
-  postgres:15
+  postgres:18
 ```
 
 ```bash title=".env"
 LNBITS_DATABASE_URL=postgres://lnbits:lnbits@localhost:5432/lnbits
 ```
 
-LNbits expects the `postgres://` scheme. These credentials are for a throwaway local container only.
+LNbits expects the `postgres://` scheme and refuses `postgresql://`. CI tests against PostgreSQL 18. These credentials are for a throwaway local container only.
 
 ## Editor setup {#vs-code-setup}
 
