@@ -70,7 +70,7 @@ Anyone holding a wallet's admin key can drain that wallet. Keep it on your serve
 | `POST /api/v1/payments/decode` | None | Decode a BOLT11 invoice or LNURL |
 | `POST /api/v1/payments/lnurl` | Admin key | Pay an LNURL-pay link or Lightning address |
 | `GET /api/v1/auth` | User token | The logged-in user and their wallets |
-| `GET /api/v1/health` | None | Server time and uptime |
+| `GET /api/v1/health` | None | Server time and uptime. Until `/first_install` is completed, every path (this one too) answers `307` to `/first_install`. |
 
 Each is covered in [Wallets](/docs/api/wallets), [Payments](/docs/api/payments), [LNURL](/docs/api/lnurl) and [Users](/docs/api/users).
 
