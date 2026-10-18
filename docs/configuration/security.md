@@ -22,7 +22,7 @@ Every sat in an LNbits wallet is held by the funding source you run. Whoever con
 | ☐ | Run the current release | Known, fixed vulnerabilities | [Stay current](#security-updates) |
 | ☐ | Set `FIRST_INSTALL_TOKEN` before the first start on a reachable server | A stranger claims the Super User | [First install](#first-install) |
 | ☐ | Bind to `127.0.0.1` behind a TLS proxy | Bypassing the proxy and its protections | [Network](#network-security) |
-| ☐ | Set `FORWARDED_ALLOW_IPS` to your proxy | Spoofed client IPs defeat the rate limit and IP blocks | [Proxy headers](#forwarded-allow-ips) |
+| ☐ | Set `FORWARDED_ALLOW_IPS` to your proxy. In Docker the image ignores it, so publish the port on `127.0.0.1` only. | Spoofed client IPs defeat the rate limit and IP blocks | [Proxy headers](#forwarded-allow-ips) |
 | ☐ | Keep `AUTH_HTTPS_ONLY=true` | Session cookies sent over plain HTTP | [Sessions](#session-security) |
 | ☐ | Keep `user-id-only` off | Leaked URLs give full account access | [Sessions](#session-security) |
 | ☐ | Turn off open sign-up on private instances | Anyone can create accounts and wallets | [Accounts](#accounts) |
