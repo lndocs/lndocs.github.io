@@ -21,7 +21,8 @@ const config: Config = {
   organizationName: 'lndocs',
   projectName: 'lndocs.github.io',
 
-  onBrokenLinks: 'warn',
+  onBrokenLinks: 'throw',
+  onBrokenAnchors: 'throw',
 
   i18n: {
     defaultLocale: 'en',

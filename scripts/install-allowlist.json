@@ -1,0 +1,15 @@
+{
+  "_comment": "Copy-paste install targets that appear in the docs. Each entry records the verified owner. Re-verify on every LNbits version bump.",
+  "verified": "2026-10-18",
+  "allowed": {
+    "git:https://github.com/lnbits/lnbits.git": "lnbits org (upstream)",
+    "git:https://github.com/lnbits/example.git": "lnbits org, the extension template",
+    "docker:lnbits/lnbits": "Docker Hub lnbits org (official image)",
+    "docker:postgres": "Docker official image",
+    "curl:https://astral.sh/uv/install.sh": "Astral, the official uv installer",
+    "curl:https://fly.io/install.sh": "Fly.io, the official flyctl installer",
+    "npm:lnbits": "MiguelMedeiros/lnbits-js. Community package, last published 2022",
+    "pip:pylnbits": "bitkarrot/pylnbits. Community package"
+  },
+  "denied": {}
+}
