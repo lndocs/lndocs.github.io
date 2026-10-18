@@ -15,7 +15,7 @@ A wallet owner can share a wallet with other users on the same LNbits instance a
 
 1. Open the wallet.
 2. Open **Share Wallet** in the wallet's settings panel.
-3. Enter the other user's **username or email**. They must already have an account on this instance.
+3. Enter the other user's **username or email**. They must already have an account on this instance, or the invite fails with `Invited user not found.`
 4. Select the permissions.
 5. Send the invitation.
 
@@ -57,15 +57,14 @@ A share's status is `invite_sent` until it is accepted, then `approved`.
 
 ## Use Cases {#use-cases}
 
-- **Team accounts**: several people managing one balance
-- **Family wallets**: shared household spending
-- **Business**: staff who can create invoices but not spend (`receive-payments` only)
+A typical use: shop staff who create invoices but cannot spend (`receive-payments`, perhaps with `view-payments`).
 
 ## Security {#security}
 
-- Share only with users you trust, and grant the fewest permissions that work.
-- Review shares regularly and revoke the ones you no longer need.
-- Sharing does not hand out the wallet's keys. To revoke access for someone who has a key, create a new wallet and move the funds.
+- The invited user's shared wallet has **its own** admin and invoice keys, not yours. Those keys act on your balance, limited to the permissions you granted: with **Send payments**, the shared wallet's admin key can spend your funds through the API.
+- Revoking a share deletes the shared wallet, so its keys stop working.
+- Sharing never reveals your own keys. If someone already has your wallet's admin key, revoking a share does nothing about that: create a new wallet and move the funds.
+- Review shares regularly and remove the ones you no longer need.
 
 ## See Also
 
