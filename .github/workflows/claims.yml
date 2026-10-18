@@ -39,6 +39,25 @@ jobs:
         run: node scripts/ci-claims.mjs
         env:
           LNBITS_CONTAINER: lnbits
+      - name: Dump reference data
+        if: always()
+        run: |
+          docker exec -i lnbits uv --offline run --no-sync python - \
+            < scripts/reference/dump_settings.py > /tmp/settings.json
+          curl -sf http://127.0.0.1:5000/openapi.json | jq -S . > /tmp/openapi.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lnbits-reference
+          path: |
+            /tmp/settings.json
+            /tmp/openapi.json
+      - name: Generated reference pages are up to date
+        run: |
+          cp /tmp/settings.json /tmp/openapi.json scripts/reference/
+          node scripts/gen-reference.mjs
+          git diff --exit-code -- scripts/reference docs/configuration/env-reference.md docs/api/endpoint-reference.md \
+            || { echo "::error::Reference pages are stale. Download the lnbits-reference artifact into scripts/reference/ and run node scripts/gen-reference.mjs"; exit 1; }
       - name: LNbits logs
         if: failure()
         run: docker logs lnbits | tail -100
