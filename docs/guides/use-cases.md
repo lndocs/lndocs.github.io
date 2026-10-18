@@ -35,7 +35,7 @@ flowchart LR
 
 Integrate Lightning payments into your online store:
 
-- **WooCommerce**: Use the [LNbits Payment Gateway](https://wordpress.org/plugins/lnbits-payment-gateway/) plugin
+- **WooCommerce**: Use the [LNbits Payment Gateway](https://wordpress.org/plugins/lnbits-bitcoin-onchain-and-lightning-payment-gateway/) plugin
 - **Custom**: Integrate via REST API with webhooks
 - **SatsPay**: Create payment links with expiration
 

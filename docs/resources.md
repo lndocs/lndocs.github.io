@@ -144,9 +144,7 @@ See the [SDKs & Libraries](/docs/api/sdks) page for usage examples.
 
 ### WordPress Plugins
 
-- [LNbits Payment Gateway](https://wordpress.org/plugins/lnbits-payment-gateway/) - WooCommerce
-- [Pay-to-read-more](https://wordpress.org/plugins/flavor-flavor/) - Paywalled content
-- [Lightning Publisher](https://wordpress.org/plugins/flavor-flavor/) - Donations & paywalls
+- [LNbits – Bitcoin Lightning and Onchain Payment Gateway](https://wordpress.org/plugins/lnbits-bitcoin-onchain-and-lightning-payment-gateway/) - WooCommerce
 
 ## Community
 

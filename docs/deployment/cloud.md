@@ -67,7 +67,7 @@ fly volumes create lnbits_data --size 1
 fly deploy
 
 # Set secrets
-fly secrets set AUTH_SECRET_KEY=your-secret-key
+fly secrets set AUTH_SECRET_KEY=$(openssl rand -hex 32)
 ```
 
 ## Railway
@@ -85,7 +85,7 @@ fly secrets set AUTH_SECRET_KEY=your-secret-key
 HOST=0.0.0.0
 PORT=$PORT
 LNBITS_BACKEND_WALLET_CLASS=FakeWallet
-AUTH_SECRET_KEY=your-secret
+# Set AUTH_SECRET_KEY in the dashboard to the output of: openssl rand -hex 32
 ```
 
 ## Render

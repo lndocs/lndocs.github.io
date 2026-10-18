@@ -20,8 +20,9 @@ Protect your LNbits data with regular backups.
 # Stop LNbits first
 docker compose stop
 
-# Copy database
-cp ./data/lnbits.sqlite3 ./backup/lnbits-$(date +%Y%m%d).sqlite3
+# Copy the whole data folder: database.sqlite3, one ext_<id>.sqlite3 per
+# extension, and .lnbits_auth_key (without it, existing logins stop working)
+mkdir -p ./backup && cp -a ./data ./backup/lnbits-data-$(date +%Y%m%d)
 
 # Start LNbits
 docker compose start
@@ -42,7 +43,8 @@ pg_dump lnbits | gzip > backup-$(date +%Y%m%d).sql.gz
 ### SQLite
 
 ```bash
-cp ./backup/lnbits-backup.sqlite3 ./data/lnbits.sqlite3
+# With LNbits stopped, put back the data folder you saved
+cp -a ./backup/lnbits-data-YYYYMMDD/. ./data/
 ```
 
 ### PostgreSQL

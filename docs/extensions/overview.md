@@ -272,11 +272,11 @@ await send_webhook(
 
 ## Security Model
 
-Extensions:
-- Can only access wallets user has enabled them for
-- Cannot access other users' data
-- Must use wallet API for payments
-- Are sandboxed from core internals
+:::warning Python extensions are not sandboxed
+A Python extension runs inside the LNbits process with full access to its database, its settings and every wallet's funds. Installing one means trusting its code as much as LNbits itself. Install only extensions you have reviewed, or from a source you trust.
+
+WASM extensions (new in v1.6.0) run in a sandbox with resource limits and declared permissions.
+:::
 
 ## Extension Lifecycle
 
