@@ -14,7 +14,7 @@ The Admin UI is the browser interface for running an LNbits instance. It's **on 
 :::danger The Super User and the admins control the funds
 The Super User can switch the funding source, credit any wallet with sats out of thin air, restart the server and download a backup of all data. Give that account a strong, unique password, and use it only for the tasks that need it.
 
-Admins are powerful too. The UI hides the funding-source fields from them, but the settings API doesn't: an admin can read the funding-source credentials with `GET /admin/api/v1/settings` and change the funding source with `PUT /admin/api/v1/settings` ([admin_api.py L70-94](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/admin_api.py#L70-L94), [crud/settings.py L35-48](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/crud/settings.py#L35-L48)). Only make someone an admin if you'd trust them with the node.
+Admins are powerful too. The UI hides the funding-source fields from them, but the settings API doesn't: an admin can read the funding-source credentials with `GET /admin/api/v1/settings` and change the funding source, its credentials and the admin list (`lnbits_admin_users`) with `PUT` or `PATCH /admin/api/v1/settings` ([admin_api.py L70-105](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/admin_api.py#L70-L105), [settings.py L1072-1095](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/settings.py#L1072-L1095), [crud/settings.py L35-48](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/crud/settings.py#L35-L48)). Only make someone an admin if you'd trust them with the node.
 :::
 
 ## First start {#first-time-setup}
@@ -25,7 +25,7 @@ On the first start with an empty settings table, LNbits does the following ([ser
 
 1. It creates a Super User account with a wallet, unless `SUPER_USER` names an existing account.
 2. It copies the editable settings from the environment into the database.
-3. It writes the Super User ID to `<data folder>/.super_user`. That's `./data/.super_user` for a source install and `/app/data/.super_user` in Docker.
+3. It writes the Super User ID to `<data folder>/.super_user` (only while the Admin UI is on). That's `./data/.super_user` for a source install and `/app/data/.super_user` in Docker.
 4. It switches to **first-install mode**. Every page request redirects to `/first_install` until the Super User has a username and password ([middleware.py L231-240](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/middleware.py#L231-L240)).
 
 Open the instance in a browser. On `/first_install`, pick the Super User's username and password. LNbits saves them (`PUT /api/v1/auth/first_install`) and logs you in ([auth_api.py L601-633](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/auth_api.py#L601-L633)). Upstream's walkthrough with screenshots is on [docs.lnbits.com](https://docs.lnbits.com/guide/installation/first-setup).
@@ -78,7 +78,7 @@ After login, admins get extra entries under **Manage** in the sidebar ([componen
 | Install and manage extensions | ✓ | ✓ |
 | **Change the funding source** in the UI | — (the API allows it, see the warning above) | ✓ |
 | **Credit or debit a wallet** (`PUT /users/api/v1/balance`) | — | ✓ |
-| **Grant or revoke admin rights** | — | ✓ |
+| **Grant or revoke admin rights** on the Users page | — (an admin can still edit `lnbits_admin_users` through the settings API) | ✓ |
 | **Generate password-reset keys** | — | ✓ |
 | **Restart the server, reset settings to defaults** | — | ✓ |
 | **Download the backup** (`GET /admin/api/v1/backup`) | — | ✓ |
@@ -136,7 +136,9 @@ There is no `_OVERRIDE` suffix or any other per-variable override.
 
 ## Funding source {#funding-source-management}
 
-### Changing the backend (Super User only) {#changing-backend-super-user-only}
+### Changing the backend {#changing-backend-super-user-only}
+
+In the UI only the Super User sees the funding-source picker. Any admin can still change it through `PUT /admin/api/v1/settings` (see the warning at the top).
 
 1. Download a backup (**Download database backup**).
 2. Open **Settings → Funding** and scroll to **Funding Sources**.

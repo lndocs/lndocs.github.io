@@ -281,10 +281,10 @@ gpg -d lnbits-data-2026-10-18.tar.gz.gpg | tar xzf -
 
 ## Admin accounts {#admin-security}
 
-- Use the Super User only for its reserved tasks (funding source, credits, restarts, backups). Give operators admin accounts.
+- Use the Super User only for its reserved tasks (funding source, credits, restarts, backups). Make someone an admin only if you'd trust them with the node: the UI hides the funding source from admins, but the settings API lets any admin change it, its credentials and the admin list.
 - Give every admin a strong, unique password.
 - Restrict `/admin`, `/users`, `/audit` and `/node`, and their API prefixes, to trusted IPs at the proxy (see [Admin UI](/docs/configuration/admin-ui)).
-- Treat every admin as able to read and change the funding-source credentials. The UI hides them from admins, but `GET` and `PUT /admin/api/v1/settings` don't ([admin_api.py L70-94](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/admin_api.py#L70-L94)).
+- Treat every admin as able to read and change the funding-source credentials. The UI hides them from admins, but `GET`, `PUT` and `PATCH /admin/api/v1/settings` don't ([admin_api.py L70-105](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/admin_api.py#L70-L105)).
 - Crediting a wallet creates sats that your node doesn't back. Only the Super User can do it, and an admin notification goes out when notifications are configured.
 
 ## Monitoring {#monitoring--alerts}

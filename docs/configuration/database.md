@@ -26,7 +26,7 @@ data/
 ├── database.sqlite3        # core: accounts, wallets, payments, settings
 ├── ext_<id>.sqlite3        # one per Python extension, e.g. ext_tpos.sqlite3
 ├── .lnbits_auth_key        # generated if AUTH_SECRET_KEY is empty
-├── .super_user             # the Super User ID (Admin UI on)
+├── .super_user             # the Super User ID, written only while the Admin UI is on
 ├── logs/
 ├── wasm_extensions/        # WASM extensions (v1.6.0+)
 ├── zips/                   # downloaded Python extension archives
