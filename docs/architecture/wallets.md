@@ -79,7 +79,7 @@ Send a key in the `X-Api-Key` header, or as the `api-key` query parameter:
 curl -H "X-Api-Key: $INVOICE_KEY" https://your-lnbits.example/api/v1/wallet
 ```
 
-Wallet keys only work on wallet routes. User and admin routes take a bearer token, a cookie or `?usr=`, never a wallet key.
+Wallet keys only work on wallet routes. User and admin routes take a bearer token, a cookie or `?usr=`, never a wallet key. A key stops working when its wallet is deleted or its account is deactivated (`lnbits/core/crud/wallets.py`, `get_wallet_for_key`).
 
 ### What each key can do {#permissions}
 
@@ -118,7 +118,7 @@ A share is a `WalletSharePermission` (`request_id`, `username`, `shared_with_wal
 
 1. The owner invites a user by username or email: `PUT /api/v1/wallet/share/invite` with the source wallet's **admin key**. LNbits records a share with status `invite_sent`, and adds an invite to the invited user's `extra.wallet_invite_requests`.
 2. The invited user accepts by creating a wallet of type `lightning-shared` whose `shared_wallet_id` is the source wallet (`POST /api/v1/wallet`, logged in as that user). LNbits creates the mirror wallet and marks the share `approved`.
-3. Or the invited user rejects it: `DELETE /api/v1/wallet/share/invite/{share_request_id}`, logged in as that user.
+3. Or the invited user rejects it: `DELETE /api/v1/wallet/share/invite/{share_request_id}`, logged in as that user. This only removes the invite from the user's account; the owner still sees the share as `invite_sent` until they revoke it.
 4. The owner can change the permissions of an approved share with `PUT /api/v1/wallet/share`.
 5. The owner can revoke a share with `DELETE /api/v1/wallet/share/{share_request_id}`. This deletes the mirror wallet.
 
@@ -133,7 +133,7 @@ For the user-facing steps, see [Shared Wallets](/docs/guides/shared-wallets).
 `DELETE /api/v1/wallet/{wallet_id}` is a **soft delete**: it sets `deleted = true`. The payments stay in the database, the keys stop working, and the wallet drops out of the `balances` view.
 
 - An admin can restore a deleted wallet from the user manager (`PUT /users/api/v1/user/{user_id}/wallet/{wallet}/undelete`).
-- `lnbits-cli db cleanup-deleted-wallets` removes deleted wallets for good.
+- `lnbits-cli db cleanup-deleted-wallets` removes the deleted wallet rows for good. Their payment rows stay in `apipayments`.
 
 :::warning
 A deleted wallet's balance no longer shows anywhere in LNbits, but the funds are still on the funding source. Withdraw the balance before you delete a wallet.

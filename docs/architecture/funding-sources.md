@@ -101,7 +101,6 @@ class PaymentStatus(NamedTuple):
 | `OpenNodeWallet` | OpenNode |
 | `ZBDWallet` | ZBD |
 | `LNbitsWallet` | A wallet on another LNbits instance |
-| `AlbyWallet` | Alby's OAuth Wallet API |
 
 ### Test and fallback {#special-purpose}
 
@@ -115,7 +114,7 @@ class PaymentStatus(NamedTuple):
 :::caution
 These classes still ship in v1.6.2, but the service behind them is gone or no longer maintained. Don't use them for new installs, and move existing ones to another backend:
 
-- `AlbyWallet`: Alby closed its shared (custodial) wallet on 2025-01-04. Connect Alby Hub through `NWCWallet` instead.
+- `AlbyWallet`: it talks to Alby's hosted wallet API (`ALBY_API_ENDPOINT`, default `https://api.getalby.com/`), and Alby closed its shared (custodial) wallet on 2025-01-04. Connect Alby Hub through `NWCWallet` instead.
 - `LNPayWallet` and `LnTipsWallet`: the LNPay and LN.tips API hosts no longer resolve.
 - `CoreLightningRestWallet`: c-lightning-REST is archived. Use `CLNRestWallet`.
 - `BreezSdkWallet` (Greenlight) and `BreezLiquidSdkWallet`: both Breez SDKs are deprecated.
@@ -128,14 +127,16 @@ For setup guides per backend, see [Funding Sources](/docs/funding-sources/overvi
 
 ## How a backend is loaded {#runtime-loading}
 
-At startup LNbits looks up the class by name, `getattr(lnbits.wallets, class_name)`, and creates one instance. It then calls `status()`. If that fails, it retries with backoff up to `FUNDING_SOURCE_MAX_RETRIES` times (default 4), and then **falls back to `VoidWallet`** so the server still starts. Check the log for "Fallback to VoidWallet" if invoices suddenly stop working.
+At startup LNbits looks up the class by name, `getattr(lnbits.wallets, class_name)`, and creates one instance. It then calls `status()`. If that fails, it retries up to `FUNDING_SOURCE_MAX_RETRIES` times (default 4, waiting 0.5, 1, 2 and 4 seconds), and then **falls back to `VoidWallet`** so the server still starts (`lnbits/app.py`, `check_funding_source`). Check the log for "Fallback to VoidWallet" if invoices suddenly stop working.
 
-The funding source is only loaded at startup. After you change it, restart LNbits: the Super User can do this from the Admin UI or with `GET /admin/api/v1/restart`.
+The funding source is only loaded at startup. After you change it, restart LNbits: the Admin UI says "Restart required!", and the Super User can restart from there or with `GET /admin/api/v1/restart`.
 
 ## Configuration {#configuration}
 
 :::info Settings live in the database
 The Admin UI is on by default (`LNBITS_ADMIN_UI=true`). After the first start, the funding source settings are stored in the database and **override `.env`**. Editing `.env` and restarting changes nothing. Change the funding source in the Admin UI (`/admin`, Funding Sources), or turn the Admin UI off if you want to manage it through `.env`.
+
+The Admin UI shows the funding source section only to the Super User, but `PUT /admin/api/v1/settings` accepts funding source fields from any admin. See [Users & Accounts](/docs/architecture/users).
 :::
 
 With the Admin UI off, set the class and its settings in `.env`, then restart:
@@ -154,8 +155,8 @@ LNBITS_BACKEND_WALLET_CLASS=CLNRestWallet
 CLNREST_URL=https://127.0.0.1:3010
 CLNREST_READONLY_RUNE=        # required
 CLNREST_INVOICE_RUNE=         # needed to create invoices
-CLNREST_PAY_RUNE=             # needed to pay
-CLNREST_RENEPAY_RUNE=         # optional, for renepay
+CLNREST_PAY_RUNE=             # needed to pay, unless you set the renepay rune
+CLNREST_RENEPAY_RUNE=         # optional; if set, payments use renepay
 ```
 
 If you use Docker, note that `docker start` doesn't re-read an env file. Recreate the container instead.
@@ -172,7 +173,7 @@ When LNbits pays an invoice, it waits `LNBITS_FUNDING_SOURCE_PAY_INVOICE_WAIT_SE
 
 LNbits doesn't stop wallets from adding up to more than the backend holds. It offers two tools to spot a gap:
 
-- **`GET /admin/api/v1/audit`** (admin): returns the node balance and the total of all LNbits wallets, in sats.
+- **`GET /admin/api/v1/audit`** (admin): returns `lnbits_balance_sats` (the total of all wallets) and `node_balance_sats`. It errors if the funding source's `status()` reports an error.
 - **The watchdog** (`check_server_balance_against_node`): every `LNBITS_WATCHDOG_INTERVAL_MINUTES` (default 60) it compares the two. If LNbits holds more than the node by at least `LNBITS_WATCHDOG_DELTA` sats (default 1,000,000), it sends an admin notification and, if `LNBITS_WATCHDOG_SWITCH_TO_VOIDWALLET` is on, switches the instance to `VoidWallet`.
 
 The watchdog does nothing unless `LNBITS_WATCHDOG_SWITCH_TO_VOIDWALLET` or `LNBITS_NOTIFICATION_WATCHDOG` is turned on. Both are off by default.
