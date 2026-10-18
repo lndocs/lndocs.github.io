@@ -21,8 +21,8 @@ function HomepageHeader() {
         <p className="hero__subtitle">{siteConfig.tagline}</p>
         <p className={styles.heroDescription}>
           Build powerful Lightning Network applications with a modular,
-          self-hosted wallet and accounts system. 24+ funding sources,
-          100+ extensions, infinite possibilities.
+          self-hosted wallet and accounts system. 20+ funding sources,
+          60+ extensions, infinite possibilities.
         </p>
         <div className={styles.buttons}>
           <Link
@@ -52,13 +52,13 @@ const FeatureList: FeatureItem[] = [
   {
     title: 'Multiple Funding Sources',
     icon: '🔌',
-    description: 'Connect to LND, Core Lightning, Phoenixd, Eclair, or 20+ other Lightning backends. Self-hosted or custodial - your choice.',
+    description: 'Connect to LND, Core Lightning, Phoenixd, Eclair, or about 20 other Lightning backends. Self-hosted or custodial - your choice.',
     link: '/docs/funding-sources/overview',
   },
   {
     title: 'Powerful Extensions',
     icon: '🧩',
-    description: 'TPoS, LNURL, Paywall, Jukebox, and 100+ more. Install extensions to add functionality without touching code.',
+    description: 'TPoS, LNURL, Paywall, Jukebox, and 60+ more. Install extensions to add functionality without touching code.',
     link: '/docs/extensions/overview',
   },
   {
@@ -70,7 +70,7 @@ const FeatureList: FeatureItem[] = [
   {
     title: 'Developer Friendly',
     icon: '👩‍💻',
-    description: 'Clean REST API, webhook support, LNURL compatibility. Build your own extensions with Python and Vue.js.',
+    description: 'Clean REST API, webhook support, LNURL compatibility. Build your own extensions with Python and Vue.js, or as sandboxed WASM.',
     link: '/docs/api/overview',
   },
   {
@@ -125,11 +125,11 @@ function StatsSection() {
         </Heading>
         <div className={styles.statsGrid}>
           <div className={styles.statItem}>
-            <span className={styles.statNumber}>24+</span>
+            <span className={styles.statNumber}>20+</span>
             <span className={styles.statLabel}>Funding Sources</span>
           </div>
           <div className={styles.statItem}>
-            <span className={styles.statNumber}>100+</span>
+            <span className={styles.statNumber}>60+</span>
             <span className={styles.statLabel}>Extensions</span>
           </div>
           <div className={styles.statItem}>
