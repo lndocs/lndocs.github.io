@@ -150,7 +150,6 @@ services:
 
 ## Changing the port {#port}
 
-{/* snippet:skip: LNBITS_PORT is read by the image's start command, not by settings.py */}
 ```yaml
     environment:
       - LNBITS_PORT=8000
