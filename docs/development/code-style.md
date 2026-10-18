@@ -1,102 +1,50 @@
 ---
 sidebar_position: 4
 title: Code Style
-description: LNbits coding standards and style guide
+description: The formatters, linters and type checkers LNbits enforces
+last_update:
+  date: 2026-10-18
+verified_with: v1.6.2
 ---
 
 # Code Style
 
-LNbits follows consistent coding standards.
+LNbits' style is whatever its tooling enforces. Run `make format` before committing and `make check` before opening a PR. CI runs the same checks.
 
-## Formatting
+## Tools {#tools}
 
-Black is used for code formatting:
+| Tool | Scope | Configured in | Fix | Check |
+|---|---|---|---|---|
+| [Black](https://black.readthedocs.io/) | Python formatting, line length 88 | `pyproject.toml` `[tool.black]` | `make black` | `make checkblack` |
+| [Ruff](https://docs.astral.sh/ruff/) | Python lint and import order | `pyproject.toml` `[tool.ruff]` | `make ruff` | `make checkruff` |
+| [mypy](https://mypy.readthedocs.io/) | Type checking | `pyproject.toml` `[tool.mypy]` | n/a | `make mypy` |
+| [Pyright](https://microsoft.github.io/pyright/) | Type checking of `lnbits`, `tests`, `tools` | `pyproject.toml` `[tool.pyright]` | n/a | `make pyright` |
+| [Prettier](https://prettier.io/) | JS, CSS, HTML, JSON | `.prettierrc` | `make prettier` | `make checkprettier` |
 
-```bash
-make format
-```
+`make format` runs Prettier, Black and Ruff with `--fix`. `make check` runs mypy, Pyright, the three format checks and `checkbundle`. There is no `make lint`.
 
-Configuration in `pyproject.toml`:
-```toml
-[tool.black]
-line-length = 88
-```
+## Ruff rules {#linting}
 
-## Linting
+`pyproject.toml` selects these rule sets: `F` (pyflakes), `E`/`W` (pycodestyle), `I` (isort), `A` (builtins), `C` (mccabe), `N` (naming), `UP` (pyupgrade), `RUF`, `B` (bugbear) and `S` (bandit). So imports are sorted by Ruff, and the bandit rules flag things like hard-coded passwords and `subprocess` calls.
 
-Ruff for linting:
+The formatters skip generated and third-party code: `lnbits/static` bundles, `lnbits/extensions`, `lnbits/upgrades` and the gRPC stubs in `lnbits/wallets/*_grpc_files`.
 
-```bash
-make lint
-```
+## Conventions in the codebase {#conventions}
 
-## Type Hints
-
-Type hints are required for all public functions:
+- **Type hints** on functions, using modern syntax (`str | None`, not `Optional[str]`), since the minimum Python is 3.10.
+- **Async all the way.** Database calls and HTTP requests are awaited. Don't add blocking work to async paths.
+- **Keyword-only service functions.** Core services such as `create_invoice(*, wallet_id, amount, memo, ...)` and `pay_invoice(*, wallet_id, payment_request, ...)` take keyword arguments only. Follow the same pattern for new services with many parameters.
+- **Layering.** Database access goes in `lnbits/core/crud/`, business logic in `lnbits/core/services/`, HTTP routes in `lnbits/core/views/`, and Pydantic models in `lnbits/core/models/`. Schema changes go in a new numbered function in `lnbits/core/migrations.py`.
+- **Settings** are Pydantic fields in `lnbits/settings.py`. The environment variable is the field name in upper case.
 
 ```python
-async def create_invoice(
-    wallet_id: str,
-    amount: int,
-    memo: str
-) -> InvoiceResponse:
+async def get_wallet_payment(
+    wallet_id: str, payment_hash: str, conn: Connection | None = None
+) -> Payment | None:
     ...
 ```
 
-## Docstrings
-
-Use docstrings for public functions:
-
-```python
-async def create_invoice(
-    wallet_id: str,
-    amount: int,
-    memo: str
-) -> InvoiceResponse:
-    """Create a Lightning invoice.
-
-    Args:
-        wallet_id: The wallet to create invoice for
-        amount: Amount in satoshis
-        memo: Invoice description
-
-    Returns:
-        InvoiceResponse with payment_request and payment_hash
-    """
-```
-
-## Async/Await
-
-Use async/await for all database and network operations:
-
-```python
-# Good
-async def get_data():
-    return await db.fetchone(query)
-
-# Bad
-def get_data():
-    return db.fetchone(query)  # Blocking!
-```
-
-## Import Order
-
-1. Standard library
-2. Third-party packages
-3. Local imports
-
-```python
-import asyncio
-from typing import Optional
-
-import httpx
-from fastapi import APIRouter
-
-from lnbits.core.models import Wallet
-from .crud import get_items
-```
-
-## See Also
+## See also {#see-also}
 
 - [Contributing](/docs/development/contributing)
 - [Development Setup](/docs/development/setup)
