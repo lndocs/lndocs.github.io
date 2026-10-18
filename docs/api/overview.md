@@ -11,7 +11,7 @@ verified_with: v1.6.2
 
 LNbits is a FastAPI application. Everything the web UI does goes through the same REST API, so anything you can click you can also script.
 
-These pages explain the concepts and the endpoints most integrations need. They are not a full reference.
+These pages explain the concepts and the endpoints most integrations need. For every endpoint, see the [Endpoint reference](/docs/api/endpoint-reference), which is generated from the official image's OpenAPI schema.
 
 ## The authoritative reference {#api-documentation}
 

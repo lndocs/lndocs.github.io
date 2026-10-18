@@ -42,6 +42,7 @@ const sidebars: SidebarsConfig = {
         'configuration/authentication',
         'configuration/admin-ui',
         'configuration/security',
+        'configuration/env-reference',
       ],
     },
     {
@@ -85,6 +86,7 @@ const sidebars: SidebarsConfig = {
         'api/lnurl',
         'api/webhooks',
         'api/sdks',
+        'api/endpoint-reference',
       ],
     },
     {

@@ -119,6 +119,11 @@ await claim('api/overview', 'The OpenAPI schema is served at /openapi.json', asy
   expect(r.status === 200 && r.data.openapi, `status ${r.status}`);
 });
 
+await claim('api/endpoint-reference', 'The interactive API docs are served at /docs', async () => {
+  const r = await call('GET', '/docs');
+  expect(r.status === 200 && /swagger/i.test(String(r.data)), `status ${r.status}`);
+});
+
 // ---- findings from the critic pass, read from code, proven here ------------
 let su;
 async function register(username) {
