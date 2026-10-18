@@ -42,6 +42,8 @@ That listens on `127.0.0.1:5000`. The command takes `--host`, `--port`, `--forwa
 
 Then open `http://127.0.0.1:5000/first_install` and set the Super User's username and password. `uv run lnbits-cli superuser` prints the Super User ID later if you need it.
 
+Over plain HTTP, mind `AUTH_HTTPS_ONLY=true` (the default): the login cookie is `Secure`, which browsers generally accept on `localhost`/`127.0.0.1` but not on a LAN address. Use the reverse proxy, or set `AUTH_HTTPS_ONLY=false` for a local test instance only.
+
 ## Configuration {#configuration}
 
 The settings that matter for a deployment live in `.env` and are read at every start:
@@ -73,16 +75,15 @@ AUTH_SECRET_KEY=
 
 ## Updating {#updating}
 
+Read the [release notes](https://github.com/lnbits/lnbits/releases) first and back up `data/`. For the [systemd](/docs/deployment/systemd) layout (checkout in `/home/lnbits/lnbits`, owned by the `lnbits` user):
+
 ```bash
 sudo systemctl stop lnbits
-cd lnbits
-git fetch --tags
-git checkout v1.6.2   # the release you're moving to
-uv sync --all-extras
+sudo -iu lnbits bash -c 'cd ~/lnbits && git fetch --tags && git checkout v1.6.2 && ~/.local/bin/uv sync --all-extras'
 sudo systemctl start lnbits
 ```
 
-Read the [release notes](https://github.com/lnbits/lnbits/releases) first and back up `data/`. Migrations run on start. Then update extensions in the Admin UI.
+Replace `v1.6.2` with the release you're moving to. Run git and uv as the user that owns the checkout, or the files end up owned by someone else. Migrations run on start. Then update extensions in the Admin UI.
 
 ## Poetry (legacy) {#installation-with-poetry}
 
