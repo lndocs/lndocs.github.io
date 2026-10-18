@@ -1,0 +1,3466 @@
+[
+ {
+  "default": [
+   "AlbyWallet",
+   "BarkWallet",
+   "BoltzWallet",
+   "BlinkWallet",
+   "BreezSdkWallet",
+   "BreezLiquidSdkWallet",
+   "CLNRestWallet",
+   "CoreLightningRestWallet",
+   "CoreLightningWallet",
+   "EclairWallet",
+   "FakeWallet",
+   "LNPayWallet",
+   "LNbitsWallet",
+   "SparkL2Wallet",
+   "LnTipsWallet",
+   "LndRestWallet",
+   "LndWallet",
+   "OpenNodeWallet",
+   "PhoenixdWallet",
+   "VoidWallet",
+   "ZBDWallet",
+   "NWCWallet",
+   "StrikeWallet"
+  ],
+  "editable": false,
+  "env": [
+   "LNBITS_ALLOWED_FUNDING_SOURCES"
+  ],
+  "group": "SuperUserSettings",
+  "name": "lnbits_allowed_funding_sources",
+  "type": "List[str]"
+ },
+ {
+  "default": "./data",
+  "editable": false,
+  "env": [
+   "LNBITS_DATA_FOLDER"
+  ],
+  "group": "PersistenceSettings",
+  "name": "lnbits_data_folder",
+  "type": "str"
+ },
+ {
+  "default": null,
+  "editable": false,
+  "env": [
+   "LNBITS_DATABASE_URL"
+  ],
+  "group": "PersistenceSettings",
+  "name": "lnbits_database_url",
+  "type": "Optional[str]"
+ },
+ {
+  "default": "",
+  "editable": false,
+  "env": [
+   "LNBITS_WASM_EXTENSIONS_PATH"
+  ],
+  "group": "PersistenceSettings",
+  "name": "lnbits_wasm_extensions_path",
+  "type": "str"
+ },
+ {
+  "default": [],
+  "editable": false,
+  "env": [
+   "LNBITS_EXTENSIONS_DEFAULT_INSTALL"
+  ],
+  "group": "ExtensionsInstallSettings",
+  "name": "lnbits_extensions_default_install",
+  "type": "List[str]"
+ },
+ {
+  "default": "",
+  "editable": false,
+  "env": [
+   "LNBITS_EXT_GITHUB_TOKEN"
+  ],
+  "group": "ExtensionsInstallSettings",
+  "name": "lnbits_ext_github_token",
+  "type": "str"
+ },
+ {
+  "default": false,
+  "editable": false,
+  "env": [
+   "DEBUG"
+  ],
+  "group": "EnvSettings",
+  "name": "debug",
+  "type": "bool"
+ },
+ {
+  "default": false,
+  "editable": false,
+  "env": [
+   "DEBUG_DATABASE"
+  ],
+  "group": "EnvSettings",
+  "name": "debug_database",
+  "type": "bool"
+ },
+ {
+  "default": true,
+  "editable": false,
+  "env": [
+   "BUNDLE_ASSETS"
+  ],
+  "group": "EnvSettings",
+  "name": "bundle_assets",
+  "type": "bool"
+ },
+ {
+  "default": false,
+  "editable": false,
+  "env": [
+   "PROFILER"
+  ],
+  "group": "EnvSettings",
+  "name": "profiler",
+  "type": "bool"
+ },
+ {
+  "default": true,
+  "editable": false,
+  "env": [
+   "AUTH_HTTPS_ONLY"
+  ],
+  "group": "EnvSettings",
+  "name": "auth_https_only",
+  "type": "bool"
+ },
+ {
+  "default": "127.0.0.1",
+  "editable": false,
+  "env": [
+   "HOST"
+  ],
+  "group": "EnvSettings",
+  "name": "host",
+  "type": "str"
+ },
+ {
+  "default": 5000,
+  "editable": false,
+  "env": [
+   "PORT"
+  ],
+  "group": "EnvSettings",
+  "name": "port",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": "*",
+  "editable": false,
+  "env": [
+   "FORWARDED_ALLOW_IPS"
+  ],
+  "group": "EnvSettings",
+  "name": "forwarded_allow_ips",
+  "type": "str"
+ },
+ {
+  "default": "LNbits API",
+  "editable": false,
+  "env": [
+   "LNBITS_TITLE"
+  ],
+  "group": "EnvSettings",
+  "name": "lnbits_title",
+  "type": "str"
+ },
+ {
+  "default": ".",
+  "editable": false,
+  "env": [
+   "LNBITS_PATH"
+  ],
+  "group": "EnvSettings",
+  "name": "lnbits_path",
+  "type": "str"
+ },
+ {
+  "default": "lnbits",
+  "editable": false,
+  "env": [
+   "LNBITS_EXTENSIONS_PATH"
+  ],
+  "group": "EnvSettings",
+  "name": "lnbits_extensions_path",
+  "type": "str"
+ },
+ {
+  "default": "",
+  "editable": false,
+  "env": [
+   "SUPER_USER"
+  ],
+  "group": "EnvSettings",
+  "name": "super_user",
+  "type": "str"
+ },
+ {
+  "default": "",
+  "editable": false,
+  "env": [
+   "AUTH_SECRET_KEY"
+  ],
+  "group": "EnvSettings",
+  "name": "auth_secret_key",
+  "type": "str"
+ },
+ {
+  "default": "0.0.0",
+  "editable": false,
+  "env": [
+   "VERSION"
+  ],
+  "group": "EnvSettings",
+  "name": "version",
+  "type": "str"
+ },
+ {
+  "default": "",
+  "editable": false,
+  "env": [
+   "USER_AGENT"
+  ],
+  "group": "EnvSettings",
+  "name": "user_agent",
+  "type": "str"
+ },
+ {
+  "default": true,
+  "editable": false,
+  "env": [
+   "ENABLE_LOG_TO_FILE"
+  ],
+  "group": "EnvSettings",
+  "name": "enable_log_to_file",
+  "type": "bool"
+ },
+ {
+  "default": "100 MB",
+  "editable": false,
+  "env": [
+   "LOG_ROTATION"
+  ],
+  "group": "EnvSettings",
+  "name": "log_rotation",
+  "type": "str"
+ },
+ {
+  "default": "3 months",
+  "editable": false,
+  "env": [
+   "LOG_RETENTION"
+  ],
+  "group": "EnvSettings",
+  "name": "log_retention",
+  "type": "str"
+ },
+ {
+  "default": null,
+  "editable": false,
+  "env": [
+   "FIRST_INSTALL_TOKEN"
+  ],
+  "group": "EnvSettings",
+  "name": "first_install_token",
+  "type": "Optional[str]"
+ },
+ {
+  "default": 90,
+  "editable": false,
+  "env": [
+   "CLEANUP_WALLETS_DAYS"
+  ],
+  "group": "EnvSettings",
+  "name": "cleanup_wallets_days",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 4,
+  "editable": true,
+  "env": [
+   "FUNDING_SOURCE_MAX_RETRIES"
+  ],
+  "group": "FundingSourcesSettings",
+  "name": "funding_source_max_retries",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 0,
+  "editable": false,
+  "env": [
+   "LNBITS_MAX_USERS"
+  ],
+  "group": "EnvSettings",
+  "name": "lnbits_max_users",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 0,
+  "editable": false,
+  "env": [
+   "LNBITS_MAX_EXTENSIONS"
+  ],
+  "group": "EnvSettings",
+  "name": "lnbits_max_extensions",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": false,
+  "editable": false,
+  "env": [
+   "TASK_HEART_BEAT_VERBOSE"
+  ],
+  "group": "EnvSettings",
+  "name": "task_heart_beat_verbose",
+  "type": "bool"
+ },
+ {
+  "default": 30,
+  "editable": false,
+  "env": [
+   "TASK_HEART_BEAT_INTERVAL"
+  ],
+  "group": "EnvSettings",
+  "name": "task_heart_beat_interval",
+  "type": "int"
+ },
+ {
+  "default": true,
+  "editable": false,
+  "env": [
+   "LNBITS_ADMIN_UI"
+  ],
+  "group": "ReadOnlySettings",
+  "name": "lnbits_admin_ui",
+  "type": "bool"
+ },
+ {
+  "default": "",
+  "editable": true,
+  "env": [
+   "OIDC_DISCOVERY_URL"
+  ],
+  "group": "OidcAuthSettings",
+  "name": "oidc_discovery_url",
+  "type": "str"
+ },
+ {
+  "default": "",
+  "editable": true,
+  "env": [
+   "OIDC_CLIENT_ID"
+  ],
+  "group": "OidcAuthSettings",
+  "name": "oidc_client_id",
+  "type": "str"
+ },
+ {
+  "default": "",
+  "editable": true,
+  "env": [
+   "OIDC_CLIENT_SECRET"
+  ],
+  "group": "OidcAuthSettings",
+  "name": "oidc_client_secret",
+  "type": "str"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "OIDC_CLIENT_CUSTOM_ORG"
+  ],
+  "group": "OidcAuthSettings",
+  "name": "oidc_client_custom_org",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "OIDC_CLIENT_CUSTOM_ICON"
+  ],
+  "group": "OidcAuthSettings",
+  "name": "oidc_client_custom_icon",
+  "type": "Optional[str]"
+ },
+ {
+  "default": "",
+  "editable": true,
+  "env": [
+   "KEYCLOAK_DISCOVERY_URL"
+  ],
+  "group": "KeycloakAuthSettings",
+  "name": "keycloak_discovery_url",
+  "type": "str"
+ },
+ {
+  "default": "",
+  "editable": true,
+  "env": [
+   "KEYCLOAK_CLIENT_ID"
+  ],
+  "group": "KeycloakAuthSettings",
+  "name": "keycloak_client_id",
+  "type": "str"
+ },
+ {
+  "default": "",
+  "editable": true,
+  "env": [
+   "KEYCLOAK_CLIENT_SECRET"
+  ],
+  "group": "KeycloakAuthSettings",
+  "name": "keycloak_client_secret",
+  "type": "str"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "KEYCLOAK_CLIENT_CUSTOM_ORG"
+  ],
+  "group": "KeycloakAuthSettings",
+  "name": "keycloak_client_custom_org",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "KEYCLOAK_CLIENT_CUSTOM_ICON"
+  ],
+  "group": "KeycloakAuthSettings",
+  "name": "keycloak_client_custom_icon",
+  "type": "Optional[str]"
+ },
+ {
+  "default": "",
+  "editable": true,
+  "env": [
+   "GITHUB_CLIENT_ID"
+  ],
+  "group": "GitHubAuthSettings",
+  "name": "github_client_id",
+  "type": "str"
+ },
+ {
+  "default": "",
+  "editable": true,
+  "env": [
+   "GITHUB_CLIENT_SECRET"
+  ],
+  "group": "GitHubAuthSettings",
+  "name": "github_client_secret",
+  "type": "str"
+ },
+ {
+  "default": "",
+  "editable": true,
+  "env": [
+   "GOOGLE_CLIENT_ID"
+  ],
+  "group": "GoogleAuthSettings",
+  "name": "google_client_id",
+  "type": "str"
+ },
+ {
+  "default": "",
+  "editable": true,
+  "env": [
+   "GOOGLE_CLIENT_SECRET"
+  ],
+  "group": "GoogleAuthSettings",
+  "name": "google_client_secret",
+  "type": "str"
+ },
+ {
+  "default": [
+   "http://127.0.0.1:5000",
+   "http://localhost:5000"
+  ],
+  "editable": true,
+  "env": [
+   "NOSTR_ABSOLUTE_REQUEST_URLS"
+  ],
+  "group": "NostrAuthSettings",
+  "name": "nostr_absolute_request_urls",
+  "type": "List[str]"
+ },
+ {
+  "default": 525600,
+  "editable": true,
+  "env": [
+   "AUTH_TOKEN_EXPIRE_MINUTES"
+  ],
+  "group": "AuthSettings",
+  "name": "auth_token_expire_minutes",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": [
+   "user-id-only",
+   "username-password",
+   "nostr-auth-nip98",
+   "google-auth",
+   "github-auth",
+   "keycloak-auth",
+   "oidc-auth"
+  ],
+  "editable": true,
+  "env": [
+   "AUTH_ALL_METHODS"
+  ],
+  "group": "AuthSettings",
+  "name": "auth_all_methods",
+  "type": "List[str]"
+ },
+ {
+  "default": [
+   "username-password"
+  ],
+  "editable": true,
+  "env": [
+   "AUTH_ALLOWED_METHODS"
+  ],
+  "group": "AuthSettings",
+  "name": "auth_allowed_methods",
+  "type": "List[str]"
+ },
+ {
+  "default": 120,
+  "editable": true,
+  "env": [
+   "AUTH_CREDETIALS_UPDATE_THRESHOLD"
+  ],
+  "group": "AuthSettings",
+  "name": "auth_credetials_update_threshold",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 10,
+  "editable": true,
+  "env": [
+   "AUTH_AUTHENTICATION_CACHE_MINUTES"
+  ],
+  "group": "AuthSettings",
+  "name": "auth_authentication_cache_minutes",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": true,
+  "editable": true,
+  "env": [
+   "LNBITS_AUDIT_ENABLED"
+  ],
+  "group": "AuditSettings",
+  "name": "lnbits_audit_enabled",
+  "type": "bool"
+ },
+ {
+  "default": 7,
+  "editable": true,
+  "env": [
+   "LNBITS_AUDIT_RETENTION_DAYS"
+  ],
+  "group": "AuditSettings",
+  "name": "lnbits_audit_retention_days",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LNBITS_AUDIT_LOG_IP_ADDRESS"
+  ],
+  "group": "AuditSettings",
+  "name": "lnbits_audit_log_ip_address",
+  "type": "bool"
+ },
+ {
+  "default": true,
+  "editable": true,
+  "env": [
+   "LNBITS_AUDIT_LOG_PATH_PARAMS"
+  ],
+  "group": "AuditSettings",
+  "name": "lnbits_audit_log_path_params",
+  "type": "bool"
+ },
+ {
+  "default": true,
+  "editable": true,
+  "env": [
+   "LNBITS_AUDIT_LOG_QUERY_PARAMS"
+  ],
+  "group": "AuditSettings",
+  "name": "lnbits_audit_log_query_params",
+  "type": "bool"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LNBITS_AUDIT_LOG_REQUEST_BODY"
+  ],
+  "group": "AuditSettings",
+  "name": "lnbits_audit_log_request_body",
+  "type": "bool"
+ },
+ {
+  "default": [
+   ".*api/v1/.*"
+  ],
+  "editable": true,
+  "env": [
+   "LNBITS_AUDIT_INCLUDE_PATHS"
+  ],
+  "group": "AuditSettings",
+  "name": "lnbits_audit_include_paths",
+  "type": "List[str]"
+ },
+ {
+  "default": [
+   "/static"
+  ],
+  "editable": true,
+  "env": [
+   "LNBITS_AUDIT_EXCLUDE_PATHS"
+  ],
+  "group": "AuditSettings",
+  "name": "lnbits_audit_exclude_paths",
+  "type": "List[str]"
+ },
+ {
+  "default": [
+   "POST",
+   "PUT",
+   "PATCH",
+   "DELETE"
+  ],
+  "editable": true,
+  "env": [
+   "LNBITS_AUDIT_HTTP_METHODS"
+  ],
+  "group": "AuditSettings",
+  "name": "lnbits_audit_http_methods",
+  "type": "List[str]"
+ },
+ {
+  "default": [
+   "4.*",
+   "5.*"
+  ],
+  "editable": true,
+  "env": [
+   "LNBITS_AUDIT_HTTP_RESPONSE_CODES"
+  ],
+  "group": "AuditSettings",
+  "name": "lnbits_audit_http_response_codes",
+  "type": "List[str]"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LNBITS_BLOCKEXPLORER_ENABLED"
+  ],
+  "group": "BlockExplorerSettings",
+  "name": "lnbits_blockexplorer_enabled",
+  "type": "bool"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LNBITS_BLOCKEXPLORER_PUBLIC_API"
+  ],
+  "group": "BlockExplorerSettings",
+  "name": "lnbits_blockexplorer_public_api",
+  "type": "bool"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LNBITS_BLOCKEXPLORER_IN_USER_MENU"
+  ],
+  "group": "BlockExplorerSettings",
+  "name": "lnbits_blockexplorer_in_user_menu",
+  "type": "bool"
+ },
+ {
+  "default": "ssl://electrum.blockstream.info:50002",
+  "editable": true,
+  "env": [
+   "LNBITS_BLOCKEXPLORER_ELECTRUM_URL"
+  ],
+  "group": "BlockExplorerSettings",
+  "name": "lnbits_blockexplorer_electrum_url",
+  "type": "str"
+ },
+ {
+  "default": "main",
+  "editable": true,
+  "env": [
+   "LNBITS_BLOCKEXPLORER_NETWORK"
+  ],
+  "group": "BlockExplorerSettings",
+  "name": "lnbits_blockexplorer_network",
+  "type": "str"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LNBITS_NODE_UI"
+  ],
+  "group": "NodeUISettings",
+  "name": "lnbits_node_ui",
+  "type": "bool"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LNBITS_PUBLIC_NODE_UI"
+  ],
+  "group": "NodeUISettings",
+  "name": "lnbits_public_node_ui",
+  "type": "bool"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LNBITS_NODE_UI_TRANSACTIONS"
+  ],
+  "group": "NodeUISettings",
+  "name": "lnbits_node_ui_transactions",
+  "type": "bool"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LNBITS_WEBPUSH_PUBKEY"
+  ],
+  "group": "WebPushSettings",
+  "name": "lnbits_webpush_pubkey",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LNBITS_WEBPUSH_PRIVKEY"
+  ],
+  "group": "WebPushSettings",
+  "name": "lnbits_webpush_privkey",
+  "type": "Optional[str]"
+ },
+ {
+  "default": 3600,
+  "editable": true,
+  "env": [
+   "LIGHTNING_INVOICE_EXPIRY"
+  ],
+  "group": "LightningSettings",
+  "name": "lightning_invoice_expiry",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "REVOLUT_ENABLED"
+  ],
+  "group": "RevolutFiatProvider",
+  "name": "revolut_enabled",
+  "type": "bool"
+ },
+ {
+  "default": "https://merchant.revolut.com",
+  "editable": true,
+  "env": [
+   "REVOLUT_API_ENDPOINT"
+  ],
+  "group": "RevolutFiatProvider",
+  "name": "revolut_api_endpoint",
+  "type": "str"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "REVOLUT_API_SECRET_KEY"
+  ],
+  "group": "RevolutFiatProvider",
+  "name": "revolut_api_secret_key",
+  "type": "Optional[str]"
+ },
+ {
+  "default": "2026-04-20",
+  "editable": true,
+  "env": [
+   "REVOLUT_API_VERSION"
+  ],
+  "group": "RevolutFiatProvider",
+  "name": "revolut_api_version",
+  "type": "str"
+ },
+ {
+  "default": "https://lnbits.com",
+  "editable": true,
+  "env": [
+   "REVOLUT_PAYMENT_SUCCESS_URL"
+  ],
+  "group": "RevolutFiatProvider",
+  "name": "revolut_payment_success_url",
+  "type": "str"
+ },
+ {
+  "default": "https://your-lnbits-domain-here.com/api/v1/callback/revolut",
+  "editable": true,
+  "env": [
+   "REVOLUT_PAYMENT_WEBHOOK_URL"
+  ],
+  "group": "RevolutFiatProvider",
+  "name": "revolut_payment_webhook_url",
+  "type": "str"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "REVOLUT_WEBHOOK_SIGNING_SECRET"
+  ],
+  "group": "RevolutFiatProvider",
+  "name": "revolut_webhook_signing_secret",
+  "type": "Optional[str]"
+ },
+ {
+  "default": "allowed_users=[] service_max_fee_sats=0 service_fee_percent=0 service_fee_wallet_id=None service_min_amount_sats=0 service_max_amount_sats=0 service_faucet_wallet_id=''",
+  "editable": true,
+  "env": [
+   "REVOLUT_LIMITS"
+  ],
+  "group": "RevolutFiatProvider",
+  "name": "revolut_limits",
+  "type": "FiatProviderLimits"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "SQUARE_ENABLED"
+  ],
+  "group": "SquareFiatProvider",
+  "name": "square_enabled",
+  "type": "bool"
+ },
+ {
+  "default": "https://connect.squareup.com",
+  "editable": true,
+  "env": [
+   "SQUARE_API_ENDPOINT"
+  ],
+  "group": "SquareFiatProvider",
+  "name": "square_api_endpoint",
+  "type": "str"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "SQUARE_ACCESS_TOKEN"
+  ],
+  "group": "SquareFiatProvider",
+  "name": "square_access_token",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "SQUARE_LOCATION_ID"
+  ],
+  "group": "SquareFiatProvider",
+  "name": "square_location_id",
+  "type": "Optional[str]"
+ },
+ {
+  "default": "2026-01-22",
+  "editable": true,
+  "env": [
+   "SQUARE_API_VERSION"
+  ],
+  "group": "SquareFiatProvider",
+  "name": "square_api_version",
+  "type": "str"
+ },
+ {
+  "default": "https://lnbits.com",
+  "editable": true,
+  "env": [
+   "SQUARE_PAYMENT_SUCCESS_URL"
+  ],
+  "group": "SquareFiatProvider",
+  "name": "square_payment_success_url",
+  "type": "str"
+ },
+ {
+  "default": "https://your-lnbits-domain-here.com/api/v1/callback/square",
+  "editable": true,
+  "env": [
+   "SQUARE_PAYMENT_WEBHOOK_URL"
+  ],
+  "group": "SquareFiatProvider",
+  "name": "square_payment_webhook_url",
+  "type": "str"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "SQUARE_WEBHOOK_SIGNATURE_KEY"
+  ],
+  "group": "SquareFiatProvider",
+  "name": "square_webhook_signature_key",
+  "type": "Optional[str]"
+ },
+ {
+  "default": "allowed_users=[] service_max_fee_sats=0 service_fee_percent=0 service_fee_wallet_id=None service_min_amount_sats=0 service_max_amount_sats=0 service_faucet_wallet_id=''",
+  "editable": true,
+  "env": [
+   "SQUARE_LIMITS"
+  ],
+  "group": "SquareFiatProvider",
+  "name": "square_limits",
+  "type": "FiatProviderLimits"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "PAYPAL_ENABLED"
+  ],
+  "group": "PayPalFiatProvider",
+  "name": "paypal_enabled",
+  "type": "bool"
+ },
+ {
+  "default": "https://api-m.paypal.com",
+  "editable": true,
+  "env": [
+   "PAYPAL_API_ENDPOINT"
+  ],
+  "group": "PayPalFiatProvider",
+  "name": "paypal_api_endpoint",
+  "type": "str"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "PAYPAL_CLIENT_ID"
+  ],
+  "group": "PayPalFiatProvider",
+  "name": "paypal_client_id",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "PAYPAL_CLIENT_SECRET"
+  ],
+  "group": "PayPalFiatProvider",
+  "name": "paypal_client_secret",
+  "type": "Optional[str]"
+ },
+ {
+  "default": "https://lnbits.com",
+  "editable": true,
+  "env": [
+   "PAYPAL_PAYMENT_SUCCESS_URL"
+  ],
+  "group": "PayPalFiatProvider",
+  "name": "paypal_payment_success_url",
+  "type": "str"
+ },
+ {
+  "default": "https://your-lnbits-domain-here.com/api/v1/callback/paypal",
+  "editable": true,
+  "env": [
+   "PAYPAL_PAYMENT_WEBHOOK_URL"
+  ],
+  "group": "PayPalFiatProvider",
+  "name": "paypal_payment_webhook_url",
+  "type": "str"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "PAYPAL_WEBHOOK_ID"
+  ],
+  "group": "PayPalFiatProvider",
+  "name": "paypal_webhook_id",
+  "type": "Optional[str]"
+ },
+ {
+  "default": "allowed_users=[] service_max_fee_sats=0 service_fee_percent=0 service_fee_wallet_id=None service_min_amount_sats=0 service_max_amount_sats=0 service_faucet_wallet_id=''",
+  "editable": true,
+  "env": [
+   "PAYPAL_LIMITS"
+  ],
+  "group": "PayPalFiatProvider",
+  "name": "paypal_limits",
+  "type": "FiatProviderLimits"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "STRIPE_ENABLED"
+  ],
+  "group": "StripeFiatProvider",
+  "name": "stripe_enabled",
+  "type": "bool"
+ },
+ {
+  "default": "https://api.stripe.com",
+  "editable": true,
+  "env": [
+   "STRIPE_API_ENDPOINT"
+  ],
+  "group": "StripeFiatProvider",
+  "name": "stripe_api_endpoint",
+  "type": "str"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "STRIPE_API_SECRET_KEY"
+  ],
+  "group": "StripeFiatProvider",
+  "name": "stripe_api_secret_key",
+  "type": "Optional[str]"
+ },
+ {
+  "default": "https://lnbits.com",
+  "editable": true,
+  "env": [
+   "STRIPE_PAYMENT_SUCCESS_URL"
+  ],
+  "group": "StripeFiatProvider",
+  "name": "stripe_payment_success_url",
+  "type": "str"
+ },
+ {
+  "default": "https://your-lnbits-domain-here.com/api/v1/callback/stripe",
+  "editable": true,
+  "env": [
+   "STRIPE_PAYMENT_WEBHOOK_URL"
+  ],
+  "group": "StripeFiatProvider",
+  "name": "stripe_payment_webhook_url",
+  "type": "str"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "STRIPE_WEBHOOK_SIGNING_SECRET"
+  ],
+  "group": "StripeFiatProvider",
+  "name": "stripe_webhook_signing_secret",
+  "type": "Optional[str]"
+ },
+ {
+  "default": "allowed_users=[] service_max_fee_sats=0 service_fee_percent=0 service_fee_wallet_id=None service_min_amount_sats=0 service_max_amount_sats=0 service_faucet_wallet_id=''",
+  "editable": true,
+  "env": [
+   "STRIPE_LIMITS"
+  ],
+  "group": "StripeFiatProvider",
+  "name": "stripe_limits",
+  "type": "FiatProviderLimits"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "BREEZ_LIQUID_API_KEY"
+  ],
+  "group": "BreezLiquidSdkFundingSource",
+  "name": "breez_liquid_api_key",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "BREEZ_LIQUID_SEED"
+  ],
+  "group": "BreezLiquidSdkFundingSource",
+  "name": "breez_liquid_seed",
+  "type": "Optional[str]"
+ },
+ {
+  "default": 50,
+  "editable": true,
+  "env": [
+   "BREEZ_LIQUID_FEE_OFFSET_SAT"
+  ],
+  "group": "BreezLiquidSdkFundingSource",
+  "name": "breez_liquid_fee_offset_sat",
+  "type": "int"
+ },
+ {
+  "default": "https://api.strike.me/v1",
+  "editable": true,
+  "env": [
+   "STRIKE_API_ENDPOINT"
+  ],
+  "group": "StrikeFundingSource",
+  "name": "strike_api_endpoint",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "STRIKE_API_KEY"
+  ],
+  "group": "StrikeFundingSource",
+  "name": "strike_api_key",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "BREEZ_API_KEY"
+  ],
+  "group": "BreezSdkFundingSource",
+  "name": "breez_api_key",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "BREEZ_GREENLIGHT_SEED"
+  ],
+  "group": "BreezSdkFundingSource",
+  "name": "breez_greenlight_seed",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "BREEZ_GREENLIGHT_INVITE_CODE"
+  ],
+  "group": "BreezSdkFundingSource",
+  "name": "breez_greenlight_invite_code",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "BREEZ_GREENLIGHT_DEVICE_KEY"
+  ],
+  "group": "BreezSdkFundingSource",
+  "name": "breez_greenlight_device_key",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "BREEZ_GREENLIGHT_DEVICE_CERT"
+  ],
+  "group": "BreezSdkFundingSource",
+  "name": "breez_greenlight_device_cert",
+  "type": "Optional[str]"
+ },
+ {
+  "default": true,
+  "editable": true,
+  "env": [
+   "BREEZ_USE_TRAMPOLINE"
+  ],
+  "group": "BreezSdkFundingSource",
+  "name": "breez_use_trampoline",
+  "type": "bool"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "NWC_PAIRING_URL"
+  ],
+  "group": "NWCFundingSource",
+  "name": "nwc_pairing_url",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LNTIPS_API_ENDPOINT"
+  ],
+  "group": "LnTipsFundingSource",
+  "name": "lntips_api_endpoint",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LNTIPS_API_KEY"
+  ],
+  "group": "LnTipsFundingSource",
+  "name": "lntips_api_key",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LNTIPS_ADMIN_KEY"
+  ],
+  "group": "LnTipsFundingSource",
+  "name": "lntips_admin_key",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LNTIPS_INVOICE_KEY"
+  ],
+  "group": "LnTipsFundingSource",
+  "name": "lntips_invoice_key",
+  "type": "Optional[str]"
+ },
+ {
+  "default": "MAINNET",
+  "editable": true,
+  "env": [
+   "SPARK_L2_NETWORK"
+  ],
+  "group": "SparkL2FundingSource",
+  "name": "spark_l2_network",
+  "type": "str"
+ },
+ {
+  "default": "http://localhost:8765",
+  "editable": true,
+  "env": [
+   "SPARK_L2_EXTERNAL_ENDPOINT"
+  ],
+  "group": "SparkL2FundingSource",
+  "name": "spark_l2_external_endpoint",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "SPARK_L2_EXTERNAL_API_KEY"
+  ],
+  "group": "SparkL2FundingSource",
+  "name": "spark_l2_external_api_key",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "SPARK_L2_MNEMONIC"
+  ],
+  "group": "SparkL2FundingSource",
+  "name": "spark_l2_mnemonic",
+  "type": "Optional[str]"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "SPARK_L2_MNEMONIC_BACKUP_CONFIRMED"
+  ],
+  "group": "SparkL2FundingSource",
+  "name": "spark_l2_mnemonic_backup_confirmed",
+  "type": "bool"
+ },
+ {
+  "default": 4000,
+  "editable": true,
+  "env": [
+   "SPARK_L2_PAY_WAIT_MS"
+  ],
+  "group": "SparkL2FundingSource",
+  "name": "spark_l2_pay_wait_ms",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 500,
+  "editable": true,
+  "env": [
+   "SPARK_L2_PAY_POLL_MS"
+  ],
+  "group": "SparkL2FundingSource",
+  "name": "spark_l2_pay_poll_ms",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 15000,
+  "editable": true,
+  "env": [
+   "SPARK_L2_STREAM_KEEPALIVE_MS"
+  ],
+  "group": "SparkL2FundingSource",
+  "name": "spark_l2_stream_keepalive_ms",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": "http://localhost:3000",
+  "editable": true,
+  "env": [
+   "BARK_API_ENDPOINT"
+  ],
+  "group": "BarkFundingSource",
+  "name": "bark_api_endpoint",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "BARK_API_TOKEN"
+  ],
+  "group": "BarkFundingSource",
+  "name": "bark_api_token",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "SPARK_URL"
+  ],
+  "group": "SparkFundingSource",
+  "name": "spark_url",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "SPARK_TOKEN"
+  ],
+  "group": "SparkFundingSource",
+  "name": "spark_token",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "OPENNODE_API_ENDPOINT"
+  ],
+  "group": "OpenNodeFundingSource",
+  "name": "opennode_api_endpoint",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "OPENNODE_KEY"
+  ],
+  "group": "OpenNodeFundingSource",
+  "name": "opennode_key",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "OPENNODE_ADMIN_KEY"
+  ],
+  "group": "OpenNodeFundingSource",
+  "name": "opennode_admin_key",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "OPENNODE_INVOICE_KEY"
+  ],
+  "group": "OpenNodeFundingSource",
+  "name": "opennode_invoice_key",
+  "type": "Optional[str]"
+ },
+ {
+  "default": "http://localhost:9740/",
+  "editable": true,
+  "env": [
+   "PHOENIXD_API_ENDPOINT"
+  ],
+  "group": "PhoenixdFundingSource",
+  "name": "phoenixd_api_endpoint",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "PHOENIXD_API_PASSWORD"
+  ],
+  "group": "PhoenixdFundingSource",
+  "name": "phoenixd_api_password",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "PHOENIXD_DATA_DIR"
+  ],
+  "group": "PhoenixdFundingSource",
+  "name": "phoenixd_data_dir",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "PHOENIXD_MNEMONIC"
+  ],
+  "group": "PhoenixdFundingSource",
+  "name": "phoenixd_mnemonic",
+  "type": "Optional[str]"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "PHOENIXD_MNEMONIC_BACKUP_CONFIRMED"
+  ],
+  "group": "PhoenixdFundingSource",
+  "name": "phoenixd_mnemonic_backup_confirmed",
+  "type": "bool"
+ },
+ {
+  "default": "https://api.zebedee.io/v0/",
+  "editable": true,
+  "env": [
+   "ZBD_API_ENDPOINT"
+  ],
+  "group": "ZBDFundingSource",
+  "name": "zbd_api_endpoint",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "ZBD_API_KEY"
+  ],
+  "group": "ZBDFundingSource",
+  "name": "zbd_api_key",
+  "type": "Optional[str]"
+ },
+ {
+  "default": "127.0.0.1:9002",
+  "editable": true,
+  "env": [
+   "BOLTZ_CLIENT_ENDPOINT"
+  ],
+  "group": "BoltzFundingSource",
+  "name": "boltz_client_endpoint",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "BOLTZ_CLIENT_MACAROON"
+  ],
+  "group": "BoltzFundingSource",
+  "name": "boltz_client_macaroon",
+  "type": "Optional[str]"
+ },
+ {
+  "default": "",
+  "editable": true,
+  "env": [
+   "BOLTZ_CLIENT_PASSWORD"
+  ],
+  "group": "BoltzFundingSource",
+  "name": "boltz_client_password",
+  "type": "str"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "BOLTZ_CLIENT_CERT"
+  ],
+  "group": "BoltzFundingSource",
+  "name": "boltz_client_cert",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "BOLTZ_MNEMONIC"
+  ],
+  "group": "BoltzFundingSource",
+  "name": "boltz_mnemonic",
+  "type": "Optional[str]"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "BOLTZ_MNEMONIC_BACKUP_CONFIRMED"
+  ],
+  "group": "BoltzFundingSource",
+  "name": "boltz_mnemonic_backup_confirmed",
+  "type": "bool"
+ },
+ {
+  "default": "https://api.getalby.com/",
+  "editable": true,
+  "env": [
+   "ALBY_API_ENDPOINT"
+  ],
+  "group": "AlbyFundingSource",
+  "name": "alby_api_endpoint",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "ALBY_ACCESS_TOKEN"
+  ],
+  "group": "AlbyFundingSource",
+  "name": "alby_access_token",
+  "type": "Optional[str]"
+ },
+ {
+  "default": "https://api.blink.sv/graphql",
+  "editable": true,
+  "env": [
+   "BLINK_API_ENDPOINT"
+  ],
+  "group": "BlinkFundingSource",
+  "name": "blink_api_endpoint",
+  "type": "Optional[str]"
+ },
+ {
+  "default": "wss://ws.blink.sv/graphql",
+  "editable": true,
+  "env": [
+   "BLINK_WS_ENDPOINT"
+  ],
+  "group": "BlinkFundingSource",
+  "name": "blink_ws_endpoint",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "BLINK_TOKEN"
+  ],
+  "group": "BlinkFundingSource",
+  "name": "blink_token",
+  "type": "Optional[str]"
+ },
+ {
+  "default": true,
+  "editable": true,
+  "env": [
+   "BLINK_SEND_WITHOUT_PROBE"
+  ],
+  "group": "BlinkFundingSource",
+  "name": "blink_send_without_probe",
+  "type": "bool"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LNPAY_API_ENDPOINT"
+  ],
+  "group": "LnPayFundingSource",
+  "name": "lnpay_api_endpoint",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LNPAY_API_KEY"
+  ],
+  "group": "LnPayFundingSource",
+  "name": "lnpay_api_key",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LNPAY_WALLET_KEY"
+  ],
+  "group": "LnPayFundingSource",
+  "name": "lnpay_wallet_key",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LNPAY_ADMIN_KEY"
+  ],
+  "group": "LnPayFundingSource",
+  "name": "lnpay_admin_key",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LND_GRPC_ENDPOINT"
+  ],
+  "group": "LndGrpcFundingSource",
+  "name": "lnd_grpc_endpoint",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LND_GRPC_CERT"
+  ],
+  "group": "LndGrpcFundingSource",
+  "name": "lnd_grpc_cert",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LND_GRPC_PORT"
+  ],
+  "group": "LndGrpcFundingSource",
+  "name": "lnd_grpc_port",
+  "type": "Optional[int]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LND_GRPC_ADMIN_MACAROON"
+  ],
+  "group": "LndGrpcFundingSource",
+  "name": "lnd_grpc_admin_macaroon",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LND_GRPC_INVOICE_MACAROON"
+  ],
+  "group": "LndGrpcFundingSource",
+  "name": "lnd_grpc_invoice_macaroon",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LND_GRPC_MACAROON"
+  ],
+  "group": "LndGrpcFundingSource",
+  "name": "lnd_grpc_macaroon",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LND_GRPC_MACAROON_ENCRYPTED"
+  ],
+  "group": "LndGrpcFundingSource",
+  "name": "lnd_grpc_macaroon_encrypted",
+  "type": "Optional[str]"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LND_GRPC_ALLOW_SELF_PAYMENT"
+  ],
+  "group": "LndGrpcFundingSource",
+  "name": "lnd_grpc_allow_self_payment",
+  "type": "bool"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LND_REST_ENDPOINT"
+  ],
+  "group": "LndRestFundingSource",
+  "name": "lnd_rest_endpoint",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LND_REST_CERT"
+  ],
+  "group": "LndRestFundingSource",
+  "name": "lnd_rest_cert",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LND_REST_MACAROON"
+  ],
+  "group": "LndRestFundingSource",
+  "name": "lnd_rest_macaroon",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LND_REST_MACAROON_ENCRYPTED"
+  ],
+  "group": "LndRestFundingSource",
+  "name": "lnd_rest_macaroon_encrypted",
+  "type": "Optional[str]"
+ },
+ {
+  "default": true,
+  "editable": true,
+  "env": [
+   "LND_REST_ROUTE_HINTS"
+  ],
+  "group": "LndRestFundingSource",
+  "name": "lnd_rest_route_hints",
+  "type": "bool"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LND_REST_ALLOW_SELF_PAYMENT"
+  ],
+  "group": "LndRestFundingSource",
+  "name": "lnd_rest_allow_self_payment",
+  "type": "bool"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LND_CERT"
+  ],
+  "group": "LndRestFundingSource",
+  "name": "lnd_cert",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LND_ADMIN_MACAROON"
+  ],
+  "group": "LndRestFundingSource",
+  "name": "lnd_admin_macaroon",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LND_INVOICE_MACAROON"
+  ],
+  "group": "LndRestFundingSource",
+  "name": "lnd_invoice_macaroon",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LND_REST_ADMIN_MACAROON"
+  ],
+  "group": "LndRestFundingSource",
+  "name": "lnd_rest_admin_macaroon",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LND_REST_INVOICE_MACAROON"
+  ],
+  "group": "LndRestFundingSource",
+  "name": "lnd_rest_invoice_macaroon",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "ECLAIR_URL"
+  ],
+  "group": "EclairFundingSource",
+  "name": "eclair_url",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "ECLAIR_PASS"
+  ],
+  "group": "EclairFundingSource",
+  "name": "eclair_pass",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "CORELIGHTNING_REST_URL"
+  ],
+  "group": "CoreLightningRestFundingSource",
+  "name": "corelightning_rest_url",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "CORELIGHTNING_REST_MACAROON"
+  ],
+  "group": "CoreLightningRestFundingSource",
+  "name": "corelightning_rest_macaroon",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "CORELIGHTNING_REST_CERT"
+  ],
+  "group": "CoreLightningRestFundingSource",
+  "name": "corelightning_rest_cert",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "CORELIGHTNING_RPC"
+  ],
+  "group": "CoreLightningFundingSource",
+  "name": "corelightning_rpc",
+  "type": "Optional[str]"
+ },
+ {
+  "default": "pay",
+  "editable": true,
+  "env": [
+   "CORELIGHTNING_PAY_COMMAND"
+  ],
+  "group": "CoreLightningFundingSource",
+  "name": "corelightning_pay_command",
+  "type": "str"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "CLIGHTNING_RPC"
+  ],
+  "group": "CoreLightningFundingSource",
+  "name": "clightning_rpc",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "CLNREST_URL"
+  ],
+  "group": "CLNRestFundingSource",
+  "name": "clnrest_url",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "CLNREST_CA"
+  ],
+  "group": "CLNRestFundingSource",
+  "name": "clnrest_ca",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "CLNREST_CERT"
+  ],
+  "group": "CLNRestFundingSource",
+  "name": "clnrest_cert",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "CLNREST_READONLY_RUNE"
+  ],
+  "group": "CLNRestFundingSource",
+  "name": "clnrest_readonly_rune",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "CLNREST_INVOICE_RUNE"
+  ],
+  "group": "CLNRestFundingSource",
+  "name": "clnrest_invoice_rune",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "CLNREST_PAY_RUNE"
+  ],
+  "group": "CLNRestFundingSource",
+  "name": "clnrest_pay_rune",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "CLNREST_RENEPAY_RUNE"
+  ],
+  "group": "CLNRestFundingSource",
+  "name": "clnrest_renepay_rune",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "CLNREST_LAST_PAY_INDEX"
+  ],
+  "group": "CLNRestFundingSource",
+  "name": "clnrest_last_pay_index",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "CLNREST_NODEID"
+  ],
+  "group": "CLNRestFundingSource",
+  "name": "clnrest_nodeid",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "CLICHE_ENDPOINT"
+  ],
+  "group": "ClicheFundingSource",
+  "name": "cliche_endpoint",
+  "type": "Optional[str]"
+ },
+ {
+  "default": "https://demo.lnbits.com",
+  "editable": true,
+  "env": [
+   "LNBITS_ENDPOINT"
+  ],
+  "group": "LNbitsFundingSource",
+  "name": "lnbits_endpoint",
+  "type": "str"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LNBITS_KEY"
+  ],
+  "group": "LNbitsFundingSource",
+  "name": "lnbits_key",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LNBITS_ADMIN_KEY"
+  ],
+  "group": "LNbitsFundingSource",
+  "name": "lnbits_admin_key",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LNBITS_INVOICE_KEY"
+  ],
+  "group": "LNbitsFundingSource",
+  "name": "lnbits_invoice_key",
+  "type": "Optional[str]"
+ },
+ {
+  "default": "ToTheMoon1",
+  "editable": true,
+  "env": [
+   "FAKE_WALLET_SECRET"
+  ],
+  "group": "FakeWalletFundingSource",
+  "name": "fake_wallet_secret",
+  "type": "str"
+ },
+ {
+  "default": "sats",
+  "editable": true,
+  "env": [
+   "LNBITS_DENOMINATION"
+  ],
+  "group": "FakeWalletFundingSource",
+  "name": "lnbits_denomination",
+  "type": "str"
+ },
+ {
+  "default": "VoidWallet",
+  "editable": true,
+  "env": [
+   "LNBITS_BACKEND_WALLET_CLASS"
+  ],
+  "group": "FundingSourcesSettings",
+  "name": "lnbits_backend_wallet_class",
+  "type": "str"
+ },
+ {
+  "default": 5,
+  "editable": true,
+  "env": [
+   "LNBITS_FUNDING_SOURCE_PAY_INVOICE_WAIT_SECONDS"
+  ],
+  "group": "FundingSourcesSettings",
+  "name": "lnbits_funding_source_pay_invoice_wait_seconds",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 1800,
+  "editable": true,
+  "env": [
+   "LNBITS_FUNDING_SOURCE_PENDING_INTERVAL_SECONDS"
+  ],
+  "group": "FundingSourcesSettings",
+  "name": "lnbits_funding_source_pending_interval_seconds",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LNBITS_NOSTR_NOTIFICATIONS_ENABLED"
+  ],
+  "group": "NotificationsSettings",
+  "name": "lnbits_nostr_notifications_enabled",
+  "type": "bool"
+ },
+ {
+  "default": "",
+  "editable": true,
+  "env": [
+   "LNBITS_NOSTR_NOTIFICATIONS_PRIVATE_KEY"
+  ],
+  "group": "NotificationsSettings",
+  "name": "lnbits_nostr_notifications_private_key",
+  "type": "str"
+ },
+ {
+  "default": [],
+  "editable": true,
+  "env": [
+   "LNBITS_NOSTR_NOTIFICATIONS_IDENTIFIERS"
+  ],
+  "group": "NotificationsSettings",
+  "name": "lnbits_nostr_notifications_identifiers",
+  "type": "List[str]"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LNBITS_TELEGRAM_NOTIFICATIONS_ENABLED"
+  ],
+  "group": "NotificationsSettings",
+  "name": "lnbits_telegram_notifications_enabled",
+  "type": "bool"
+ },
+ {
+  "default": "",
+  "editable": true,
+  "env": [
+   "LNBITS_TELEGRAM_NOTIFICATIONS_ACCESS_TOKEN"
+  ],
+  "group": "NotificationsSettings",
+  "name": "lnbits_telegram_notifications_access_token",
+  "type": "str"
+ },
+ {
+  "default": "",
+  "editable": true,
+  "env": [
+   "LNBITS_TELEGRAM_NOTIFICATIONS_CHAT_ID"
+  ],
+  "group": "NotificationsSettings",
+  "name": "lnbits_telegram_notifications_chat_id",
+  "type": "str"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LNBITS_EMAIL_NOTIFICATIONS_ENABLED"
+  ],
+  "group": "NotificationsSettings",
+  "name": "lnbits_email_notifications_enabled",
+  "type": "bool"
+ },
+ {
+  "default": "",
+  "editable": true,
+  "env": [
+   "LNBITS_EMAIL_NOTIFICATIONS_EMAIL"
+  ],
+  "group": "NotificationsSettings",
+  "name": "lnbits_email_notifications_email",
+  "type": "str"
+ },
+ {
+  "default": "",
+  "editable": true,
+  "env": [
+   "LNBITS_EMAIL_NOTIFICATIONS_USERNAME"
+  ],
+  "group": "NotificationsSettings",
+  "name": "lnbits_email_notifications_username",
+  "type": "str"
+ },
+ {
+  "default": "",
+  "editable": true,
+  "env": [
+   "LNBITS_EMAIL_NOTIFICATIONS_PASSWORD"
+  ],
+  "group": "NotificationsSettings",
+  "name": "lnbits_email_notifications_password",
+  "type": "str"
+ },
+ {
+  "default": "smtp.protonmail.ch",
+  "editable": true,
+  "env": [
+   "LNBITS_EMAIL_NOTIFICATIONS_SERVER"
+  ],
+  "group": "NotificationsSettings",
+  "name": "lnbits_email_notifications_server",
+  "type": "str"
+ },
+ {
+  "default": 587,
+  "editable": true,
+  "env": [
+   "LNBITS_EMAIL_NOTIFICATIONS_PORT"
+  ],
+  "group": "NotificationsSettings",
+  "name": "lnbits_email_notifications_port",
+  "type": "int"
+ },
+ {
+  "default": [],
+  "editable": true,
+  "env": [
+   "LNBITS_EMAIL_NOTIFICATIONS_TO_EMAILS"
+  ],
+  "group": "NotificationsSettings",
+  "name": "lnbits_email_notifications_to_emails",
+  "type": "List[str]"
+ },
+ {
+  "default": true,
+  "editable": true,
+  "env": [
+   "LNBITS_NOTIFICATION_SETTINGS_UPDATE"
+  ],
+  "group": "NotificationsSettings",
+  "name": "lnbits_notification_settings_update",
+  "type": "bool"
+ },
+ {
+  "default": true,
+  "editable": true,
+  "env": [
+   "LNBITS_NOTIFICATION_CREDIT_DEBIT"
+  ],
+  "group": "NotificationsSettings",
+  "name": "lnbits_notification_credit_debit",
+  "type": "bool"
+ },
+ {
+  "default": 1,
+  "editable": true,
+  "env": [
+   "NOTIFICATION_BALANCE_DELTA_THRESHOLD_SATS"
+  ],
+  "group": "NotificationsSettings",
+  "name": "notification_balance_delta_threshold_sats",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": true,
+  "editable": true,
+  "env": [
+   "LNBITS_NOTIFICATION_SERVER_START_STOP"
+  ],
+  "group": "NotificationsSettings",
+  "name": "lnbits_notification_server_start_stop",
+  "type": "bool"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LNBITS_NOTIFICATION_WATCHDOG"
+  ],
+  "group": "NotificationsSettings",
+  "name": "lnbits_notification_watchdog",
+  "type": "bool"
+ },
+ {
+  "default": 24,
+  "editable": true,
+  "env": [
+   "LNBITS_NOTIFICATION_SERVER_STATUS_HOURS"
+  ],
+  "group": "NotificationsSettings",
+  "name": "lnbits_notification_server_status_hours",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 1000000,
+  "editable": true,
+  "env": [
+   "LNBITS_NOTIFICATION_INCOMING_PAYMENT_AMOUNT_SATS"
+  ],
+  "group": "NotificationsSettings",
+  "name": "lnbits_notification_incoming_payment_amount_sats",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 1000000,
+  "editable": true,
+  "env": [
+   "LNBITS_NOTIFICATION_OUTGOING_PAYMENT_AMOUNT_SATS"
+  ],
+  "group": "NotificationsSettings",
+  "name": "lnbits_notification_outgoing_payment_amount_sats",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 200,
+  "editable": true,
+  "env": [
+   "LNBITS_RATE_LIMIT_NO"
+  ],
+  "group": "SecuritySettings",
+  "name": "lnbits_rate_limit_no",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": "minute",
+  "editable": true,
+  "env": [
+   "LNBITS_RATE_LIMIT_UNIT"
+  ],
+  "group": "SecuritySettings",
+  "name": "lnbits_rate_limit_unit",
+  "type": "str"
+ },
+ {
+  "default": [],
+  "editable": true,
+  "env": [
+   "LNBITS_ALLOWED_IPS"
+  ],
+  "group": "SecuritySettings",
+  "name": "lnbits_allowed_ips",
+  "type": "List[str]"
+ },
+ {
+  "default": [],
+  "editable": true,
+  "env": [
+   "LNBITS_BLOCKED_IPS"
+  ],
+  "group": "SecuritySettings",
+  "name": "lnbits_blocked_ips",
+  "type": "List[str]"
+ },
+ {
+  "default": [
+   "https?://([a-zA-Z0-9.-]+\\.[a-zA-Z]{2,})(:\\d+)?"
+  ],
+  "editable": true,
+  "env": [
+   "LNBITS_CALLBACK_URL_RULES"
+  ],
+  "group": "SecuritySettings",
+  "name": "lnbits_callback_url_rules",
+  "type": "List[str]"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LNBITS_CALLBACK_ALLOW_PRIVATE_IPS"
+  ],
+  "group": "SecuritySettings",
+  "name": "lnbits_callback_allow_private_ips",
+  "type": "bool"
+ },
+ {
+  "default": [],
+  "editable": true,
+  "env": [
+   "LNBITS_LNURL_REDIRECT_URL_RULES"
+  ],
+  "group": "SecuritySettings",
+  "name": "lnbits_lnurl_redirect_url_rules",
+  "type": "List[str]"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LNBITS_LNURL_ALLOW_PRIVATE_IPS"
+  ],
+  "group": "SecuritySettings",
+  "name": "lnbits_lnurl_allow_private_ips",
+  "type": "bool"
+ },
+ {
+  "default": 0,
+  "editable": true,
+  "env": [
+   "LNBITS_WALLET_LIMIT_MAX_BALANCE"
+  ],
+  "group": "SecuritySettings",
+  "name": "lnbits_wallet_limit_max_balance",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 0,
+  "editable": true,
+  "env": [
+   "LNBITS_WALLET_LIMIT_DAILY_MAX_WITHDRAW"
+  ],
+  "group": "SecuritySettings",
+  "name": "lnbits_wallet_limit_daily_max_withdraw",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 0,
+  "editable": true,
+  "env": [
+   "LNBITS_WALLET_LIMIT_SECS_BETWEEN_TRANS"
+  ],
+  "group": "SecuritySettings",
+  "name": "lnbits_wallet_limit_secs_between_trans",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LNBITS_ONLY_ALLOW_INCOMING_PAYMENTS"
+  ],
+  "group": "SecuritySettings",
+  "name": "lnbits_only_allow_incoming_payments",
+  "type": "bool"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LNBITS_WATCHDOG_SWITCH_TO_VOIDWALLET"
+  ],
+  "group": "SecuritySettings",
+  "name": "lnbits_watchdog_switch_to_voidwallet",
+  "type": "bool"
+ },
+ {
+  "default": 60,
+  "editable": true,
+  "env": [
+   "LNBITS_WATCHDOG_INTERVAL_MINUTES"
+  ],
+  "group": "SecuritySettings",
+  "name": "lnbits_watchdog_interval_minutes",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 1000000,
+  "editable": true,
+  "env": [
+   "LNBITS_WATCHDOG_DELTA"
+  ],
+  "group": "SecuritySettings",
+  "name": "lnbits_watchdog_delta",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 10000000,
+  "editable": true,
+  "env": [
+   "LNBITS_MAX_OUTGOING_PAYMENT_AMOUNT_SATS"
+  ],
+  "group": "SecuritySettings",
+  "name": "lnbits_max_outgoing_payment_amount_sats",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 10000000,
+  "editable": true,
+  "env": [
+   "LNBITS_MAX_INCOMING_PAYMENT_AMOUNT_SATS"
+  ],
+  "group": "SecuritySettings",
+  "name": "lnbits_max_incoming_payment_amount_sats",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "FIRST_INSTALL_TOKEN_CONFIRMED"
+  ],
+  "group": "SecuritySettings",
+  "name": "first_install_token_confirmed",
+  "type": "Optional[str]"
+ },
+ {
+  "default": 60,
+  "editable": true,
+  "env": [
+   "LNBITS_EXCHANGE_RATE_CACHE_SECONDS"
+  ],
+  "group": "ExchangeProvidersSettings",
+  "name": "lnbits_exchange_rate_cache_seconds",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 60,
+  "editable": true,
+  "env": [
+   "LNBITS_EXCHANGE_HISTORY_SIZE"
+  ],
+  "group": "ExchangeProvidersSettings",
+  "name": "lnbits_exchange_history_size",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 300,
+  "editable": true,
+  "env": [
+   "LNBITS_EXCHANGE_HISTORY_REFRESH_INTERVAL_SECONDS"
+  ],
+  "group": "ExchangeProvidersSettings",
+  "name": "lnbits_exchange_history_refresh_interval_seconds",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": true,
+  "editable": true,
+  "env": [
+   "LNBITS_PRICE_AGGREGATOR_ENABLED"
+  ],
+  "group": "ExchangeProvidersSettings",
+  "name": "lnbits_price_aggregator_enabled",
+  "type": "bool"
+ },
+ {
+  "default": "https://price.lnbits.com",
+  "editable": true,
+  "env": [
+   "LNBITS_PRICE_AGGREGATOR_URL"
+  ],
+  "group": "ExchangeProvidersSettings",
+  "name": "lnbits_price_aggregator_url",
+  "type": "str"
+ },
+ {
+  "default": "[ExchangeRateProvider(name='Binance', api_url='https://api.binance.com/api/v3/ticker/price?symbol=BTC{TO}', path='$.price', exclude_to=['czk'], ticker_conversion=['USD:USDT']), ExchangeRateProvider(name='Blockchain', api_url='https://blockchain.info/frombtc?currency={TO}&value=100000000', path='', exclude_to=[], ticker_conversion=[]), ExchangeRateProvider(name='Exir', api_url='https://api.exir.io/v1/ticker?symbol=btc-{to}', path='$.last', exclude_to=['czk', 'eur'], ticker_conversion=['USD:USDT']), ExchangeRateProvider(name='Bitfinex', api_url='https://api.bitfinex.com/v1/pubticker/btc{to}', path='$.last_price', exclude_to=['czk'], ticker_conversion=[]), ExchangeRateProvider(name='Bitstamp', api_url='https://www.bitstamp.net/api/v2/ticker/btc{to}/', path='$.last', exclude_to=['czk'], ticker_conversion=[]), ExchangeRateProvider(name='Coinbase', api_url='https://api.coinbase.com/v2/exchange-rates?currency=BTC', path='$.data.rates.{TO}', exclude_to=[], ticker_conversion=[]), ExchangeRateProvider(name='Kraken', api_url='https://api.kraken.com/0/public/Ticker?pair=XBT{TO}', path='$.result.XXBTZ{TO}.c[0]', exclude_to=['czk'], ticker_conversion=[]), ExchangeRateProvider(name='yadio', api_url='https://api.yadio.io/exrates/BTC', path='$.BTC.{TO}', exclude_to=[], ticker_conversion=[])]",
+  "editable": true,
+  "env": [
+   "LNBITS_EXCHANGE_RATE_PROVIDERS"
+  ],
+  "group": "ExchangeProvidersSettings",
+  "name": "lnbits_exchange_rate_providers",
+  "type": "List[ExchangeRateProvider]"
+ },
+ {
+  "default": 2000,
+  "editable": true,
+  "env": [
+   "LNBITS_RESERVE_FEE_MIN"
+  ],
+  "group": "FeeSettings",
+  "name": "lnbits_reserve_fee_min",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 1.0,
+  "editable": true,
+  "env": [
+   "LNBITS_RESERVE_FEE_PERCENT"
+  ],
+  "group": "FeeSettings",
+  "name": "lnbits_reserve_fee_percent",
+  "type": "ConstrainedFloatValue"
+ },
+ {
+  "default": 0,
+  "editable": true,
+  "env": [
+   "LNBITS_SERVICE_FEE"
+  ],
+  "group": "FeeSettings",
+  "name": "lnbits_service_fee",
+  "type": "ConstrainedFloatValue"
+ },
+ {
+  "default": true,
+  "editable": true,
+  "env": [
+   "LNBITS_SERVICE_FEE_IGNORE_INTERNAL"
+  ],
+  "group": "FeeSettings",
+  "name": "lnbits_service_fee_ignore_internal",
+  "type": "bool"
+ },
+ {
+  "default": 0,
+  "editable": true,
+  "env": [
+   "LNBITS_SERVICE_FEE_MAX"
+  ],
+  "group": "FeeSettings",
+  "name": "lnbits_service_fee_max",
+  "type": "int"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LNBITS_SERVICE_FEE_WALLET"
+  ],
+  "group": "FeeSettings",
+  "name": "lnbits_service_fee_wallet",
+  "type": "Optional[str]"
+ },
+ {
+  "default": 2.5,
+  "editable": true,
+  "env": [
+   "LNBITS_MAX_ASSET_SIZE_MB"
+  ],
+  "group": "AssetSettings",
+  "name": "lnbits_max_asset_size_mb",
+  "type": "ConstrainedFloatValue"
+ },
+ {
+  "default": [
+   "image/png",
+   "image/jpeg",
+   "image/jpg",
+   "image/heic",
+   "image/heif",
+   "image/heics",
+   "png",
+   "jpeg",
+   "jpg",
+   "heic",
+   "heif",
+   "heics"
+  ],
+  "editable": true,
+  "env": [
+   "LNBITS_ASSETS_ALLOWED_MIME_TYPES"
+  ],
+  "group": "AssetSettings",
+  "name": "lnbits_assets_allowed_mime_types",
+  "type": "List[str]"
+ },
+ {
+  "default": 128,
+  "editable": true,
+  "env": [
+   "LNBITS_ASSET_THUMBNAIL_WIDTH"
+  ],
+  "group": "AssetSettings",
+  "name": "lnbits_asset_thumbnail_width",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 128,
+  "editable": true,
+  "env": [
+   "LNBITS_ASSET_THUMBNAIL_HEIGHT"
+  ],
+  "group": "AssetSettings",
+  "name": "lnbits_asset_thumbnail_height",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": "png",
+  "editable": true,
+  "env": [
+   "LNBITS_ASSET_THUMBNAIL_FORMAT"
+  ],
+  "group": "AssetSettings",
+  "name": "lnbits_asset_thumbnail_format",
+  "type": "str"
+ },
+ {
+  "default": 10,
+  "editable": true,
+  "env": [
+   "LNBITS_MAX_ASSETS_PER_USER"
+  ],
+  "group": "AssetSettings",
+  "name": "lnbits_max_assets_per_user",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": [],
+  "editable": true,
+  "env": [
+   "LNBITS_ASSETS_NO_LIMIT_USERS"
+  ],
+  "group": "AssetSettings",
+  "name": "lnbits_assets_no_limit_users",
+  "type": "List[str]"
+ },
+ {
+  "default": "http://127.0.0.1:5000/",
+  "editable": true,
+  "env": [
+   "LNBITS_BASEURL"
+  ],
+  "group": "OpsSettings",
+  "name": "lnbits_baseurl",
+  "type": "str"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LNBITS_HIDE_API"
+  ],
+  "group": "OpsSettings",
+  "name": "lnbits_hide_api",
+  "type": "bool"
+ },
+ {
+  "default": "LNbits",
+  "editable": true,
+  "env": [
+   "LNBITS_SITE_TITLE"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_site_title",
+  "type": "str"
+ },
+ {
+  "default": "free and open-source lightning wallet",
+  "editable": true,
+  "env": [
+   "LNBITS_SITE_TAGLINE"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_site_tagline",
+  "type": "str"
+ },
+ {
+  "default": "The world's most powerful suite of bitcoin tools.",
+  "editable": true,
+  "env": [
+   "LNBITS_SITE_DESCRIPTION"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_site_description",
+  "type": "Optional[str]"
+ },
+ {
+  "default": true,
+  "editable": true,
+  "env": [
+   "LNBITS_SHOW_HOME_PAGE_ELEMENTS"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_show_home_page_elements",
+  "type": "bool"
+ },
+ {
+  "default": "LNbits wallet",
+  "editable": true,
+  "env": [
+   "LNBITS_DEFAULT_WALLET_NAME"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_default_wallet_name",
+  "type": "str"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LNBITS_WALLET_FEATURED_BUTTON_LABEL"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_wallet_featured_button_label",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LNBITS_WALLET_FEATURED_BUTTON_URL"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_wallet_featured_button_url",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LNBITS_WALLET_FEATURED_BUTTON_ICON"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_wallet_featured_button_icon",
+  "type": "Optional[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LNBITS_CUSTOM_BADGE"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_custom_badge",
+  "type": "Optional[str]"
+ },
+ {
+  "default": "warning",
+  "editable": true,
+  "env": [
+   "LNBITS_CUSTOM_BADGE_COLOR"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_custom_badge_color",
+  "type": "str"
+ },
+ {
+  "default": [
+   "classic",
+   "freedom",
+   "mint",
+   "salvador",
+   "monochrome",
+   "autumn",
+   "cyber",
+   "flamingo",
+   "bitcoin"
+  ],
+  "editable": true,
+  "env": [
+   "LNBITS_THEME_OPTIONS"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_theme_options",
+  "type": "List[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LNBITS_CUSTOM_LOGO"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_custom_logo",
+  "type": "Optional[str]"
+ },
+ {
+  "default": "/static/images/logos/lnbits.svg",
+  "editable": true,
+  "env": [
+   "LNBITS_CUSTOM_IMAGE"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_custom_image",
+  "type": "Optional[str]"
+ },
+ {
+  "default": "Supported by",
+  "editable": true,
+  "env": [
+   "LNBITS_AD_SPACE_TITLE"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_ad_space_title",
+  "type": "str"
+ },
+ {
+  "default": "https://shop.lnbits.com/;/static/images/bitcoin-shop-banner.png;/static/images/bitcoin-shop-banner.png,https://affil.trezor.io/aff_c?offer_id=169&aff_id=33845;/static/images/bitcoin-hardware-wallet.png;/static/images/bitcoin-hardware-wallet.png,https://firefish.io/?ref=lnbits;/static/images/firefish.png;/static/images/firefish.png",
+  "editable": true,
+  "env": [
+   "LNBITS_AD_SPACE"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_ad_space",
+  "type": "str"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LNBITS_AD_SPACE_ENABLED"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_ad_space_enabled",
+  "type": "bool"
+ },
+ {
+  "default": [],
+  "editable": true,
+  "env": [
+   "LNBITS_ALLOWED_CURRENCIES"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_allowed_currencies",
+  "type": "List[str]"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LNBITS_DEFAULT_ACCOUNTING_CURRENCY"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_default_accounting_currency",
+  "type": "Optional[str]"
+ },
+ {
+  "default": "/static/images/favicon_qr_logo.png",
+  "editable": true,
+  "env": [
+   "LNBITS_QR_LOGO"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_qr_logo",
+  "type": "str"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LNBITS_APPLE_TOUCH_ICON"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_apple_touch_icon",
+  "type": "Optional[str]"
+ },
+ {
+  "default": "confettiBothSides",
+  "editable": true,
+  "env": [
+   "LNBITS_DEFAULT_REACTION"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_default_reaction",
+  "type": "str"
+ },
+ {
+  "default": "bitcoin",
+  "editable": true,
+  "env": [
+   "LNBITS_DEFAULT_THEME"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_default_theme",
+  "type": "str"
+ },
+ {
+  "default": "hard-border",
+  "editable": true,
+  "env": [
+   "LNBITS_DEFAULT_BORDER"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_default_border",
+  "type": "str"
+ },
+ {
+  "default": true,
+  "editable": true,
+  "env": [
+   "LNBITS_DEFAULT_GRADIENT"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_default_gradient",
+  "type": "bool"
+ },
+ {
+  "default": null,
+  "editable": true,
+  "env": [
+   "LNBITS_DEFAULT_BGIMAGE"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_default_bgimage",
+  "type": "Optional[str]"
+ },
+ {
+  "default": true,
+  "editable": true,
+  "env": [
+   "LNBITS_DEFAULT_DARK"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_default_dark",
+  "type": "bool"
+ },
+ {
+  "default": true,
+  "editable": true,
+  "env": [
+   "LNBITS_DEFAULT_CARD_ROUNDED"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_default_card_rounded",
+  "type": "bool"
+ },
+ {
+  "default": true,
+  "editable": true,
+  "env": [
+   "LNBITS_DEFAULT_CARD_GRADIENT"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_default_card_gradient",
+  "type": "bool"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LNBITS_DEFAULT_CARD_SHADOW"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_default_card_shadow",
+  "type": "bool"
+ },
+ {
+  "default": true,
+  "editable": true,
+  "env": [
+   "LNBITS_DEFAULT_BURGER_MENU_BACKGROUND"
+  ],
+  "group": "ThemesSettings",
+  "name": "lnbits_default_burger_menu_background",
+  "type": "bool"
+ },
+ {
+  "default": 67108864,
+  "editable": true,
+  "env": [
+   "WASM_RUNTIME_MAX_MEMORY_BYTES"
+  ],
+  "group": "WasmRuntimeLimits",
+  "name": "wasm_runtime_max_memory_bytes",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 5000,
+  "editable": true,
+  "env": [
+   "WASM_RUNTIME_MAX_EXECUTION_MS"
+  ],
+  "group": "WasmRuntimeLimits",
+  "name": "wasm_runtime_max_execution_ms",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 100000000,
+  "editable": true,
+  "env": [
+   "WASM_RUNTIME_MAX_FUEL"
+  ],
+  "group": "WasmRuntimeLimits",
+  "name": "wasm_runtime_max_fuel",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 1048576,
+  "editable": true,
+  "env": [
+   "WASM_RUNTIME_MAX_RESPONSE_BYTES"
+  ],
+  "group": "WasmRuntimeLimits",
+  "name": "wasm_runtime_max_response_bytes",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 1048576,
+  "editable": true,
+  "env": [
+   "WASM_RUNTIME_MAX_REQUEST_BYTES"
+  ],
+  "group": "WasmRuntimeLimits",
+  "name": "wasm_runtime_max_request_bytes",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 1048576,
+  "editable": true,
+  "env": [
+   "WASM_RUNTIME_MAX_WASM_STACK_BYTES"
+  ],
+  "group": "WasmRuntimeLimits",
+  "name": "wasm_runtime_max_wasm_stack_bytes",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 10000,
+  "editable": true,
+  "env": [
+   "WASM_RUNTIME_MAX_TABLE_ELEMENTS"
+  ],
+  "group": "WasmRuntimeLimits",
+  "name": "wasm_runtime_max_table_elements",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 8,
+  "editable": true,
+  "env": [
+   "WASM_RUNTIME_MAX_INSTANCES"
+  ],
+  "group": "WasmRuntimeLimits",
+  "name": "wasm_runtime_max_instances",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 10,
+  "editable": true,
+  "env": [
+   "WASM_RUNTIME_MAX_TABLES"
+  ],
+  "group": "WasmRuntimeLimits",
+  "name": "wasm_runtime_max_tables",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 1,
+  "editable": true,
+  "env": [
+   "WASM_RUNTIME_MAX_MEMORIES"
+  ],
+  "group": "WasmRuntimeLimits",
+  "name": "wasm_runtime_max_memories",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 16,
+  "editable": true,
+  "env": [
+   "WASM_RUNTIME_MAX_CONCURRENT_INVOCATIONS"
+  ],
+  "group": "WasmRuntimeLimits",
+  "name": "wasm_runtime_max_concurrent_invocations",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 4,
+  "editable": true,
+  "env": [
+   "WASM_RUNTIME_MAX_CONCURRENT_INVOCATIONS_PER_EXTENSION"
+  ],
+  "group": "WasmRuntimeLimits",
+  "name": "wasm_runtime_max_concurrent_invocations_per_extension",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 4,
+  "editable": true,
+  "env": [
+   "WASM_RUNTIME_MAX_CONCURRENT_INVOCATIONS_PER_USER"
+  ],
+  "group": "WasmRuntimeLimits",
+  "name": "wasm_runtime_max_concurrent_invocations_per_user",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 1000,
+  "editable": true,
+  "env": [
+   "WASM_RUNTIME_MAX_HOST_CALLS"
+  ],
+  "group": "WasmRuntimeLimits",
+  "name": "wasm_runtime_max_host_calls",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 20,
+  "editable": true,
+  "env": [
+   "WASM_RUNTIME_MAX_HTTP_CALLS"
+  ],
+  "group": "WasmRuntimeLimits",
+  "name": "wasm_runtime_max_http_calls",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 100,
+  "editable": true,
+  "env": [
+   "WASM_RUNTIME_MAX_STORAGE_CALLS"
+  ],
+  "group": "WasmRuntimeLimits",
+  "name": "wasm_runtime_max_storage_calls",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 20,
+  "editable": true,
+  "env": [
+   "WASM_RUNTIME_MAX_WALLET_CALLS"
+  ],
+  "group": "WasmRuntimeLimits",
+  "name": "wasm_runtime_max_wallet_calls",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 5000,
+  "editable": true,
+  "env": [
+   "WASM_RUNTIME_HTTP_TIMEOUT_MS"
+  ],
+  "group": "WasmRuntimeLimits",
+  "name": "wasm_runtime_http_timeout_ms",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": 1048576,
+  "editable": true,
+  "env": [
+   "WASM_RUNTIME_MAX_HTTP_RESPONSE_BYTES"
+  ],
+  "group": "WasmRuntimeLimits",
+  "name": "wasm_runtime_max_http_response_bytes",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": [],
+  "editable": true,
+  "env": [
+   "LNBITS_ADMIN_EXTENSIONS"
+  ],
+  "group": "ExtensionsSettings",
+  "name": "lnbits_admin_extensions",
+  "type": "List[str]"
+ },
+ {
+  "default": [],
+  "editable": true,
+  "env": [
+   "LNBITS_USER_DEFAULT_EXTENSIONS"
+  ],
+  "group": "ExtensionsSettings",
+  "name": "lnbits_user_default_extensions",
+  "type": "List[str]"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LNBITS_EXTENSIONS_DEACTIVATE_ALL"
+  ],
+  "group": "ExtensionsSettings",
+  "name": "lnbits_extensions_deactivate_all",
+  "type": "bool"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LNBITS_EXTENSIONS_BUILDER_ACTIVATE_NON_ADMINS"
+  ],
+  "group": "ExtensionsSettings",
+  "name": "lnbits_extensions_builder_activate_non_admins",
+  "type": "bool"
+ },
+ {
+  "default": 7,
+  "editable": true,
+  "env": [
+   "LNBITS_WASM_INVOCATION_RETENTION_DAYS"
+  ],
+  "group": "ExtensionsSettings",
+  "name": "lnbits_wasm_invocation_retention_days",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": "https://demo.lnbits.com/paidreviews/api/v1/AdFzLjzuKFLsdk4Bcnff6r",
+  "editable": true,
+  "env": [
+   "LNBITS_EXTENSIONS_REVIEWS_URL"
+  ],
+  "group": "ExtensionsSettings",
+  "name": "lnbits_extensions_reviews_url",
+  "type": "str"
+ },
+ {
+  "default": [
+   "https://raw.githubusercontent.com/lnbits/lnbits-extensions/main/extensions.json"
+  ],
+  "editable": true,
+  "env": [
+   "LNBITS_EXTENSIONS_MANIFESTS"
+  ],
+  "group": "ExtensionsSettings",
+  "name": "lnbits_extensions_manifests",
+  "type": "List[str]"
+ },
+ {
+  "default": [
+   "https://raw.githubusercontent.com/lnbits/lnbits-extensions-wasm/refs/heads/main/extensions.json"
+  ],
+  "editable": true,
+  "env": [
+   "LNBITS_WASM_EXTENSIONS_MANIFESTS"
+  ],
+  "group": "ExtensionsSettings",
+  "name": "lnbits_wasm_extensions_manifests",
+  "type": "List[str]"
+ },
+ {
+  "default": "https://raw.githubusercontent.com/lnbits/extension_builder_stub/refs/heads/main/manifest.json",
+  "editable": true,
+  "env": [
+   "LNBITS_EXTENSIONS_BUILDER_MANIFEST_URL"
+  ],
+  "group": "ExtensionsSettings",
+  "name": "lnbits_extensions_builder_manifest_url",
+  "type": "str"
+ },
+ {
+  "default": [],
+  "editable": true,
+  "env": [
+   "LNBITS_ADMIN_USERS"
+  ],
+  "group": "UsersSettings",
+  "name": "lnbits_admin_users",
+  "type": "List[str]"
+ },
+ {
+  "default": [],
+  "editable": true,
+  "env": [
+   "LNBITS_ALLOWED_USERS"
+  ],
+  "group": "UsersSettings",
+  "name": "lnbits_allowed_users",
+  "type": "List[str]"
+ },
+ {
+  "default": true,
+  "editable": true,
+  "env": [
+   "LNBITS_ALLOW_NEW_ACCOUNTS"
+  ],
+  "group": "UsersSettings",
+  "name": "lnbits_allow_new_accounts",
+  "type": "bool"
+ },
+ {
+  "default": "extension_first",
+  "editable": true,
+  "env": [
+   "LNBITS_LN_ADDRESS_MODE"
+  ],
+  "group": "UsersSettings",
+  "name": "lnbits_ln_address_mode",
+  "type": "Literal['core_first', 'extension_first', 'extension_only']"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LNBITS_ALLOW_CUSTOM_WALLET_LIGHTNING_ADDRESSES"
+  ],
+  "group": "UsersSettings",
+  "name": "lnbits_allow_custom_wallet_lightning_addresses",
+  "type": "bool"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LNBITS_CHARGE_WALLET_LIGHTNING_ADDRESSES"
+  ],
+  "group": "UsersSettings",
+  "name": "lnbits_charge_wallet_lightning_addresses",
+  "type": "bool"
+ },
+ {
+  "default": 1000,
+  "editable": true,
+  "env": [
+   "LNBITS_WALLET_LIGHTNING_ADDRESS_PRICE_SATS"
+  ],
+  "group": "UsersSettings",
+  "name": "lnbits_wallet_lightning_address_price_sats",
+  "type": "ConstrainedIntValue"
+ },
+ {
+  "default": [
+   "admin",
+   "info",
+   "support",
+   "help",
+   "security"
+  ],
+  "editable": true,
+  "env": [
+   "LNBITS_WALLET_LIGHTNING_ADDRESS_BLACKLIST"
+  ],
+  "group": "UsersSettings",
+  "name": "lnbits_wallet_lightning_address_blacklist",
+  "type": "List[str]"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LNBITS_REQUIRE_USER_ACTIVATION"
+  ],
+  "group": "UsersSettings",
+  "name": "lnbits_require_user_activation",
+  "type": "bool"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LNBITS_USER_ACTIVATION_BY_EMAIL"
+  ],
+  "group": "UsersSettings",
+  "name": "lnbits_user_activation_by_email",
+  "type": "bool"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LNBITS_USER_ACTIVATION_BY_PAYMENT"
+  ],
+  "group": "UsersSettings",
+  "name": "lnbits_user_activation_by_payment",
+  "type": "bool"
+ },
+ {
+  "default": false,
+  "editable": true,
+  "env": [
+   "LNBITS_USER_ACTIVATION_BY_INVITATION_CODE"
+  ],
+  "group": "UsersSettings",
+  "name": "lnbits_user_activation_by_invitation_code",
+  "type": "bool"
+ },
+ {
+  "default": "",
+  "editable": true,
+  "env": [
+   "LNBITS_REGISTER_REUSABLE_ACTIVATION_CODE"
+  ],
+  "group": "UsersSettings",
+  "name": "lnbits_register_reusable_activation_code",
+  "type": "str"
+ },
+ {
+  "default": [],
+  "editable": true,
+  "env": [
+   "LNBITS_REGISTER_ONE_TIME_ACTIVATION_CODES"
+  ],
+  "group": "UsersSettings",
+  "name": "lnbits_register_one_time_activation_codes",
+  "type": "List[str]"
+ }
+]

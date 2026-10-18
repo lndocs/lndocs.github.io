@@ -11,7 +11,7 @@ verified_with: v1.6.2
 
 LNbits reads its configuration from environment variables and from a `.env` file in its working directory. Each setting is a field in [`lnbits/settings.py`](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/settings.py), and the variable name is the field name in upper case (`auth_https_only` becomes `AUTH_HTTPS_ONLY`). Names aren't case-sensitive and have no prefix.
 
-LNbits v1.6.2 has about 430 settings. This page covers the ones most operators need, grouped by area, with the v1.6.2 default for each. For the full list, see [`.env.example` at the v1.6.2 tag](https://github.com/lnbits/lnbits/blob/v1.6.2/.env.example). Where `.env.example` and `settings.py` disagree, the real default is the one in `settings.py`. The official docs also have an [environment page](https://docs.lnbits.com/guide/core/environment).
+LNbits v1.6.2 has 338 settings you can set. This page covers the ones most operators need, grouped by area, with the v1.6.2 default for each. The [Environment variable reference](/docs/configuration/env-reference) lists all of them, with their types, their defaults and whether the Admin UI manages them, generated from the official image. Where `.env.example` and `settings.py` disagree, the real default is the one in `settings.py`. The official docs also have an [environment page](https://docs.lnbits.com/guide/core/environment).
 
 ## Settings precedence {#settings-precedence}
 

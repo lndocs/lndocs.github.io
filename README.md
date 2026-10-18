@@ -38,8 +38,13 @@ last_update:
 verified_with: v1.6.2
 ```
 
+## Generated reference pages
+
+`docs/configuration/env-reference.md` and `docs/api/endpoint-reference.md` are generated; don't edit them by hand. The API claims workflow dumps every setting (`scripts/reference/dump_settings.py`, run inside the image) and `/openapi.json` from the pinned image. It then runs `node scripts/gen-reference.mjs` and fails if the committed pages differ. To regenerate, download the `lnbits-reference` artifact from that run into `scripts/reference/` and run the script.
+
 ## Bumping LNbits
 
 1. Change `scripts/lnbits-version.txt`.
 2. Run the gate.
-3. Fix the pages it flags, re-verify them, update `verified_with`, and merge.
+3. Regenerate the reference pages from the new image (see above).
+4. Fix the pages the gate and the claims flag, re-verify them, update `verified_with`, and merge.
