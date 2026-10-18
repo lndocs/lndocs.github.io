@@ -1,278 +1,147 @@
 ---
 sidebar_position: 2
 title: LND
-description: Configure LNbits with LND Lightning node
+description: Configure LNbits with an LND Lightning node over REST or gRPC
+last_update:
+  date: 2026-10-18
+verified_with: v1.6.2
 ---
 
 # LND Configuration
 
-Connect LNbits to your LND (Lightning Network Daemon) node.
+Connect LNbits to your LND (Lightning Network Daemon) node. LNbits supports two classes:
 
-## Prerequisites
+| Class | Transport | Extras in v1.6.2 |
+|---|---|---|
+| `LndRestWallet` | REST (default port 8080) | Node UI, hold invoices |
+| `LndWallet` | gRPC (default port 10009) | Hold invoices |
 
-- LND running and synced
-- REST or gRPC API enabled
-- TLS certificate accessible
-- Macaroon with appropriate permissions
+Both use `SendPaymentV2`/`TrackPaymentV2` (REST: `/v2/router/send` and `/v2/router/track`), so the RPCs that LND 0.21 removed don't affect them. Pick REST unless you have a reason to prefer gRPC.
 
-## REST API (Recommended)
+:::note Admin UI or .env
+The Admin UI is on by default, and once it has saved settings they override `.env`. Configure LND in **Settings → Funding** at `/admin` and restart LNbits. The `.env` blocks below only apply on the first start or with `LNBITS_ADMIN_UI=false`. See [Funding sources overview](/docs/funding-sources/overview).
+:::
 
-### Configuration
+## What you need {#prerequisites}
+
+- LND running and synced, with REST (`restlisten`) or gRPC (`rpclisten`) reachable from LNbits.
+- LND's `tls.cert`.
+- A macaroon. Use `admin.macaroon`, or bake one with only the permissions LNbits needs ([below](#macaroon-permissions)).
+
+## REST {#rest-api-recommended}
 
 ```bash title=".env"
 LNBITS_BACKEND_WALLET_CLASS=LndRestWallet
-
-# LND REST endpoint
 LND_REST_ENDPOINT=https://127.0.0.1:8080
-
-# TLS certificate path
-LND_REST_CERT=/path/to/tls.cert
-
-# Admin macaroon (full access)
-LND_REST_MACAROON=/path/to/admin.macaroon
+LND_REST_CERT=/home/lnbits/lnd/tls.cert
+LND_REST_MACAROON=/home/lnbits/lnd/admin.macaroon
 ```
 
-### Encrypted Macaroon
+- `LND_REST_MACAROON` takes a file path ending in `.macaroon`, or the macaroon itself as hex or base64.
+- `LND_REST_ROUTE_HINTS` (default `true`) adds route hints to invoices, which private channels need.
+- `LND_REST_ALLOW_SELF_PAYMENT` (default `false`) lets LND pay an invoice issued by the same node, for example by another app on it. Payments between wallets on the same LNbits instance are internal and don't need it.
 
-For better security, encrypt the macaroon:
+## gRPC {#grpc-api}
 
-```bash
-# Encrypt macaroon (in LNbits container)
-python -c "
-from lnbits.wallets.macaroon import encrypt_macaroon
-with open('/path/to/admin.macaroon', 'rb') as f:
-    print(encrypt_macaroon(f.read()))
-"
-```
-
-Then use:
-
-```bash
-LND_REST_MACAROON_ENCRYPTED=your_encrypted_string
-```
-
-### Remote LND
-
-For LND on a different machine:
-
-```bash
-# Use IP or hostname
-LND_REST_ENDPOINT=https://192.168.1.100:8080
-
-# Copy TLS cert from LND machine
-scp user@lnd-host:~/.lnd/tls.cert ./
-
-# Copy macaroon
-scp user@lnd-host:~/.lnd/data/chain/bitcoin/mainnet/admin.macaroon ./
-```
-
-## gRPC API
-
-For gRPC connections:
-
-```bash
+```bash title=".env"
 LNBITS_BACKEND_WALLET_CLASS=LndWallet
-
 LND_GRPC_ENDPOINT=127.0.0.1
 LND_GRPC_PORT=10009
-LND_GRPC_CERT=/path/to/tls.cert
-LND_GRPC_MACAROON=/path/to/admin.macaroon
+LND_GRPC_CERT=/home/lnbits/lnd/tls.cert
+LND_GRPC_MACAROON=/home/lnbits/lnd/admin.macaroon
 ```
 
-## Macaroon Permissions
+`LND_GRPC_ENDPOINT` is a host name or IP, without a port; the port goes in `LND_GRPC_PORT`. Both, and the cert, are required. `LND_GRPC_ALLOW_SELF_PAYMENT` (default `false`) works as on REST.
 
-### Full Admin Macaroon
+## TLS certificate {#tls-certificate}
 
-Location: `~/.lnd/data/chain/bitcoin/mainnet/admin.macaroon`
+LND generates a self-signed `tls.cert`. Point `LND_REST_CERT` or `LND_GRPC_CERT` at a copy of it.
 
-Permissions:
-- Create/pay invoices
-- View wallet info
-- All operations
+- The certificate must be valid for the host name in your endpoint. If you connect to `https://lnd:8080` or `https://umbrel.local:8080`, add that name with `tlsextradomain=` (or the IP with `tlsextraip=`) in `lnd.conf`, then regenerate the cert.
+- **An empty `LND_REST_CERT` doesn't turn verification off.** LNbits then verifies against the public CA store, which only works if LND serves a publicly issued certificate (for example, behind a TLS-terminating proxy). There is no setting that skips verification, and that is how it should be.
+- For gRPC the cert is mandatory.
+- Use absolute paths. `.env` values aren't shell-expanded, so `~/.lnd/tls.cert` won't be found.
 
-### Invoice-Only Macaroon
+To regenerate an expired or mismatched cert, stop LND, delete `tls.cert` and `tls.key` from its data directory, and start LND again (for example `sudo systemctl restart lnd`). Then copy the new cert to LNbits.
 
-For receiving only:
+## Macaroon permissions {#macaroon-permissions}
+
+`admin.macaroon` works for everything, including the Node UI. It is also the most powerful credential on your node, so keep it on the LNbits host only, readable only by the LNbits user.
+
+For the wallet functions alone, a baked macaroon is enough. These are the permissions behind the calls LNbits makes in v1.6.2 (channel balance, add/lookup/subscribe invoices, hold invoices, send and track payments):
 
 ```bash
-# Create custom macaroon
-lncli bakemacaroon invoices:read invoices:write
-
-# Save and use
-LND_REST_MACAROON=/path/to/invoice.macaroon
+lncli bakemacaroon --root_key_id 42 --save_to /home/lnbits/lnd/lnbits.macaroon \
+  invoices:read invoices:write offchain:read offchain:write
 ```
 
-### Read-Only Macaroon
+- Without `offchain:write`, LNbits can receive but not send.
+- Don't drop `offchain:read`: LNbits' status check reads the channel balance, and fails without it.
+- The Node UI needs more (peers, channels, on-chain). Use the admin macaroon if you enable it.
 
-For monitoring:
+LNbits doesn't publish an official minimal set; this list is derived from the v1.6.2 code (`lndrest.py`, `lndgrpc.py`).
+
+## Encrypted macaroon {#encrypted-macaroon}
+
+Instead of storing the macaroon in clear, you can store it AES-encrypted and type the key at startup:
 
 ```bash
-lncli bakemacaroon info:read offchain:read onchain:read
+uv run lnbits-cli encrypt macaroon
 ```
 
-## TLS Certificate
+The command asks for the macaroon (a file path, hex or base64) and an encryption key, then prints the encrypted string. Put that in `LND_REST_MACAROON_ENCRYPTED` (or `LND_GRPC_MACAROON_ENCRYPTED`) and leave the plain macaroon setting empty.
 
-### Default Location
-
-```bash
-# Linux
-~/.lnd/tls.cert
-
-# Docker
-/root/.lnd/tls.cert
-
-# Umbrel
-~/umbrel/app-data/lightning/data/lnd/tls.cert
-```
-
-### Skip Verification (Not Recommended)
-
-For testing only:
-
-```bash
-LND_REST_CERT=""  # Empty string skips verification
-```
-
-:::danger
-Never skip certificate verification in production!
+:::warning Only for interactive starts
+With an encrypted macaroon set, LNbits stops at every startup and prompts `Enter the macaroon decryption key:` on its terminal. Under `docker run -d`, systemd or any other service manager there is no terminal, so the backend can't load. Use it only if you start LNbits by hand. For services, protect the plain macaroon with file permissions instead.
 :::
 
-## Testing Connection
+## Remote LND {#remote-lnd}
 
-### Check LND Status
-
-```bash
-# Via lncli
-lncli getinfo
-
-# Via REST
-curl --cacert tls.cert \
-  --header "Grpc-Metadata-macaroon: $(xxd -ps -u -c 1000 admin.macaroon)" \
-  https://127.0.0.1:8080/v1/getinfo
-```
-
-### Check LNbits Connection
+Copy the cert and macaroon from the LND host, then point the endpoint at it:
 
 ```bash
-# Start LNbits and check logs
-docker logs lnbits | grep -i lnd
-
-# Or via health endpoint
-curl http://localhost:5000/api/v1/health
+scp user@lnd-host:.lnd/tls.cert /home/lnbits/lnd/tls.cert
+scp user@lnd-host:.lnd/data/chain/bitcoin/mainnet/admin.macaroon /home/lnbits/lnd/admin.macaroon
 ```
 
-## Common LND Setups
+```bash title=".env"
+LND_REST_ENDPOINT=https://192.168.1.100:8080
+LND_REST_CERT=/home/lnbits/lnd/tls.cert
+LND_REST_MACAROON=/home/lnbits/lnd/admin.macaroon
+```
 
-### Umbrel
+Remember the cert's host-name rule above, and don't expose LND's REST or gRPC port to the internet; use a LAN, VPN or SSH tunnel.
+
+For node packages (Umbrel, Start9, RaspiBlitz, myNode) and hosted nodes (Voltage), the paths and host names differ per platform. Get the REST endpoint, `tls.cert` and macaroon from the platform's own LND connection screen or docs. A hosted node like Voltage gives you a normal macaroon: it goes in `LND_REST_MACAROON`, not the `_ENCRYPTED` field.
+
+## Testing the connection {#testing-connection}
+
+From the LNbits host, check that LND answers with the same cert and macaroon:
 
 ```bash
-LND_REST_ENDPOINT=https://umbrel.local:8080
-LND_REST_CERT=~/umbrel/app-data/lightning/data/lnd/tls.cert
-LND_REST_MACAROON=~/umbrel/app-data/lightning/data/lnd/data/chain/bitcoin/mainnet/admin.macaroon
+curl --cacert /home/lnbits/lnd/tls.cert \
+  --header "Grpc-Metadata-macaroon: $(xxd -ps -u -c 1000 /home/lnbits/lnd/admin.macaroon)" \
+  https://127.0.0.1:8080/v1/balance/channels
 ```
 
-### RaspiBlitz
+That is the call LNbits makes for its status check. Then restart LNbits and look at **Settings → Funding** for the node balance, or call `GET /api/v1/status` as an admin user.
 
-```bash
-LND_REST_ENDPOINT=https://raspiblitz.local:8080
-LND_REST_CERT=/mnt/hdd/lnd/tls.cert
-LND_REST_MACAROON=/mnt/hdd/lnd/data/chain/bitcoin/mainnet/admin.macaroon
-```
+## Troubleshooting {#troubleshooting}
 
-### Start9
+- **Connection refused:** LND isn't listening where you think. Check `restlisten=` (or `rpclisten=`) in `lnd.conf`, and any firewall in between.
+- **Certificate verify failed:** the cert doesn't match the host name, is out of date, or `LND_REST_CERT` is empty while LND uses its self-signed cert. See [TLS certificate](#tls-certificate).
+- **Permission denied or macaroon errors:** the macaroon is for another network (mainnet vs testnet), or lacks a permission. `ls .lnd/data/chain/bitcoin/` shows which networks exist.
+- **Payments stuck or failing:** check channel liquidity with `lncli listchannels` and LND's own logs. LNbits reports a payment as pending if LND hasn't finished within `LNBITS_FUNDING_SOURCE_PAY_INVOICE_WAIT_SECONDS`.
 
-```bash
-LND_REST_ENDPOINT=https://lnd.embassy:8080
-LND_REST_CERT=/path/to/embassy/lnd/tls.cert
-LND_REST_MACAROON=/path/to/embassy/lnd/admin.macaroon
-```
+## Security {#security-best-practices}
 
-### BTCPay Server
+1. Keep the macaroon and cert readable only by the LNbits user (`chmod 600`).
+2. Use a baked macaroon when you don't need the Node UI.
+3. Never expose LND's REST or gRPC ports publicly.
+4. If a macaroon leaks, revoke it. A macaroon baked with its own `--root_key_id` (as above) is revoked with `lncli deletemacaroonid 42`. The admin macaroon shares root key ID 0 with LND's other default macaroons; see LND's [macaroon docs](https://docs.lightning.engineering/lightning-network-tools/lnd/macaroons) before you rotate it.
 
-```bash
-LND_REST_ENDPOINT=https://btcpay.local:8080
-# Use BTCPay's LND directory
-```
+## See also
 
-### Voltage
-
-```bash
-LND_REST_ENDPOINT=https://your-node.m.voltageapp.io:8080
-LND_REST_MACAROON_ENCRYPTED=voltage_provided_macaroon
-# Voltage provides pre-configured macaroon
-```
-
-## Troubleshooting
-
-### Connection Refused
-
-```bash
-# Check LND is running
-lncli getinfo
-
-# Check REST is enabled in lnd.conf
-[Application Options]
-restlisten=0.0.0.0:8080
-```
-
-### Certificate Error
-
-```bash
-# Regenerate TLS cert
-lncli stop
-rm ~/.lnd/tls.*
-lncli start
-
-# Update LNbits with new cert path
-```
-
-### Macaroon Invalid
-
-```bash
-# Check macaroon is readable
-xxd -ps -u -c 1000 admin.macaroon | head -c 100
-
-# Ensure correct network (mainnet vs testnet)
-ls ~/.lnd/data/chain/bitcoin/
-```
-
-### Payment Stuck
-
-1. Check LND has channels with liquidity
-2. Verify channels are active: `lncli listchannels`
-3. Check pending payments: `lncli listpayments`
-4. Review LND logs for routing failures
-
-## Performance Tips
-
-### Connection Pooling
-
-LNbits maintains connection pools. For high traffic:
-
-```bash
-# Increase LND connection limits in lnd.conf
-[Application Options]
-maxpendingchannels=10
-max-cltv-expiry=5000
-```
-
-### Timeout Settings
-
-```bash
-# In LNbits settings (if experiencing timeouts)
-# Adjust via code or contact support for options
-```
-
-## Security Best Practices
-
-1. **Use invoice macaroon** when possible
-2. **Encrypt macaroons** in storage
-3. **Rotate macaroons** periodically
-4. **Restrict network access** to LND
-5. **Monitor for anomalies** in payment patterns
-
-## See Also
-
-- [Funding Sources Overview](/docs/funding-sources/overview)
+- [Funding sources overview](/docs/funding-sources/overview)
 - [Core Lightning](/docs/funding-sources/cln)
 - [Security](/docs/configuration/security)
