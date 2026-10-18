@@ -13,7 +13,7 @@ How a **Python extension** uses LNbits core: authentication, wallets and payment
 
 ## URL prefix {#url-prefix}
 
-LNbits mounts your router under `/<ext_id>`. By convention its API routes sit under `api/v1`, so the items route of the example on the [development page](/docs/extensions/development) is served at `/myextension/api/v1/items`. Core routes such as `/api/v1/payments` are separate and unchanged.
+LNbits includes your `<id>_ext` router as it is: the `/<ext_id>` prefix comes from the router itself (`APIRouter(prefix="/myextension")`). Keep the prefix equal to the extension id. LNbits takes the first path segment as the extension id when it checks whether a user has the extension enabled, and when it answers 404 for a deactivated extension. By convention the API routes sit under `api/v1`, so the items route of the example on the [development page](/docs/extensions/development) is served at `/myextension/api/v1/items`. Core routes such as `/api/v1/payments` are separate and unchanged.
 
 ## Authentication decorators {#authentication-decorators}
 
@@ -86,7 +86,7 @@ bolt11 = payment.bolt11
 payment_hash = payment.payment_hash
 ```
 
-Put your extension id in `extra["tag"]` so your invoice listener can pick out your payments. You can also pass `webhook=` (a URL LNbits calls when the invoice is paid), `expiry=`, `labels=` and `external_id=`.
+Put your extension id in `extra["tag"]` so your invoice listener can pick out your payments. You can also pass `webhook=` (a URL LNbits calls when the invoice is paid), `expiry=` (seconds), `labels=` and `external_id=`. When it can't create the invoice, `create_invoice` raises `lnbits.exceptions.InvoiceError`.
 
 ### Pay an invoice {#pay-invoice}
 
@@ -97,11 +97,14 @@ payment = await pay_invoice(
     wallet_id=wallet_id,
     payment_request=bolt11,  # not bolt11=
     max_sat=5000,            # optional upper bound
+    tag="myextension",       # refuse if the wallet owner has disabled the extension
     extra={"tag": "myextension"},
 )
 ```
 
-When a payment fails, `pay_invoice` raises `lnbits.exceptions.PaymentError`. Uncaught, LNbits returns it as HTTP 520 with `{"detail": ..., "status": "failed"}`.
+With `tag=` set to your extension id, `pay_invoice` first checks that the wallet's owner still has your extension enabled (and is an admin, for an admin-only extension), and refuses the payment otherwise. Without `tag=` it skips that check.
+
+When a payment fails, `pay_invoice` raises `lnbits.exceptions.PaymentError`. Uncaught, LNbits returns a `PaymentError` or an `InvoiceError` as HTTP 520 with `{"detail": <message>, "status": <status>}`, where the status is usually `"failed"`.
 
 ### Check a payment {#check-payment-status}
 
@@ -184,9 +187,11 @@ def myextension_stop():
             logger.warning(ex)
 ```
 
-`task_manager.create_permanent_task(func, name=..., interval=...)` runs a coroutine function forever, restarts it when it fails, and waits `interval` seconds between runs if you set one.
+`task_manager.create_permanent_task(func, name=..., interval=...)` runs a coroutine function forever, restarts it five seconds after it fails, and waits `interval` seconds between runs if you set one. A new task with the same `name` cancels the old one, so give your tasks names that start with your extension id.
 
-lnbits/example still uses the older helpers `lnbits.tasks.create_permanent_unique_task(name, coro)` and `lnbits.tasks.register_invoice_listener(queue, name)`. They still work in v1.6.2 but log a deprecation message.
+`<id>_start` must be a plain `def`. At server start LNbits calls it without awaiting it, so an `async def` start function would never run there. `<id>_stop` may be either.
+
+lnbits/example still uses the older helpers `lnbits.tasks.create_permanent_unique_task(name, coro)` and `lnbits.tasks.register_invoice_listener(queue, name)`. They still work in v1.6.2. They log a `DEPRECATED` message at debug level only, so you see it only with `DEBUG=true`.
 
 ## Websockets {#sse-updates}
 
@@ -202,11 +207,13 @@ await websocket_manager.send(item_id, json.dumps({"paid": True}))
 
 (`websocket_updater(item_id, data)` still exists but is deprecated.)
 
-:::warning Websocket messages are not authenticated
+:::warning Websockets are not authenticated, in either direction
 Anyone can push a message to any item id with
 `POST /api/v1/ws/{item_id}` or
 `GET /api/v1/ws/{item_id}/{data}`.
-Neither route needs a key. Never fulfil an order, unlock content or release goods because a websocket message said "paid". Use the message as a hint, then confirm on the server, for example with `get_standalone_payment` or `GET /api/v1/payments/{payment_hash}`.
+Neither route needs a key.
+
+In the other direction, anyone who knows an item id can listen on its websocket and read what you send. Never send secrets, keys or other users' data over a websocket. Never fulfil an order, unlock content or release goods because a websocket message said "paid". Use the message as a hint, then confirm on the server, for example with `get_standalone_payment` or `GET /api/v1/payments/{payment_hash}`.
 :::
 
 ## Settings {#settings-management}
@@ -228,7 +235,7 @@ async with httpx.AsyncClient(timeout=10) as client:
 
 ## Frontend helpers {#templates-frontend}
 
-The page loads Vue 3, Quasar 2 and the LNbits JS helpers. Build your app with `Vue.createApp({mixins: [windowMixin], ...})` (see [Extension Development](/docs/extensions/development)). `windowMixin` provides `this.g.user`, the user's wallets with their `inkey` and `adminkey`.
+The page loads Vue 3, Quasar 2 and the LNbits JS helpers (the global `LNbits` object). Build your app with `Vue.createApp({...})` and assign it to `window.app` (see [Extension Development](/docs/extensions/development)). LNbits then adds a global mixin that gives every component `this.g`, `this.api` and `this.utils`. `this.g.user` holds the user's wallets with their `inkey` and `adminkey`, as long as your view passes `user` to the template.
 
 ```js
 // generic request: method, path, api key, body
@@ -245,7 +252,7 @@ LNbits.utils.notifyApiError(error)
 
 ## Errors and validation {#error-handling}
 
-Raise `fastapi.HTTPException` for client errors. LNbits also turns an uncaught `ValueError` or `AssertionError` into a 400 with `{"detail": "<message>"}`. Validate request bodies with pydantic (v1.10) models:
+Raise `fastapi.HTTPException` for client errors. LNbits also turns an uncaught `ValueError` or `AssertionError` into a 400 with `{"detail": "<message>"}`, and any other uncaught exception into a 500 that says only `Unexpected error! ID: <id>`. A request body that fails pydantic validation gets **400**, not FastAPI's usual 422. Validate request bodies with pydantic (v1.10) models:
 
 ```python
 from pydantic import BaseModel, Field, validator
