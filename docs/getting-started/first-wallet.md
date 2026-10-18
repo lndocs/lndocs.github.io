@@ -1,245 +1,215 @@
 ---
 sidebar_position: 4
 title: Create Your First Wallet
-description: Step-by-step guide to creating and managing wallets in LNbits
+description: Wallets, API keys, receiving, sending, sharing and key rotation in LNbits v1.6.2
+last_update:
+  date: 2026-10-18
+verified_with: v1.6.2
 ---
 
 # Create Your First Wallet
 
-This guide walks you through creating and managing your first LNbits wallet.
+This guide covers wallets in LNbits v1.6.2: how to create them, what their keys can do, and how to receive, send and share. It assumes you've finished the [Quick Start](/docs/getting-started/quick-start). For a UI walkthrough with screenshots, see the official [wallets and accounts guide](https://docs.lnbits.com/guide/core/wallets-and-accounts).
 
-## Understanding Wallets
+## Understanding wallets {#understanding-wallets}
 
-In LNbits, a **wallet** is an isolated account with its own:
-- Balance (tracked in millisatoshis)
-- API keys (admin and invoice)
-- Transaction history
-- Extension access
-- Customization options
+An **account** is what you log in with (by default, a username and password). An account holds one or more **wallets**. Each wallet has:
 
-Wallets are backed by a single funding source, but each wallet has independent accounting.
+- a balance, kept by LNbits in **millisatoshis** (the API's `balance` field is in msat);
+- two API keys, an **admin key** and an **invoice key**;
+- its own payment history;
+- a name, icon, color, fiat currency and, if the instance allows it, a Lightning Address.
 
-## Creating a Wallet
+Extensions are enabled per **account**, not per wallet. Within an extension, you usually pick which wallet it uses.
 
-### Step 1: Access LNbits
+All wallets share the instance's single funding source. Their balances are entries in LNbits' own ledger.
 
-Open your LNbits instance (default: http://localhost:5000).
+## Creating a wallet {#creating-a-wallet}
 
-### Step 2: Create New Wallet
+### Step 1: Log in {#step-1-access-lnbits}
 
-1. Click **"Add a new wallet"**
-2. Enter a name for your wallet (e.g., "Personal Savings")
-3. Click **"Create wallet"**
+Open your instance (for example `http://localhost:5000`) and log in. On a default install that's with a username and password: either the Super User you created on `/first_install`, or an account registered on the home page.
 
-### Step 3: Save Your Wallet URL
+### Step 2: Add a wallet {#step-2-create-new-wallet}
 
-:::danger Important
-Your wallet URL contains your unique identifier. Save it securely!
-```
-http://localhost:5000/wallet?usr=abc123def456
-```
-If you lose this URL, you lose access to the wallet.
+1. Click **Add a new wallet**.
+2. Enter a name, for example "Personal".
+3. Confirm.
+
+New accounts start with one wallet, named after `LNBITS_DEFAULT_WALLET_NAME` (default "LNbits wallet").
+
+### Step 3: Keep your login safe {#step-3-save-your-wallet-url}
+
+Your access is your **username and password**. On a default v1.6.2 install, a wallet URL by itself doesn't log anyone in.
+
+:::caution If your instance allows `user-id-only`
+Some instances turn on the legacy `user-id-only` method, and instances set up before v1.6.0 may still have it on. There, a URL such as `.../wallet?usr=<user id>` **is** the login: anyone who has it controls the whole account. Treat such a URL like a password and never share it. See [Authentication](/docs/configuration/authentication).
 :::
 
-## Wallet Dashboard
+## Wallet dashboard {#wallet-dashboard}
 
-Your wallet dashboard shows:
+### Balance {#balance-section}
 
-### Balance Section
-- Current balance in satoshis
-- Balance in selected fiat currency (if configured)
-- Receive/Send buttons
+The balance in sats (and in fiat, if the wallet has a currency set), with the **Receive** and **Send** buttons.
 
-### Transaction History
-- Recent incoming and outgoing payments
-- Payment status (pending/success/failed)
-- Memos and timestamps
+### Transaction history {#transaction-history}
 
-### API Keys
-- **Admin Key**: Full wallet control
-- **Invoice Key**: Create invoices only
+Incoming and outgoing payments, with their status (pending, success or failed), memo, time and labels.
 
-## API Keys Explained
+### API keys {#api-keys}
 
-### Admin Key
-```
-Full access to wallet:
-- Send payments
-- Create invoices
-- View balance
-- Access extensions
-- View all transactions
-```
+The **Node URL, API keys and API docs** panel shows the wallet ID and both keys.
 
-**Security**: Keep this key private. Never share it.
+## API keys explained {#api-keys-explained}
 
-### Invoice Key
-```
-Limited access:
-- Create invoices only
-- Cannot send payments
-- Cannot view balance
-```
+| | Admin key | Invoice key |
+|---|---|---|
+| Create invoices | ✓ | ✓ |
+| Read the balance (`GET /api/v1/wallet`) | ✓ | ✓ |
+| List the payment history (`GET /api/v1/payments`) | ✓ | ✓ |
+| **Send payments** | ✓ | — |
+| Change wallet settings, share the wallet | ✓ | — |
 
-**Security**: Safe to share for receiving payments.
+Sources: [wallet_api.py](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/wallet_api.py) and [payment_api.py](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/payment_api.py) in v1.6.2.
 
-## Receiving Payments
+### Admin key {#admin-key}
 
-### Create an Invoice
+Full control of the wallet, including spending. Keep it secret. Only give it to a backend service that has to send payments.
 
-1. Click **"Receive"**
-2. Enter amount in sats (or toggle to fiat)
-3. Add a memo (optional but recommended)
-4. Click **"Create Invoice"**
+### Invoice key {#invoice-key}
 
-You'll get:
-- **BOLT11 invoice**: Text format for copy/paste
-- **QR Code**: For mobile wallets
-- **Payment link**: Shareable URL
+The invoice key **can't spend**, but it isn't private. Whoever holds it can read the wallet's balance and its full payment history. Use it in apps that only need to receive, such as a shop's checkout, and share it only with services you'd trust to see all the wallet's activity.
 
-### Invoice Options
+## Receiving payments {#receiving-payments}
 
-```javascript
-// Via API
-POST /api/v1/payments
-{
-  "out": false,          // false = incoming (invoice)
-  "amount": 1000,        // Amount in sats
-  "memo": "Coffee",      // Description
-  "webhook": "https://...", // Notification URL
-  "unit": "sat"          // Currency unit
-}
-```
+### Create an invoice {#create-an-invoice}
 
-## Sending Payments
+1. Click **Receive**.
+2. Enter the amount (in sats, or in fiat if the wallet has a currency).
+3. Add a memo.
+4. Click **Create Invoice**.
 
-### Pay an Invoice
+You get a BOLT11 invoice as text and as a QR code.
 
-1. Click **"Send"**
-2. Paste the BOLT11 invoice
-3. Review the amount and recipient
-4. Click **"Pay Invoice"**
-
-### Pay via LNURL
-
-1. Click **"Send"**
-2. Paste the LNURL or Lightning Address
-3. Enter the amount
-4. Confirm payment
-
-## Wallet Settings
-
-### Customize Your Wallet
-
-Click the gear icon to access settings:
-
-- **Name**: Rename your wallet
-- **Icon**: Choose an icon
-- **Color**: Set a theme color
-- **Currency**: Default fiat currency
-
-### Multiple Wallets
-
-Create additional wallets for different purposes:
-- Personal spending
-- Business income
-- Savings
-- Testing
-
-Each wallet has independent:
-- Balance and history
-- API keys
-- Extension configurations
-
-## Sharing Wallets
-
-LNbits supports wallet sharing with granular permissions.
-
-### Share with Another User
-
-1. Go to wallet settings
-2. Click **"Share Wallet"**
-3. Enter the username or email
-4. Select permissions:
-   - **View**: See balance and transactions
-   - **Receive**: Create invoices
-   - **Send**: Make payments
-5. Send the invitation
-
-### Accept a Shared Wallet
-
-1. Check your notifications
-2. Review the sharing invitation
-3. Accept or decline
-4. Shared wallet appears in your list
-
-## Wallet Security
-
-### Backup Your Access
+### Through the API {#invoice-options}
 
 ```bash
-# Save these for each wallet:
-1. Wallet URL (contains user ID)
-2. Admin Key
-3. Invoice Key
+curl -X POST https://lnbits.example.com/api/v1/payments \
+  -H "X-Api-Key: <invoice key>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "out": false,
+    "amount": 1000,
+    "unit": "sat",
+    "memo": "Coffee",
+    "webhook": "https://shop.example.com/lnbits-hook"
+  }'
 ```
 
-### Secure Your Keys
+- **Always send `"out": false`** for an invoice. When `out` is missing, it defaults to `true`, which means paying ([models/payments.py L254-276](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/models/payments.py#L254-L276)).
+- `amount` is in `unit`, which defaults to `sat`. Other units are fiat currency codes.
+- `webhook` is called when the invoice is paid. By default, LNbits refuses webhook URLs that point at private or non-global IPs, or that use a bare IP instead of a domain (`LNBITS_CALLBACK_ALLOW_PRIVATE_IPS`, `LNBITS_CALLBACK_URL_RULES`). See [Webhooks](/docs/api/webhooks).
 
-| Key Type | Share? | Store |
-|----------|--------|-------|
-| Wallet URL | Never | Password manager |
-| Admin Key | Never | Password manager |
-| Invoice Key | Carefully | Apps that need receiving only |
+## Sending payments {#sending-payments}
 
-### Key Rotation
+### Pay an invoice {#pay-an-invoice}
 
-If you suspect a key is compromised:
-1. Note the wallet ID
-2. Contact instance admin
-3. Generate new keys
-4. Update all integrations
+1. Click **Send**.
+2. Click **Paste Request** and paste the BOLT11 invoice (or scan a QR code).
+3. Check the amount and description.
+4. Confirm.
 
-## Deleting a Wallet
+### Pay an LNURL or Lightning Address {#pay-via-lnurl}
+
+Paste the LNURL or Lightning Address in the same **Send** dialog, enter the amount, and confirm. By default, LNbits fetches LNURLs only over HTTPS from public addresses.
+
+## Wallet settings {#wallet-settings}
+
+### Customize the wallet {#customize-your-wallet}
+
+In the wallet's settings you can change the **name**, **icon**, **color** and **fiat currency**, and pin the wallet. If the instance allows it, you can also set a **Lightning Address**. Through the API, these are `PATCH /api/v1/wallet` with the admin key.
+
+### Multiple wallets {#multiple-wallets}
+
+Create separate wallets for separate purposes, such as personal, shop and testing. Each one has its own balance, history and keys.
+
+## Sharing wallets {#sharing-wallets}
+
+You can share a wallet with another user on the same instance, with chosen permissions ([models/wallets.py L25-51](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/models/wallets.py#L25-L51)).
+
+### Share with another user {#share-with-another-user}
+
+1. Open the wallet and choose **Share Wallet**.
+2. Enter the other user's **username**. Invitations go by username, not by email.
+3. Pick the permissions:
+   - **view-payments:** see the balance and payments
+   - **receive-payments:** create invoices
+   - **send-payments:** make payments
+4. Send the invitation (`PUT /api/v1/wallet/share/invite`, admin key).
+
+### Accept a shared wallet {#accept-a-shared-wallet}
+
+The invited user sees the invitation in their account and accepts or declines it. An accepted share shows up in their wallet list. The owner can revoke it at any time. See [Shared Wallets](/docs/guides/shared-wallets).
+
+## Wallet security {#wallet-security}
+
+### What to back up {#backup-your-access}
+
+- Your **username and password** (in a password manager).
+- Any **admin keys** you've put into other systems, so that you know what to rotate.
+- The wallets themselves live on the server. Their safety depends on the operator's backups. See [Backup & Restore](/docs/guides/backup-restore).
+
+### Where keys belong {#secure-your-keys}
+
+| Credential | Share? | Store |
+|---|---|---|
+| Username and password | Never | Password manager |
+| Admin key | Never | Server-side secrets of the backend that pays |
+| Invoice key | Only with services that may see the balance and history | App config of receive-only integrations |
+
+### Key rotation {#key-rotation}
+
+If a key may have leaked, rotate it yourself. Open the wallet's settings and click **Reset Keys**, or call `PUT /api/v1/wallet/reset/{wallet_id}` while logged in ([wallet_api.py L133-147](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/wallet_api.py#L133-L147)). Both keys are replaced, so update every integration that used them.
+
+## Deleting a wallet {#deleting-a-wallet}
 
 :::warning
-Wallet deletion is permanent. Ensure balance is zero and backup transaction history.
+Move the balance out before you delete a wallet. You can't use a deleted wallet again.
 :::
 
-1. Go to wallet settings
-2. Click **"Delete Wallet"**
-3. Confirm deletion
+1. Open the wallet's settings.
+2. Click **Delete wallet**.
+3. Confirm.
 
-## Common Tasks
+The API equivalent is `DELETE /api/v1/wallet/{wallet_id}`, which you call as the logged-in owner.
 
-### Check Balance
+## Common tasks {#common-tasks}
+
+### Check the balance {#check-balance}
 
 ```bash
-curl http://localhost:5000/api/v1/wallet \
-  -H "X-Api-Key: YOUR_INVOICE_KEY"
+curl https://lnbits.example.com/api/v1/wallet -H "X-Api-Key: <invoice key>"
+# {"name": "...", "balance": 1000000}  (balance in msat)
 ```
 
-### List Transactions
+### List transactions {#list-transactions}
 
 ```bash
-curl http://localhost:5000/api/v1/payments \
-  -H "X-Api-Key: YOUR_ADMIN_KEY"
+curl https://lnbits.example.com/api/v1/payments -H "X-Api-Key: <invoice key>"
 ```
 
-### Create Payment
+### Pay an invoice {#create-payment}
 
 ```bash
-curl -X POST http://localhost:5000/api/v1/payments \
-  -H "X-Api-Key: YOUR_ADMIN_KEY" \
+curl -X POST https://lnbits.example.com/api/v1/payments \
+  -H "X-Api-Key: <admin key>" \
   -H "Content-Type: application/json" \
   -d '{"out": true, "bolt11": "lnbc..."}'
 ```
 
-## Next Steps
+## Next Steps {#next-steps}
 
-Now that you have a wallet:
-
-1. **[Connect a Funding Source](/docs/funding-sources/overview)** - Use real Lightning
-2. **[Enable Extensions](/docs/extensions/overview)** - Add TPoS, LNURL, etc.
-3. **[Learn the API](/docs/api/overview)** - Build integrations
-4. **[Configure Security](/docs/configuration/security)** - Harden your instance
+1. **[Connect a Funding Source](/docs/funding-sources/overview):** real Lightning.
+2. **[Extensions](/docs/extensions/overview):** TPoS, pay links and more.
+3. **[API](/docs/api/overview):** build integrations.
+4. **[Security](/docs/configuration/security):** harden your instance.
