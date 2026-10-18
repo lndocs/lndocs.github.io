@@ -1,255 +1,221 @@
 ---
 sidebar_position: 3
 title: Wallets API
-description: LNbits wallet management API endpoints
+description: Read, create, rename, rotate and delete LNbits wallets over the API
+last_update:
+  date: 2026-10-18
+verified_with: v1.6.2
 ---
 
 # Wallets API
 
-Manage wallets via the LNbits API.
+Wallet routes come in two kinds:
 
-## Get Wallet Info
+- Routes that act on **one wallet** take that wallet's key in the `X-API-KEY` header.
+- Routes that act on **your account's wallets** (listing, creating, deleting, rotating keys) take **user** credentials: a bearer token, the login cookie or `?usr=`. A wallet key is rejected there with 401 `Missing user ID or access token.`
 
-Get basic wallet information and balance.
+See [Authentication](/docs/api/authentication) for both.
 
-```http
-GET /api/v1/wallet
-```
+| Method and path | Credential | Purpose |
+|---|---|---|
+| `GET /api/v1/wallet` | Invoice or admin key | Name and balance |
+| `PATCH /api/v1/wallet` | Admin key | Update name, icon, colour, currency, pin, Lightning address |
+| `PUT /api/v1/wallet/{new_name}` | Admin key | Rename (older route) |
+| `GET /api/v1/wallets` | User | All your wallets |
+| `GET /api/v1/wallet/paginated` | User | Your wallets, filtered and paged |
+| `POST /api/v1/wallet` | User | Create a wallet |
+| `PUT /api/v1/wallet/reset/{wallet_id}` | User | Generate new keys |
+| `DELETE /api/v1/wallet/{wallet_id}` | User | Delete a wallet |
 
-**Authentication**: Invoice Key or Admin Key
+## Get wallet info {#get-wallet-info}
 
-**Response**:
-```json
-{
-  "id": "abc123",
-  "name": "My Wallet",
-  "balance": 50000
-}
-```
-
-**Example**:
 ```bash
-curl -H "X-Api-Key: $INVOICE_KEY" \
-  https://lnbits.com/api/v1/wallet
+curl https://lnbits.example.com/api/v1/wallet \
+  -H "X-Api-Key: $INVOICE_KEY"
 ```
 
-## Get Wallet Details
+With an invoice key:
 
-Get detailed wallet information with user data.
-
-```http
-GET /api/v1/wallet/details
-```
-
-**Authentication**: Admin Key
-
-**Response**:
 ```json
-{
-  "id": "abc123",
-  "name": "My Wallet",
-  "user": "user_id",
-  "balance_msat": 50000000,
-  "created_at": "2024-01-01T00:00:00Z",
-  "updated_at": "2024-01-15T12:00:00Z"
-}
+{"name": "My Wallet", "balance": 150000}
 ```
 
-## List User Wallets
+With an admin key, the response also includes `"id"`.
 
-Get all wallets for the current user.
+`balance` is in **millisatoshis**. Divide by 1000 for sats. This route only returns those fields. For the full wallet object, use `GET /api/v1/wallets`.
 
-```http
-GET /api/v1/wallets
+## List your wallets {#list-user-wallets}
+
+```bash
+curl https://lnbits.example.com/api/v1/wallets \
+  -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
-**Authentication**: Admin Key (any wallet)
+This returns a list of full wallet objects:
 
-**Response**:
 ```json
 [
   {
-    "id": "wallet1",
-    "name": "Main Wallet",
-    "balance": 50000
-  },
-  {
-    "id": "wallet2",
-    "name": "Savings",
-    "balance": 100000
+    "id": "8b2f...",
+    "user": "1c4e...",
+    "wallet_type": "lightning",
+    "adminkey": "e5c1...",
+    "inkey": "7a9d...",
+    "name": "My Wallet",
+    "shared_wallet_id": null,
+    "deleted": false,
+    "created_at": "2026-10-01T12:00:00+00:00",
+    "updated_at": "2026-10-01T12:00:00+00:00",
+    "currency": "EUR",
+    "lightning_address": null,
+    "balance_msat": 150000,
+    "extra": {"icon": "flash_on", "color": "primary", "pinned": false, "shared_with": []},
+    "stored_paylinks": {"links": []},
+    "share_permissions": []
   }
 ]
 ```
 
-## Create Wallet
+The response includes the **admin key of every wallet**. With an [ACL API token](/docs/api/authentication) that only has `read` on `/api/v1/wallets`, the keys come back masked as asterisks.
 
-Create a new wallet for the user.
+`GET /api/v1/wallet/paginated` returns the same objects as `{"data": [...], "total": n}`. It takes the standard `limit`, `offset`, `sortby`, `direction` and `search` parameters, and filters on `id`, `name`, `currency` and `lightning_address`.
 
-```http
-POST /api/v1/wallet
-```
+## Create a wallet {#create-wallet}
 
-**Authentication**: Admin Key (any existing wallet)
-
-**Request Body**:
-```json
-{
-  "name": "New Wallet"
-}
-```
-
-**Response**:
-```json
-{
-  "id": "new_wallet_id",
-  "name": "New Wallet",
-  "user": "user_id",
-  "adminkey": "admin_key_here",
-  "inkey": "invoice_key_here",
-  "balance": 0
-}
-```
-
-**Example**:
 ```bash
-curl -X POST \
+curl -X POST https://lnbits.example.com/api/v1/wallet \
+  -H "Authorization: Bearer $ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Shop"}'
+```
+
+| Field | Type | Notes |
+|---|---|---|
+| `name` | string | Wallet name |
+| `wallet_type` | string | `lightning` (default) or `lightning-shared` |
+| `shared_wallet_id` | string | Required for `lightning-shared`: the wallet that was shared with you |
+
+The response is the new wallet object, including its `adminkey` and `inkey`. Store the keys from this response.
+
+Shared wallets (v1.4+) let another user view, receive or send from your wallet with permissions you choose. Invitations are handled by the `/api/v1/wallet/share` routes. See [Shared wallets](/docs/guides/shared-wallets) and Swagger at `/docs` for the request shapes.
+
+## Update a wallet {#update-wallet}
+
+`PATCH /api/v1/wallet` changes the wallet that owns the admin key. Send only the fields you want to change:
+
+```bash
+curl -X PATCH https://lnbits.example.com/api/v1/wallet \
   -H "X-Api-Key: $ADMIN_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"name": "New Wallet"}' \
-  https://lnbits.com/api/v1/wallet
+  -d '{"name": "Shop till", "currency": "EUR"}'
 ```
 
-## Rename Wallet
+| Field | Notes |
+|---|---|
+| `name` | New name |
+| `icon`, `color` | Display settings |
+| `currency` | Fiat currency shown next to the balance |
+| `pinned` | `true` or `false` |
+| `lightning_address` | The local part of a wallet Lightning address. Refused with 403 unless the admin set `LNBITS_ALLOW_CUSTOM_WALLET_LIGHTNING_ADDRESSES` to true. It may cost a fee when the admin set `LNBITS_CHARGE_WALLET_LIGHTNING_ADDRESSES` |
 
-Update wallet name.
+The response is the updated wallet object.
 
-```http
-PUT /api/v1/wallet/{wallet_id}
+### Rename with the older route {#rename-wallet}
+
+`PUT /api/v1/wallet/{new_name}` takes the **new name in the path** and ignores any body:
+
+```bash
+curl -X PUT "https://lnbits.example.com/api/v1/wallet/Shop%20till" \
+  -H "X-Api-Key: $ADMIN_KEY"
 ```
 
-**Authentication**: Admin Key (of that wallet)
-
-**Request Body**:
 ```json
-{
-  "name": "Updated Name"
-}
+{"id": "8b2f...", "name": "Shop till", "balance": 150000}
 ```
 
-**Response**:
-```json
-{
-  "id": "wallet_id",
-  "name": "Updated Name"
-}
-```
+:::caution
+The path segment is not a wallet ID. `PUT /api/v1/wallet/<wallet_id>` renames the wallet to its own ID.
 
-## Delete Wallet
-
-Soft delete a wallet.
-
-```http
-DELETE /api/v1/wallet/{wallet_id}
-```
-
-**Authentication**: Admin Key (of that wallet)
-
-**Response**:
-```json
-{
-  "success": true
-}
-```
-
-:::warning
-Deleted wallets cannot be recovered. Ensure balance is zero.
+Prefer the `PATCH` route above.
 :::
 
-## Balance Response
+## Rotate the keys {#rotate-keys}
 
-Balance is returned in satoshis by default:
-
-```json
-{
-  "balance": 50000  // satoshis
-}
+```bash
+curl -X PUT https://lnbits.example.com/api/v1/wallet/reset/$WALLET_ID \
+  -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
-For millisatoshi precision:
-```json
-{
-  "balance_msat": 50000000  // millisatoshis
-}
+LNbits generates a new admin key and invoice key and returns the wallet with them. The old keys stop working at once, so update every integration that used them. You must own the wallet. Otherwise you get 404 `Wallet not found`.
+
+## Delete a wallet {#delete-wallet}
+
+```bash
+curl -X DELETE https://lnbits.example.com/api/v1/wallet/$WALLET_ID \
+  -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
-## Error Responses
+The response body is `null`.
 
-### Wallet Not Found
+Deletion is a **soft delete**. The wallet is marked `deleted` and disappears from your account, but its row and payment history stay in the database. An admin can restore it with `PUT /users/api/v1/user/{user_id}/wallet/{wallet}/undelete` (see [Users API](/docs/api/users)).
+
+Move the funds out before you delete a wallet. A deleted wallet's balance can't be spent until an admin restores it.
+
+## Errors {#error-responses}
+
+### Wallet not found {#wallet-not-found}
+
+An unknown wallet key gives:
+
 ```json
-{
-  "detail": "Wallet not found"
-}
+{"detail": "Wallet not found."}
 ```
-HTTP 404
 
-### Insufficient Balance
+with HTTP **404**. Owner-checked user routes (reset, delete) also return 404 when the wallet isn't yours.
+
+### Insufficient balance {#insufficient-balance}
+
+Paying more than the wallet holds gives HTTP **520**:
+
 ```json
-{
-  "detail": "Insufficient balance"
-}
+{"detail": "Insufficient balance.", "status": "failed"}
 ```
-HTTP 400
 
-## Code Examples
+For an external payment, LNbits also keeps back a reserve for routing fees. If the balance covers the amount but not the reserve, you get a 520 whose `detail` starts with `You must reserve at least`.
 
-### Python
+## Code examples {#code-examples}
+
+### Python {#python}
 
 ```python
+import os
 import httpx
 
-async def get_wallet(api_key: str):
-    async with httpx.AsyncClient() as client:
-        response = await client.get(
-            "https://lnbits.com/api/v1/wallet",
-            headers={"X-Api-Key": api_key}
-        )
-        response.raise_for_status()
-        return response.json()
+LNBITS = "https://lnbits.example.com"
+headers = {"X-Api-Key": os.environ["INVOICE_KEY"]}
 
-async def create_wallet(admin_key: str, name: str):
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            "https://lnbits.com/api/v1/wallet",
-            headers={"X-Api-Key": admin_key},
-            json={"name": name}
-        )
-        return response.json()
+r = httpx.get(f"{LNBITS}/api/v1/wallet", headers=headers)
+r.raise_for_status()
+wallet = r.json()
+print(wallet["name"], wallet["balance"] // 1000, "sats")
 ```
 
-### JavaScript
+### JavaScript {#javascript}
 
 ```javascript
-async function getWallet(apiKey) {
-  const response = await fetch('https://lnbits.com/api/v1/wallet', {
-    headers: { 'X-Api-Key': apiKey }
-  });
-  return response.json();
-}
+const LNBITS = 'https://lnbits.example.com'
 
-async function createWallet(adminKey, name) {
-  const response = await fetch('https://lnbits.com/api/v1/wallet', {
-    method: 'POST',
-    headers: {
-      'X-Api-Key': adminKey,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ name })
-  });
-  return response.json();
-}
+const res = await fetch(`${LNBITS}/api/v1/wallet`, {
+  headers: {'X-Api-Key': process.env.INVOICE_KEY}
+})
+if (!res.ok) throw new Error(`${res.status}: ${(await res.json()).detail}`)
+const wallet = await res.json()
+console.log(wallet.name, Math.floor(wallet.balance / 1000), 'sats')
 ```
 
-## See Also
+## See also {#see-also}
 
 - [Payments API](/docs/api/payments)
-- [API Overview](/docs/api/overview)
+- [Authentication](/docs/api/authentication)
+- [Wallet architecture](/docs/architecture/wallets)
+- [docs.lnbits.com: Wallets](https://docs.lnbits.com/api/core/wallets)

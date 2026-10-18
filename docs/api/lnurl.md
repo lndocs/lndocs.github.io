@@ -1,230 +1,194 @@
 ---
 sidebar_position: 6
 title: LNURL API
-description: LNURL protocol support in LNbits
+description: Resolve LNURLs, pay LNURL-pay links and Lightning addresses, withdraw, LNURL-auth and wallet Lightning addresses in LNbits core
+last_update:
+  date: 2026-10-18
+verified_with: v1.6.2
 ---
 
 # LNURL API
 
-LNbits provides full LNURL protocol support.
+LNbits core is an LNURL **client**. It can resolve LNURLs, pay LNURL-pay links and Lightning addresses, pull funds from LNURL-withdraw links, and log in to sites with LNURL-auth. Since v1.6.0, core can also **serve** Lightning addresses for wallets.
 
-## LNURL Overview
+Creating your own LNURL-pay or LNURL-withdraw **links** is done by extensions, mainly **Pay Links** (`lnurlp`) and **Withdraw Links** (`withdraw`). Their routes live under `/lnurlp/api/v1/...` and `/withdraw/api/v1/...`, and take wallet keys. They are not part of core. Once an extension is installed, its routes and models appear in Swagger at `/docs` on your instance. Extension guides are on [docs.lnbits.com](https://docs.lnbits.com).
 
-LNURL is a protocol for Lightning Network interactions:
-- **LNURL-pay**: Static payment links
-- **LNURL-withdraw**: Vouchers and withdrawals
-- **LNURL-auth**: Authentication
+## LNURL overview {#lnurl-overview}
 
-## LNURL-pay
+| Spec | What LNbits core does | Route |
+|---|---|---|
+| LNURL-pay (LUD-06), Lightning address (LUD-16) | Pays them | `POST /api/v1/payments/lnurl` |
+| LNURL-withdraw (LUD-03) | Pulls into a new invoice | `lnurl_withdraw` field of `POST /api/v1/payments` |
+| LNURL-auth (LUD-04) | Logs in as the wallet | `POST /api/v1/lnurlauth` |
+| Any of the above | Resolves and validates | `POST /api/v1/lnurlscan` |
+| Lightning address server | Serves wallet addresses | `GET /.well-known/lnurlp/{username}` |
 
-### Create Pay Link
+## Decoding an LNURL {#decoding-lnurl}
 
-Via LNURL-pay extension:
+`POST /api/v1/lnurlscan` takes a bech32 LNURL or a Lightning address. LNbits fetches it and returns the service's response. It needs an invoice or admin key.
 
-```http
-POST /lnurlp/api/v1/links
+```bash
+curl -X POST https://lnbits.example.com/api/v1/lnurlscan \
+  -H "X-Api-Key: $INVOICE_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"lnurl": "alice@example.com"}'
 ```
 
-**Request Body**:
+For a pay link the response is the LUD-06 pay response: `tag: "payRequest"`, `callback`, `minSendable` and `maxSendable` (msat), `metadata` and `commentAllowed`. Withdraw links return `tag: "withdrawRequest"` with `k1`, `minWithdrawable` and `maxWithdrawable`. Auth links return `tag: "login"` with `k1`. If the service returns an error or can't be reached, you get 400 with the reason in `detail`.
+
+`GET /api/v1/lnurlscan/{code}` is the older, deprecated form of the same call.
+
+To decode a bech32 LNURL into its URL without fetching it, use `POST /api/v1/payments/decode` (no key needed, see [Payments API](/docs/api/payments)).
+
+## Paying an LNURL or Lightning address {#lnurl-via-core-api}
+
+Use `POST /api/v1/payments/lnurl` with the **admin key**. `POST /api/v1/payments` does not take an LNURL. Sending one there with the admin key returns 400 `Missing BOLT11 invoice`.
+
+### Pay to a Lightning address {#pay-to-lightning-address}
+
+```bash
+curl -X POST https://lnbits.example.com/api/v1/payments/lnurl \
+  -H "X-Api-Key: $ADMIN_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"lnurl": "alice@example.com", "amount": 100000, "comment": "Thanks!"}'
+```
+
+### Pay to an LNURL {#pay-to-lnurl}
+
+```bash
+curl -X POST https://lnbits.example.com/api/v1/payments/lnurl \
+  -H "X-Api-Key: $ADMIN_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"lnurl": "LNURL1DP68GURN8GHJ7...", "amount": 100000}'
+```
+
+| Field | Notes |
+|---|---|
+| `lnurl` | A bech32 LNURL or a Lightning address. Send this or `res` |
+| `res` | A pay response you already got from `POST /api/v1/lnurlscan`. This saves a round trip |
+| `amount` | **Millisatoshis**: `100000` is 100 sats. With a fiat `unit`, send the fiat amount times 1000 (for example `2500` for 2.50) |
+| `unit` | Optional. `sat`, or a fiat code that is converted at the current rate |
+| `comment` | Optional. Sent to the recipient if the link allows comments |
+
+LNbits fetches the invoice from the service's callback and pays it. The response is the payment object (see [Payments API](/docs/api/payments)). Payment failures return 520. Service errors (amount out of range, comment too long, unreachable) return 400 with the service's reason.
+
+If the service marks the link as not disposable (`"disposable": false`), LNbits also saves it in the wallet's stored pay links.
+
+## LNURL-withdraw {#lnurl-withdraw}
+
+To pull funds from someone else's withdraw link into your wallet, first resolve the link with `POST /api/v1/lnurlscan`. Then create an invoice and pass the withdraw response in `lnurl_withdraw`:
+
+```bash
+curl -X POST https://lnbits.example.com/api/v1/payments \
+  -H "X-Api-Key: $INVOICE_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"out": false, "amount": 100, "memo": "Withdraw", "lnurl_withdraw": <the withdrawRequest object from lnurlscan>}'
+```
+
+LNbits creates the invoice and sends it to the link's callback. If the service rejects it, the returned payment has `status: "failed"` and the reason in `extra.lnurl_response`. Otherwise wait for the payment to arrive as usual.
+
+To create withdraw links that others can pull from, use the Withdraw Links extension.
+
+## LNURL-auth {#lnurl-auth}
+
+`POST /api/v1/lnurlauth` logs in to an LNURL-auth site as your wallet. LNbits derives the linking key from the wallet's admin key, so each wallet gets a stable identity per site. Resolve the `lnurl` with `POST /api/v1/lnurlscan` first, then send the returned `login` object (`tag`, `callback`, `k1`) as the body, with the admin key:
+
+```bash
+curl -X POST https://lnbits.example.com/api/v1/lnurlauth \
+  -H "X-Api-Key: $ADMIN_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"tag": "login", "callback": "https://site.example/auth?tag=login&k1=...", "k1": "..."}'
+```
+
+LNbits does not offer LNURL-auth as a way to log in to LNbits itself. Its login methods are listed in [Authentication](/docs/api/authentication).
+
+## Wallet Lightning addresses {#lightning-address}
+
+Since v1.6.0, core can give a wallet a Lightning address such as `alice@lnbits.example.com` without any extension.
+
+- `GET /.well-known/lnurlp/{username}` answers address lookups.
+- The callback is `GET /api/v1/lnurl/wallet/{username}/cb?amount=<msat>`. It accepts 1000 msat or more and an optional `comment`.
+- A wallet gets an address through `PATCH /api/v1/wallet` with `lightning_address` (only if `LNBITS_ALLOW_CUSTOM_WALLET_LIGHTNING_ADDRESSES` is on), or from an admin (see [Users API](/docs/api/users)).
+
+### Get address info {#get-address-info}
+
+```bash
+curl https://lnbits.example.com/.well-known/lnurlp/alice
+```
+
+The answer is a LUD-06 pay response whose `callback` points at `/api/v1/lnurl/wallet/alice/cb`.
+
+Who answers `/.well-known/lnurlp/...` depends on `LNBITS_LN_ADDRESS_MODE`:
+
+| Mode | Behaviour |
+|---|---|
+| `extension_first` (default) | An extension that claims the path (such as Pay Links) answers first. Otherwise core answers |
+| `core_first` | Core wallet addresses only. Extensions don't take part |
+| `extension_only` | Only extensions answer. Core returns an error |
+
+With the Admin UI on (the default), these settings are stored in the database after first start and override `.env`. Change them at `/admin`.
+
+## LNURL error handling {#lnurl-error-handling}
+
+LNURL endpoints that LNbits **serves**, such as the Lightning address callback, answer errors in the LUD format with HTTP 200:
+
 ```json
-{
-  "description": "Coffee tip jar",
-  "min": 100,
-  "max": 100000,
-  "comment_chars": 150
-}
+{"status": "ERROR", "reason": "Lightning address not found."}
 ```
 
-### Pay Callback
+The core API routes that **use** LNURLs (`/api/v1/lnurlscan`, `/api/v1/payments/lnurl`, `/api/v1/lnurlauth`) turn a remote error into HTTP 400 with `{"detail": "<reason>"}`.
 
-When a wallet scans the LNURL:
+### Outbound LNURL requests {#outbound-lnurl-requests}
 
-```http
-GET /lnurlp/api/v1/lnurl/callback/{link_id}?amount=1000
-```
+LNbits limits where it will send LNURL requests:
 
-**Response**:
-```json
-{
-  "pr": "lnbc10n1...",
-  "routes": []
-}
-```
+- It only fetches LNURLs over HTTPS from public IP addresses, or `.onion` hosts through Tor. Private and non-global addresses are refused unless `LNBITS_LNURL_ALLOW_PRIVATE_IPS` is true.
+- It follows a redirect only if the target origin matches `LNBITS_LNURL_REDIRECT_URL_RULES`, which is empty by default, so redirects are refused.
+- LNURL-auth and LNURL-withdraw callbacks must also match `LNBITS_CALLBACK_URL_RULES`. See [Webhooks](/docs/api/webhooks) for how those rules work.
 
-## LNURL-withdraw
+If paying or scanning a service on your own LAN fails with a "private or non-global IP" error, these settings are the reason.
 
-### Create Withdraw Link
+## Code examples {#code-examples}
 
-Via LNURL-withdraw extension:
-
-```http
-POST /withdraw/api/v1/links
-```
-
-**Request Body**:
-```json
-{
-  "title": "Voucher",
-  "min_withdrawable": 1000,
-  "max_withdrawable": 1000,
-  "uses": 1,
-  "wait_time": 60
-}
-```
-
-### Withdraw Callback
-
-```http
-GET /withdraw/api/v1/lnurl/callback/{link_id}?k1={k1}&pr={bolt11}
-```
-
-## Lightning Address
-
-LNbits supports Lightning Addresses (user@domain.com):
-
-### Get Address Info
-
-```http
-GET /.well-known/lnurlp/{username}
-```
-
-**Response**:
-```json
-{
-  "callback": "https://lnbits.com/lnurlp/api/v1/lnurl/callback/...",
-  "tag": "payRequest",
-  "minSendable": 1000,
-  "maxSendable": 100000000,
-  "metadata": "[[\"text/plain\",\"User description\"]]"
-}
-```
-
-## LNURL-auth
-
-Authenticate users with Lightning:
-
-```http
-GET /api/v1/lnurl/auth?k1={k1}&sig={signature}&key={pubkey}
-```
-
-**Response**:
-```json
-{
-  "status": "OK"
-}
-```
-
-## Decoding LNURL
-
-Decode an LNURL string:
-
-```http
-POST /api/v1/lnurl/decode
-```
-
-**Request Body**:
-```json
-{
-  "lnurl": "LNURL1DP68GURN..."
-}
-```
-
-**Response**:
-```json
-{
-  "tag": "payRequest",
-  "callback": "https://...",
-  "minSendable": 1000,
-  "maxSendable": 100000000,
-  "metadata": "..."
-}
-```
-
-## LNURL via Core API
-
-### Pay to LNURL
-
-```http
-POST /api/v1/payments
-```
-
-**Request Body**:
-```json
-{
-  "out": true,
-  "lnurl": "LNURL1DP68GURN...",
-  "amount": 1000
-}
-```
-
-### Pay to Lightning Address
-
-```http
-POST /api/v1/payments
-```
-
-**Request Body**:
-```json
-{
-  "out": true,
-  "lnurl": "user@domain.com",
-  "amount": 1000
-}
-```
-
-## Code Examples
-
-### Python - Pay to Lightning Address
+### Python: pay a Lightning address {#python---pay-to-lightning-address}
 
 ```python
+import os
 import httpx
 
-async def pay_lightning_address(admin_key: str, address: str, amount: int):
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            "https://lnbits.com/api/v1/payments",
-            headers={"X-Api-Key": admin_key},
-            json={
-                "out": True,
-                "lnurl": address,
-                "amount": amount
-            }
-        )
-        return response.json()
+LNBITS = "https://lnbits.example.com"
 
-# Usage
-await pay_lightning_address(key, "alice@getalby.com", 1000)
+def pay_address(address: str, sats: int, comment: str | None = None) -> dict:
+    r = httpx.post(
+        f"{LNBITS}/api/v1/payments/lnurl",
+        headers={"X-Api-Key": os.environ["ADMIN_KEY"]},
+        json={"lnurl": address, "amount": sats * 1000, "comment": comment},
+        timeout=60,
+    )
+    r.raise_for_status()
+    return r.json()
+
+payment = pay_address("alice@example.com", 100, "Thanks!")
+print(payment["status"], payment["payment_hash"])
 ```
 
-### JavaScript - Decode LNURL
+### JavaScript: resolve an LNURL {#javascript---decode-lnurl}
 
 ```javascript
-async function decodeLnurl(apiKey, lnurl) {
-  const response = await fetch('https://lnbits.com/api/v1/lnurl/decode', {
-    method: 'POST',
-    headers: {
-      'X-Api-Key': apiKey,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ lnurl })
-  });
-  return response.json();
-}
+const LNBITS = 'https://lnbits.example.com'
+
+const res = await fetch(`${LNBITS}/api/v1/lnurlscan`, {
+  method: 'POST',
+  headers: {'X-Api-Key': process.env.INVOICE_KEY, 'Content-Type': 'application/json'},
+  body: JSON.stringify({lnurl: 'alice@example.com'})
+})
+const info = await res.json()
+console.log(info.tag, info.minSendable / 1000, 'to', info.maxSendable / 1000, 'sats')
 ```
 
-## LNURL Error Handling
-
-LNURL errors follow the spec:
-
-```json
-{
-  "status": "ERROR",
-  "reason": "Payment amount too low"
-}
-```
-
-## See Also
+## See also {#see-also}
 
 - [Payments API](/docs/api/payments)
-- [Extensions](/docs/extensions/overview)
-- [LNURL Spec](https://github.com/lnurl/luds)
+- [Wallets API](/docs/api/wallets)
+- [docs.lnbits.com: LNURL](https://docs.lnbits.com/api/core/lnurl)
+- [LNURL specifications (LUDs)](https://github.com/lnurl/luds)
