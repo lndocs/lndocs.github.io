@@ -1,304 +1,185 @@
 ---
 sidebar_position: 5
 title: Funding Sources
-description: How LNbits connects to Lightning Network backends
+description: How LNbits talks to Lightning backends, as of v1.6.2
+last_update:
+  date: 2026-10-18
+verified_with: v1.6.2
 ---
 
 # Funding Sources Architecture
 
-Funding sources are the Lightning Network backends that power LNbits wallets.
+A funding source is the Lightning backend behind an LNbits instance: a node you run, a hosted service, or a test stand-in. The instance uses **one** funding source at a time, and every wallet shares it. LNbits keeps the per-wallet accounting itself (see [Ledger](/docs/architecture/ledger)).
 
-## Abstraction Layer
+## The `Wallet` base class {#abstraction-layer}
 
-LNbits uses an abstract `Wallet` class to interface with any backend:
+Every backend is a subclass of `Wallet` in `lnbits/wallets/base.py`. These are the abstract methods in v1.6.2:
 
 ```python
 class Wallet(ABC):
-    @abstractmethod
-    async def status(self) -> StatusResponse:
-        """Get node status and balance"""
-
-    @abstractmethod
-    async def create_invoice(
+    async def cleanup(self): ...
+    def status(self) -> Coroutine[None, None, StatusResponse]: ...
+    def create_invoice(
         self,
-        amount: int,
-        memo: str,
-        expiry: int
-    ) -> InvoiceResponse:
-        """Generate a Lightning invoice"""
-
-    @abstractmethod
-    async def pay_invoice(
-        self,
-        bolt11: str,
-        fee_limit_msat: int
-    ) -> PaymentResponse:
-        """Pay a Lightning invoice"""
-
-    @abstractmethod
-    async def get_invoice_status(
-        self,
-        checking_id: str
-    ) -> PaymentStatus:
-        """Check if invoice has been paid"""
-
-    @abstractmethod
-    async def get_payment_status(
-        self,
-        checking_id: str
-    ) -> PaymentStatus:
-        """Check outgoing payment status"""
+        amount: int,                       # in sats
+        memo: str | None = None,
+        description_hash: bytes | None = None,
+        unhashed_description: bytes | None = None,
+        **kwargs,                          # e.g. expiry
+    ) -> Coroutine[None, None, InvoiceResponse]: ...
+    def pay_invoice(
+        self, bolt11: str, fee_limit_msat: int
+    ) -> Coroutine[None, None, PaymentResponse]: ...
+    def get_invoice_status(self, checking_id: str) -> Coroutine[None, None, PaymentStatus]: ...
+    def get_payment_status(self, checking_id: str) -> Coroutine[None, None, PaymentStatus]: ...
 ```
 
-## Response Types
+The base class also provides, with defaults that a backend can override:
+
+- `paid_invoices_stream()`: yields the `checking_id` of each paid invoice. The default polls pending invoices every 5 seconds. Most node backends override it with a real stream.
+- `create_hold_invoice()`, `settle_hold_invoice()` and `cancel_hold_invoice()`: raise an error unless the backend supports hold invoices.
+- `features`: a list of `Feature` values (`nodemanager`, `holdinvoice`, `descriptionhash`).
+
+### Response types {#response-types}
+
+The responses are `NamedTuple`s, not dataclasses:
 
 ```python
-@dataclass
-class StatusResponse:
+class StatusResponse(NamedTuple):
     error_message: str | None
     balance_msat: int
 
-@dataclass
-class InvoiceResponse:
+class InvoiceResponse(NamedTuple):
     ok: bool
-    checking_id: str
-    payment_request: str  # BOLT11
-    error_message: str | None
+    checking_id: str | None = None
+    payment_request: str | None = None
+    error_message: str | None = None
+    preimage: str | None = None
+    fee_msat: int | None = None
 
-@dataclass
-class PaymentResponse:
-    ok: bool
-    checking_id: str
-    fee_msat: int
-    preimage: str
-    error_message: str | None
+class PaymentResponse(NamedTuple):
+    ok: bool | None = None        # None means "don't know yet": the payment stays pending
+    checking_id: str | None = None
+    fee_msat: int | None = None
+    preimage: str | None = None
+    error_message: str | None = None
 
-@dataclass
-class PaymentStatus:
-    pending: bool
-    paid: bool | None
-    fee_msat: int | None
-    preimage: str | None
+class PaymentStatus(NamedTuple):
+    paid: bool | None = None      # True = success, False = failed, None = pending
+    fee_msat: int | None = None
+    preimage: str | None = None
 ```
 
-## Backend Categories
+`success`, `pending` and `failed` are properties computed from `ok` or `paid`.
 
-### Self-Hosted Nodes
+## Available backends {#backend-categories}
 
-Full control, your own Lightning node:
+`lnbits/wallets/__init__.py` in v1.6.2 exports these classes. `LNBITS_BACKEND_WALLET_CLASS` takes the class name.
 
-| Backend | Description |
-|---------|-------------|
-| LND REST | Lightning Labs REST API |
-| LND gRPC | Lightning Labs gRPC API |
-| CLN REST | Core Lightning REST (runes) |
-| CoreLightning | Direct RPC connection |
-| Spark | Spark wallet interface |
-| Eclair | ACINQ Eclair node |
-| Phoenixd | ACINQ Phoenix daemon |
+### Your own node {#self-hosted-nodes}
 
-### Custodial Services
+| Class | Backend |
+|---|---|
+| `LndRestWallet` | LND, REST API |
+| `LndWallet` | LND, gRPC |
+| `CLNRestWallet` | Core Lightning's built-in `clnrest` plugin (runes) |
+| `CoreLightningWallet` | Core Lightning over its local RPC socket (`CLightningWallet` is an old alias) |
+| `EclairWallet` | Eclair |
+| `PhoenixdWallet` | phoenixd |
+| `SparkWallet` | Spark, the CLN web wallet by shesek (not Lightspark's Spark) |
 
-Third-party Lightning access:
+### Hosted and layer-2 services {#custodial-services}
 
-| Backend | Description |
-|---------|-------------|
-| Alby | Browser extension wallet |
-| OpenNode | Payment processor |
-| Blink | El Salvador service |
-| ZBD | Zebedee API |
-| LNPay | Custodial service |
-| Strike | OAuth2 integration |
+| Class | Backend |
+|---|---|
+| `SparkL2Wallet` | Lightspark's Spark L2, through the LNbits Spark sidecar (v1.5.0) |
+| `BarkWallet` | Ark, through `barkd` (v1.6.0) |
+| `BoltzWallet` | Boltz client (Liquid swaps) |
+| `NWCWallet` | Any Nostr Wallet Connect wallet. Custody depends on the wallet behind it |
+| `BlinkWallet` | Blink |
+| `StrikeWallet` | Strike, with an API key sent as a bearer token |
+| `OpenNodeWallet` | OpenNode |
+| `ZBDWallet` | ZBD |
+| `LNbitsWallet` | A wallet on another LNbits instance |
+| `AlbyWallet` | Alby's OAuth Wallet API |
 
-### Special Purpose
+### Test and fallback {#special-purpose}
 
-| Backend | Description |
-|---------|-------------|
-| LNbits | Nested LNbits instance |
-| FakeWallet | Testing/development |
-| VoidWallet | Fallback (no actual Lightning) |
-| Nostr Wallet Connect | NWC protocol |
-| Breez SDK | Greenlight-powered |
+| Class | Purpose |
+|---|---|
+| `VoidWallet` | **The default.** No Lightning at all: it can't create or pay invoices |
+| `FakeWallet` | For development and tests. It issues invoices it can "pay" itself, but refuses any invoice it didn't create ("Only internal invoices can be used!") |
 
-## Configuration
+### Deprecated or dead {#deprecated-backends}
 
-### Environment Variables
+:::caution
+These classes still ship in v1.6.2, but the service behind them is gone or no longer maintained. Don't use them for new installs, and move existing ones to another backend:
+
+- `AlbyWallet`: Alby closed its shared (custodial) wallet on 2025-01-04. Connect Alby Hub through `NWCWallet` instead.
+- `LNPayWallet` and `LnTipsWallet`: the LNPay and LN.tips API hosts no longer resolve.
+- `CoreLightningRestWallet`: c-lightning-REST is archived. Use `CLNRestWallet`.
+- `BreezSdkWallet` (Greenlight) and `BreezLiquidSdkWallet`: both Breez SDKs are deprecated.
+- `ClicheWallet`: removed on the LNbits `dev` branch, and not in the default allowed list.
+:::
+
+Which classes the Admin UI offers is controlled by `LNBITS_ALLOWED_FUNDING_SOURCES`. The default list leaves out `SparkWallet` and `ClicheWallet`.
+
+For setup guides per backend, see [Funding Sources](/docs/funding-sources/overview).
+
+## How a backend is loaded {#runtime-loading}
+
+At startup LNbits looks up the class by name, `getattr(lnbits.wallets, class_name)`, and creates one instance. It then calls `status()`. If that fails, it retries with backoff up to `FUNDING_SOURCE_MAX_RETRIES` times (default 4), and then **falls back to `VoidWallet`** so the server still starts. Check the log for "Fallback to VoidWallet" if invoices suddenly stop working.
+
+The funding source is only loaded at startup. After you change it, restart LNbits: the Super User can do this from the Admin UI or with `GET /admin/api/v1/restart`.
+
+## Configuration {#configuration}
+
+:::info Settings live in the database
+The Admin UI is on by default (`LNBITS_ADMIN_UI=true`). After the first start, the funding source settings are stored in the database and **override `.env`**. Editing `.env` and restarting changes nothing. Change the funding source in the Admin UI (`/admin`, Funding Sources), or turn the Admin UI off if you want to manage it through `.env`.
+:::
+
+With the Admin UI off, set the class and its settings in `.env`, then restart:
 
 ```bash
-# Set the backend class
 LNBITS_BACKEND_WALLET_CLASS=LndRestWallet
-
-# Backend-specific settings
 LND_REST_ENDPOINT=https://127.0.0.1:8080
 LND_REST_CERT=/path/to/tls.cert
 LND_REST_MACAROON=/path/to/admin.macaroon
 ```
 
-### Runtime Loading
-
-```python
-def get_wallet_class():
-    class_name = settings.lnbits_backend_wallet_class
-    return {
-        "LndRestWallet": LndRestWallet,
-        "CLNRestWallet": CLNRestWallet,
-        "FakeWallet": FakeWallet,
-        # ... other backends
-    }[class_name]
-```
-
-## LND Implementation
-
-```python
-class LndRestWallet(Wallet):
-    def __init__(self):
-        self.endpoint = settings.lnd_rest_endpoint
-        self.macaroon = load_macaroon()
-        self.cert = load_cert()
-
-    async def create_invoice(self, amount, memo, expiry):
-        async with httpx.AsyncClient(verify=self.cert) as client:
-            response = await client.post(
-                f"{self.endpoint}/v1/invoices",
-                headers={"Grpc-Metadata-macaroon": self.macaroon},
-                json={
-                    "value_msat": amount,
-                    "memo": memo,
-                    "expiry": expiry
-                }
-            )
-            data = response.json()
-            return InvoiceResponse(
-                ok=True,
-                checking_id=data["r_hash"],
-                payment_request=data["payment_request"]
-            )
-```
-
-## Core Lightning Implementation
-
-```python
-class CLNRestWallet(Wallet):
-    def __init__(self):
-        self.url = settings.clnrest_url
-        self.rune = settings.clnrest_rune
-
-    async def create_invoice(self, amount, memo, expiry):
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                f"{self.url}/v1/invoice",
-                headers={"Rune": self.rune},
-                json={
-                    "amount_msat": amount,
-                    "label": unique_label(),
-                    "description": memo
-                }
-            )
-            # Process response...
-```
-
-## Fake Wallet
-
-For testing without real Lightning:
-
-```python
-class FakeWallet(Wallet):
-    """In-memory accounting, no real payments"""
-
-    async def create_invoice(self, amount, memo, expiry):
-        payment_hash = random_hash()
-        # Store in memory
-        self.invoices[payment_hash] = {
-            "amount": amount,
-            "paid": False
-        }
-        return InvoiceResponse(
-            ok=True,
-            checking_id=payment_hash,
-            payment_request=fake_bolt11(amount, payment_hash)
-        )
-
-    async def pay_invoice(self, bolt11, fee_limit):
-        # Parse bolt11
-        invoice = decode_bolt11(bolt11)
-        # Mark as paid if internal
-        if invoice.hash in self.invoices:
-            self.invoices[invoice.hash]["paid"] = True
-        return PaymentResponse(
-            ok=True,
-            checking_id=invoice.hash,
-            fee_msat=0,
-            preimage=random_preimage()
-        )
-```
-
-## Switching Backends
-
-### Via Admin UI
-
-1. Go to Admin Settings
-2. Select Funding Source
-3. Enter credentials
-4. Test connection
-5. Save changes
-6. Restart (automatic)
-
-### Via Environment
-
-1. Update `.env` file
-2. Restart LNbits
+Core Lightning's `clnrest` uses up to four runes, each sent in a `rune` header:
 
 ```bash
-# Stop
-docker stop lnbits
-
-# Update .env
 LNBITS_BACKEND_WALLET_CLASS=CLNRestWallet
-CLNREST_URL=https://...
-CLNREST_RUNE=...
-
-# Start
-docker start lnbits
+CLNREST_URL=https://127.0.0.1:3010
+CLNREST_READONLY_RUNE=        # required
+CLNREST_INVOICE_RUNE=         # needed to create invoices
+CLNREST_PAY_RUNE=             # needed to pay
+CLNREST_RENEPAY_RUNE=         # optional, for renepay
 ```
 
-## Health Monitoring
+If you use Docker, note that `docker start` doesn't re-read an env file. Recreate the container instead.
 
-LNbits checks funding source health:
+:::danger
+Funding source credentials (admin macaroons, pay runes, API keys, seeds) can spend everything on the backend, across all wallets. Keep them out of shared files and screenshots. For LND you can store the macaroon encrypted with `LND_REST_MACAROON_ENCRYPTED`. Use a rune or macaroon with the narrowest permissions the backend allows.
+:::
 
-```python
-@background_task(interval=60)
-async def check_funding_source():
-    try:
-        status = await wallet.status()
-        if status.error_message:
-            logger.warning(f"Funding source issue: {status.error_message}")
-    except Exception as e:
-        logger.error(f"Funding source unreachable: {e}")
-```
+## Outgoing payment timeouts {#timeouts}
 
-## Best Practices
+When LNbits pays an invoice, it waits `LNBITS_FUNDING_SOURCE_PAY_INVOICE_WAIT_SECONDS` (default 5) for the backend. If the backend hasn't answered by then, the payment stays **pending** and LNbits checks it again later. Pending payments are re-checked every `LNBITS_FUNDING_SOURCE_PENDING_INTERVAL_SECONDS` (default 1800).
 
-### Security
+## Balance monitoring {#health-monitoring}
 
-1. **Use TLS** for all connections
-2. **Encrypt macaroons/runes** in storage
-3. **Least privilege** - use invoice-only macaroon if possible
-4. **Rotate credentials** regularly
+LNbits doesn't stop wallets from adding up to more than the backend holds. It offers two tools to spot a gap:
 
-### Performance
+- **`GET /admin/api/v1/audit`** (admin): returns the node balance and the total of all LNbits wallets, in sats.
+- **The watchdog** (`check_server_balance_against_node`): every `LNBITS_WATCHDOG_INTERVAL_MINUTES` (default 60) it compares the two. If LNbits holds more than the node by at least `LNBITS_WATCHDOG_DELTA` sats (default 1,000,000), it sends an admin notification and, if `LNBITS_WATCHDOG_SWITCH_TO_VOIDWALLET` is on, switches the instance to `VoidWallet`.
 
-1. **Connection pooling** for high traffic
-2. **Timeout configuration** for slow nodes
-3. **Retry logic** for transient failures
+The watchdog does nothing unless `LNBITS_WATCHDOG_SWITCH_TO_VOIDWALLET` or `LNBITS_NOTIFICATION_WATCHDOG` is turned on. Both are off by default.
 
-### Reliability
+## See also {#see-also}
 
-1. **Monitor balance** vs. wallet totals
-2. **Health checks** with alerting
-3. **Fallback** wallet for degraded mode
-
-## See Also
-
+- [Funding Sources overview](/docs/funding-sources/overview)
 - [LND Configuration](/docs/funding-sources/lnd)
 - [Core Lightning Configuration](/docs/funding-sources/cln)
 - [Custodial Services](/docs/funding-sources/custodial)
