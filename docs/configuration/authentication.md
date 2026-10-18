@@ -36,7 +36,7 @@ AUTH_ALLOWED_METHODS=username-password,nostr-auth-nip98,google-auth
 ```
 
 :::caution Upgraded instances
-The `username-password`-only default applies to new installs. An instance first started before v1.6.0 probably has `user-id-only` stored in its database settings, because the Admin UI copied the old default at first start. After upgrading, check **Settings → Security** in the Admin UI rather than assuming the new default.
+The `username-password`-only default applies to new installs. An instance first started before v1.6.0 probably has `user-id-only` stored in its database settings, because the Admin UI copied the old default at first start. After upgrading, check **Settings → Security** in the Admin UI rather than assuming the new default. See [Upgrading](/docs/guides/upgrading).
 :::
 
 The Super User and admins must have a username and password. They can't log in with a user ID ([auth_api.py L177-191](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/auth_api.py#L177-L191)), and admin routes refuse an admin account that has no password ([decorators.py L390-419](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/decorators.py#L390-L419)).

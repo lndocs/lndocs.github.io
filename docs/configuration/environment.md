@@ -56,7 +56,6 @@ All of these are **env-only** ([settings.py L1130-1160](https://github.com/lnbit
 The `lnbits/lnbits` image starts LNbits with explicit `--host`, `--port` and `--forwarded-allow-ips='*'` flags ([Dockerfile](https://github.com/lnbits/lnbits/blob/v1.6.2/Dockerfile)). Inside the container, `HOST`, `PORT` and `FORWARDED_ALLOW_IPS` therefore do nothing. The image takes its host and port from two variables of its own, shown below. To change the trusted proxies, you have to override the container's command.
 :::
 
-{/* snippet:skip: these two variables belong to the Docker image's CMD; they aren't LNbits settings fields */}
 ```bash
 # Read by the start command of the lnbits/lnbits image (defaults shown)
 LNBITS_HOST=0.0.0.0

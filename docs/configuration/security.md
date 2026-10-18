@@ -97,7 +97,6 @@ For Caddy and Apache, see [Reverse Proxy](/docs/deployment/reverse-proxy).
 - **Source install:** set `FORWARDED_ALLOW_IPS=127.0.0.1` (or your proxy's address) and keep `HOST=127.0.0.1`.
 - **Docker:** the image's command hard-codes `--forwarded-allow-ips='*'` ([Dockerfile](https://github.com/lnbits/lnbits/blob/v1.6.2/Dockerfile)), so setting the variable in the container does nothing. Publish the port on `127.0.0.1` only (as above), so that only the proxy can reach the container. If you need a narrower value, override the command, for example in Compose:
 
-  {/* snippet:skip: the image's own CMD variables appear in this command */}
   ```yaml
   command: ["sh", "-c", "uv --offline run --no-sync lnbits --port $LNBITS_PORT --host $LNBITS_HOST --forwarded-allow-ips=172.17.0.1"]
   ```
