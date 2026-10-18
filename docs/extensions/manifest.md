@@ -1,237 +1,181 @@
 ---
 sidebar_position: 4
 title: Extension Manifest
-description: Extension manifest.json specification
+description: The per-extension config.json and the registry manifest.json in LNbits v1.6.2
+last_update:
+  date: 2026-10-18
+verified_with: v1.6.2
 ---
 
 # Extension Manifest
 
-The manifest.json file defines extension metadata and distribution.
+LNbits reads two different JSON files for extensions. Don't mix them up:
 
-## Manifest Schema
+| File | Where it lives | What it describes | Parsed as (`lnbits/core/models/extensions.py`) |
+|---|---|---|---|
+| `config.json` | In the extension's root folder and inside its release zip | **One extension**: its name, description, tile, version range, and for WASM its full runtime contract | `ExtensionConfig` (WASM: `WasmExtensionConfig`) |
+| `manifest.json` / `extensions.json` | At a URL listed in `LNBITS_EXTENSIONS_MANIFESTS` or `LNBITS_WASM_EXTENSIONS_MANIFESTS` | **A registry**: which extensions and releases can be installed | `Manifest` |
 
-```json
+An extension's own repository usually holds both: a `config.json` with its metadata, and a small `manifest.json` that lists the repository itself, so the repo's raw `manifest.json` URL works as a one-extension registry.
+
+## `config.json` (per extension) {#config-json}
+
+The extension's folder name is its **id**. A Python extension's `config.json` has no `id` field. These are the keys LNbits v1.6.2 reads:
+
+| Key | Required | Used for |
+|---|---|---|
+| `name` | yes | Display name. Validation of a GitHub release's config fails without it. A local folder without it falls back to the id |
+| `short_description` | yes | One-line description in the extension list. Required by validation |
+| `tile` | no | Icon path, e.g. `/tpos/static/image/tpos.png`. For GitHub releases LNbits turns it into `https://github.com/<org>/<repo>/raw/main/<path after the ext id>` |
+| `version` | no | Version shown for an extension found on disk. Defaults to `"0.0"`. Releases take their version from the registry or the git tag instead |
+| `min_lnbits_version` | no | Lowest LNbits version, **inclusive** |
+| `max_lnbits_version` | no | First LNbits version it does **not** support (**exclusive**). `"1.6.2"` means "below 1.6.2" |
+| `warning` | no | Text shown before install |
+| `extension_type` | no | `"wasm"` for WASM extensions. Leave it out for Python |
+| `permissions` | WASM only | `[{id, description, policies}]`. See [WASM permissions](/docs/extensions/wasm) |
+
+LNbits doesn't validate these keys, but the extension details dialog shows them:
+
+| Key | Shown as |
+|---|---|
+| `description_md` | URL of a Markdown file, fetched and rendered as the long description |
+| `images` | `[{uri, link}]` screenshots |
+| `contributors` | `[{name, uri, role}]` |
+| `license` | License name |
+
+Official extensions also carry keys such as `repo`, `donate`, `terms_and_conditions_md` and `tags`. LNbits v1.6.2 core doesn't read them.
+
+There is **no `admin_only` key**. To limit an extension to admins, put its id in the server setting `LNBITS_ADMIN_EXTENSIONS`.
+
+This is the `config.json` of the official [example extension](https://github.com/lnbits/example):
+
+```json title="config.json (lnbits/example)"
 {
-  "name": "Extension Name",
-  "id": "extension_id",
-  "version": "1.0.0",
-  "description": "Short description of what the extension does",
-  "icon": "shopping_cart",
-  "author": "Author Name",
-  "repo": "https://github.com/author/extension",
+  "name": "Build your own!",
+  "short_description": "Extension building guide",
+  "tile": "/example/static/bitcoin-extension.png",
   "min_lnbits_version": "1.0.0",
-  "max_lnbits_version": "2.0.0",
-  "admin_only": false,
-  "archive": "https://github.com/author/extension/releases/download/v1.0.0/extension.zip"
+  "contributors": [
+    { "name": "Ben Arc", "uri": "mailto:ben@lnbits.com", "role": "Developer" },
+    { "name": "DNI", "uri": "https://github.com/dni", "role": "Developer" }
+  ],
+  "images": [
+    { "uri": "https://raw.githubusercontent.com/lnbits/example/main/static/1.png" }
+  ],
+  "description_md": "https://raw.githubusercontent.com/lnbits/example/main/description.md",
+  "license": "MIT"
 }
 ```
 
-## Required Fields
+A WASM extension's `config.json` must also have `id`, `version`, `extension_type: "wasm"` and a `wasm` section, and it declares its routes, events and permissions. See [WASM Extensions](/docs/extensions/wasm).
 
-### name
-Display name shown in the UI.
+## Registry manifest {#registry-manifest}
 
-```json
-"name": "Point of Sale"
-```
-
-### id
-Unique identifier. Must be lowercase, alphanumeric, with underscores allowed.
+A registry file has four top-level keys, all optional:
 
 ```json
-"id": "tpos"
-```
-
-### version
-Semantic version (MAJOR.MINOR.PATCH).
-
-```json
-"version": "1.2.3"
-```
-
-### description
-Brief description of the extension.
-
-```json
-"description": "Accept Bitcoin payments at your store"
-```
-
-## Optional Fields
-
-### icon
-Quasar/Material icon name.
-
-```json
-"icon": "point_of_sale"
-```
-
-Browse icons at: https://fonts.google.com/icons
-
-### author
-Extension creator.
-
-```json
-"author": "LNbits Team"
-```
-
-### repo
-GitHub repository URL.
-
-```json
-"repo": "https://github.com/lnbits/tpos"
-```
-
-### min_lnbits_version
-Minimum compatible LNbits version.
-
-```json
-"min_lnbits_version": "1.0.0"
-```
-
-### max_lnbits_version
-Maximum compatible LNbits version.
-
-```json
-"max_lnbits_version": "2.0.0"
-```
-
-### admin_only
-Restrict to admin users.
-
-```json
-"admin_only": true
-```
-
-### archive
-ZIP archive URL for installation.
-
-```json
-"archive": "https://github.com/.../releases/download/v1.0.0/extension.zip"
-```
-
-## Extension Registry Manifest
-
-For publishing multiple extensions:
-
-```json title="extensions.json"
 {
-  "extensions": [
-    {
-      "id": "ext1",
-      "name": "Extension One",
-      "version": "1.0.0",
-      "description": "First extension",
-      "archive": "https://..."
-    },
-    {
-      "id": "ext2",
-      "name": "Extension Two",
-      "version": "2.1.0",
-      "description": "Second extension",
-      "archive": "https://..."
-    }
+  "featured": ["tpos", "lnurlp"],
+  "categories": { "merchant": ["tpos"] },
+  "extensions": [],
+  "repos": []
+}
+```
+
+- `featured`: extension ids to mark as featured in the Extensions page.
+- `categories`: category name to a list of extension ids.
+- `extensions`: explicit releases (below).
+- `repos`: GitHub repositories whose releases LNbits looks up itself (below).
+
+### Explicit releases (`extensions[]`) {#explicit-releases}
+
+Each entry is one installable release of one extension. The official registry lists every release this way.
+
+| Field | Required | Meaning |
+|---|---|---|
+| `id` | yes | Extension id, which is also the install folder name |
+| `name` | yes | Display name |
+| `version` | yes | Release version |
+| `archive` | yes | URL of the zip |
+| `hash` | yes | sha256 of the zip. LNbits checks it after download and aborts with "File hash missmatch. Will not install." if it differs |
+| `short_description`, `icon`, `repo`, `html_url` | no | Display fields. `icon` is an image URL |
+| `min_lnbits_version`, `max_lnbits_version` | no | Same meaning as in `config.json` (max is exclusive) |
+| `details_link` | no | URL of this release's `config.json`, used for the details dialog. LNbits reads WASM permissions from it before install |
+| `dependencies` | no | Extension ids this one needs. LNbits won't uninstall an extension that an installed extension depends on |
+| `warning`, `info_notification`, `critical_notification` | no | Notices |
+| `pay_link`, `paid_features` | no | Paid releases (pay to install) |
+| `extension_type` | no | `"wasm"` for WASM releases |
+
+A real entry from the official registry:
+
+```json
+{
+  "id": "tpos",
+  "repo": "https://github.com/lnbits/tpos",
+  "name": "TPoS",
+  "version": "1.5.0",
+  "min_lnbits_version": "1.5.0",
+  "short_description": "A shareable PoS terminal!",
+  "paid_features": "Free to use all the PoS features, apart from 0.5% charge for the ATM which draws to help maintain development.",
+  "details_link": "https://raw.githubusercontent.com/lnbits/tpos/main/config.json",
+  "icon": "https://raw.githubusercontent.com/lnbits/tpos/main/static/image/tpos.png",
+  "archive": "https://github.com/lnbits/tpos/archive/refs/tags/v1.5.0.zip",
+  "hash": "ccd7df6edc37eeb0bfc0e19f0cca16bfbbae7ba535d455a4e1ab5d634daccd9c"
+}
+```
+
+Compute the hash of your own archive with `sha256sum myext.zip`.
+
+### GitHub repos (`repos[]`) {#repos}
+
+```json title="manifest.json (lnbits/example)"
+{
+  "repos": [
+    { "id": "example", "organisation": "lnbits", "repository": "example" }
   ]
 }
 ```
 
-## Version Updates
+For each repo LNbits calls the GitHub API for the repository, its releases and `config.json`, from the default branch and from each release tag. The release **tag** becomes the version and the tag's zipball is the archive. There is no `hash` for these releases, so nothing is verified after download. GitHub limits unauthenticated API calls, so set `LNBITS_EXT_GITHUB_TOKEN` if you list many repos. LNbits only sends that token to `api.github.com` and `raw.githubusercontent.com`.
 
-When releasing updates:
+## Archive layout {#archive-structure}
 
-1. Update `version` in manifest.json
-2. Create new GitHub release
-3. Update `archive` URL with new version
-4. LNbits will detect the update
+The zip must contain **one top-level folder**, with `config.json` directly inside it:
 
-### Versioning Guidelines
-
-```
-1.0.0 → 1.0.1  # Bug fixes
-1.0.1 → 1.1.0  # New features (backward compatible)
-1.1.0 → 2.0.0  # Breaking changes
+```text
+tpos-1.5.0/            # any name: LNbits takes the first entry in the zip
+├── config.json
+├── __init__.py
+├── views.py
+└── ...
 ```
 
-## Archive Structure
+The folder name doesn't need to match the id. LNbits copies its contents to the folder named by the release's `id`. A GitHub tag archive (`/archive/refs/tags/<tag>.zip`) or zipball already has this layout.
 
-The ZIP file should contain:
+## Publishing {#hosting-options}
 
-```
-extension.zip
-└── extension_id/
-    ├── manifest.json
-    ├── __init__.py
-    ├── views.py
-    ├── views_api.py
-    ├── ...
-    └── templates/
-```
+- **Your own registry:** host a `manifest.json` anywhere over HTTPS and add its URL as an extension source on the Admin UI's **Extensions** tab. LNbits refuses manifest URLs that contain credentials and doesn't follow redirects when it fetches them.
+- **The official registry:** open a pull request to [lnbits/lnbits-extensions](https://github.com/lnbits/lnbits-extensions) (Python) or [lnbits/lnbits-extensions-wasm](https://github.com/lnbits/lnbits-extensions-wasm) (WASM). See [docs.lnbits.com: Official Registry](https://docs.lnbits.com/dev/extensions/registry).
 
-Important: The folder name inside ZIP must match `id`.
+LNbits caches the combined list of installable extensions for up to an hour, and refreshes it in the background after ten minutes or when an admin opens the Extensions page.
 
-## Hosting Options
+## Validation {#validation}
 
-### GitHub Releases
-
-```json
-"archive": "https://github.com/user/repo/releases/download/v1.0.0/myext.zip"
-```
-
-### Raw GitHub
-
-```json
-"archive": "https://raw.githubusercontent.com/user/repo/main/release/myext.zip"
-```
-
-### Self-Hosted
-
-```json
-"archive": "https://your-server.com/extensions/myext-1.0.0.zip"
-```
-
-## Validation
-
-Validate your manifest:
+Before publishing, check that the files parse and have the required keys:
 
 ```bash
-# Check JSON syntax
-cat manifest.json | jq .
+# config.json: the keys ExtensionConfig requires
+jq -e '.name and .short_description' config.json
 
-# Verify required fields
-cat manifest.json | jq 'has("name") and has("id") and has("version")'
-```
+# registry: every explicit release has the required fields
+jq -e '[.extensions[]? | .id and .name and .version and .archive and .hash] | all' manifest.json
 
-## Example Manifests
-
-### Minimal
-
-```json
-{
-  "name": "Simple Extension",
-  "id": "simple",
-  "version": "0.1.0",
-  "description": "A simple example extension"
-}
-```
-
-### Complete
-
-```json
-{
-  "name": "Advanced Extension",
-  "id": "advanced",
-  "version": "2.0.0",
-  "description": "Feature-rich extension with all options",
-  "icon": "auto_awesome",
-  "author": "Developer Name",
-  "repo": "https://github.com/developer/advanced-ext",
-  "min_lnbits_version": "1.0.0",
-  "max_lnbits_version": "3.0.0",
-  "admin_only": false,
-  "archive": "https://github.com/developer/advanced-ext/releases/download/v2.0.0/advanced.zip"
-}
+# the archive hash matches the registry entry
+sha256sum myext.zip
 ```
 
 ## See Also
 
-- [Extension Development](/docs/extensions/development)
 - [Installing Extensions](/docs/extensions/installing)
+- [Extension Development](/docs/extensions/development)
+- [WASM Extensions](/docs/extensions/wasm)
