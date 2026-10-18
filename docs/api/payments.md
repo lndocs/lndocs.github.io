@@ -42,12 +42,12 @@ Request fields:
 | Field | Type | Notes |
 |---|---|---|
 | `out` | boolean | **Must be `false`** to create an invoice. Default `true` |
-| `amount` | number | Amount in `unit`. Must be 0 or more |
+| `amount` | number | Amount in `unit`. Must be greater than 0: `0` passes validation but then fails with 520 `Amountless invoices not supported.` |
 | `unit` | string | `sat` (default) or a fiat currency code such as `USD` or `EUR`, converted at the current rate. `msat` is not accepted |
 | `memo` | string | Invoice description, up to 640 characters. Defaults to the site title |
 | `expiry` | integer | Seconds until the invoice expires. Defaults to `LIGHTNING_INVOICE_EXPIRY` (3600) |
-| `description_hash` | hex string | Put this hash in the invoice instead of a memo (as LNURL-pay does) |
-| `unhashed_description` | hex string | The description to hash. LNbits hashes it for you |
+| `description_hash` | hex string | Put this hash in the invoice instead of a memo (as LNURL-pay does). The `memo` is then not stored |
+| `unhashed_description` | hex string | The description itself, hex-encoded. LNbits passes it to the funding source, which hashes it into the invoice. The `memo` is then not stored |
 | `webhook` | URL | Called once when the invoice is paid. See [Webhooks](/docs/api/webhooks) |
 | `extra` | object | Your own metadata, stored with the payment |
 | `labels` | list of strings | Labels for filtering |
@@ -112,7 +112,22 @@ Check `status` in the response:
 - `success`: paid.
 - `pending`: the funding source has not confirmed yet. Poll `GET /api/v1/payments/{payment_hash}` until it changes. Do **not** pay the invoice again.
 
-Errors from the Lightning layer return HTTP **520** with `{"detail": "...", "status": "failed"}` (for example `Insufficient balance.`) or `"status": "pending"` when the outcome is unknown.
+LNbits waits up to `LNBITS_FUNDING_SOURCE_PAY_INVOICE_WAIT_SECONDS` (5 by default) for the funding source. If it hasn't answered by then, you get the payment back with `status: "pending"` and LNbits keeps waiting in the background.
+
+Payment errors return HTTP **520** with `{"detail": "...", "status": "..."}`. The common ones:
+
+| `detail` | `status` | Cause |
+|---|---|---|
+| `Insufficient balance.` | `failed` | The wallet can't cover the amount |
+| `You must reserve at least (N  sat) to cover potential routing fees.` | `failed` | It covers the amount but not the [fee reserve](#fee-reserve) |
+| `Bolt11 decoding failed.` | `failed` | Not a valid BOLT11 string |
+| `Amountless invoices not supported.` | `failed` | The invoice has no amount |
+| `Invoice amount N sats is too high. Max allowed: M sats.` | `failed` | Over `LNBITS_MAX_OUTGOING_PAYMENT_AMOUNT_SATS` (10,000,000 by default) |
+| `Payment is still pending.` | `pending` | You already sent this invoice and it hasn't settled |
+| `Payment already paid.` | `success` | You already paid this invoice |
+| `Payment failed: ...` | `failed` | The funding source reported a failure |
+
+A 520 with `"status": "pending"` or `"success"` is not a failure. Check the payment before you do anything else.
 
 ## List payments {#list-payments}
 
@@ -127,15 +142,15 @@ Query parameters:
 
 | Parameter | Meaning |
 |---|---|
-| `limit`, `offset` | Page size and start. **No default limit**, so without `limit` you get every payment |
-| `sortby` | `created_at`, `updated_at`, `amount`, `fee`, `memo`, `time`, `tag` or `external_id` |
+| `limit`, `offset` | Page size and start. **Defaults to 10, at most 1000.** Without `limit` you only get the 10 newest payments |
+| `sortby` | `created_at`, `updated_at`, `amount`, `fee`, `memo`, `time` (default), `tag` or `external_id`. Anything else returns 400 |
 | `direction` | `asc` or `desc` |
 | `search` | Text search over memo, amount, wallet ID, tag, status, time, labels and external ID |
 | `status` | `pending`, `success` or `failed` |
 | `amount[gt]=0` / `amount[lt]=0` | Incoming only / outgoing only |
 | `tag`, `external_id`, `payment_hash`, `checking_id`, `memo`, `labels`, `time` | Filter on these fields, with `=` or an operator such as `[like]`, `[ge]` or `[in]` |
 
-Unknown parameters are ignored, not rejected. The `pending=true`, `incoming=true` and `outgoing=true` parameters from older docs do nothing. Use `status=pending`, `amount[gt]=0` and `amount[lt]=0`.
+Unknown parameters, unknown operators and badly typed values are ignored, not rejected. The `pending=true`, `incoming=true` and `outgoing=true` parameters from older docs do nothing. Use `status=pending`, `amount[gt]=0` and `amount[lt]=0`.
 
 ```bash
 # Successful incoming payments with your own reference
@@ -158,9 +173,9 @@ Related read-only routes, also with an invoice key:
 curl https://lnbits.example.com/api/v1/payments/$PAYMENT_HASH
 ```
 
-This route needs **no key**. It looks the payment up by payment hash or checking ID.
+This route needs **no key**. It looks the payment up by payment hash or checking ID. An unknown hash returns 404 `Payment does not exist.`
 
-Without a key, or with a key for another wallet:
+Without a key (or with a key that matches no wallet):
 
 ```json
 {"paid": true, "preimage": "0f3a..."}
@@ -171,6 +186,8 @@ Without a key, or with a key for another wallet:
 ```
 
 A failed payment returns `{"paid": false, "status": "failed"}`.
+
+With a valid key, LNbits only searches **that key's wallet**. A key for a different wallet gets 404, not the keyless answer.
 
 With the owning wallet's invoice or admin key **in the `X-Api-Key` header** (the query parameter is not read here), the response adds `details` (the full payment object) and, for pending payments, `status`:
 
@@ -204,29 +221,44 @@ For a BOLT11 invoice, the response is the decoded invoice fields. For an LNURL (
 
 ## Fee reserve {#fee-reserve}
 
-`GET /api/v1/payments/fee-reserve?invoice=lnbc...` returns `{"fee_reserve": <msat>}`. That is the amount LNbits holds back for routing fees, plus any service fee, when you pay that invoice. Your balance must cover the amount plus this reserve.
+`GET /api/v1/payments/fee-reserve?invoice=lnbc...` returns `{"fee_reserve": <msat>}`, or 400 `Invoice has no amount.` That is the amount LNbits holds back for routing fees, plus any service fee, when you pay that invoice. Your balance must cover the amount plus this reserve.
 
 ## Hold invoices {#hold-invoices}
 
 A hold invoice locks the payer's funds until you settle or cancel it. Only funding sources that implement hold invoices support them. In v1.6.2 these are LND REST and LND gRPC. Others return 520 `Hold invoices are not supported by the funding source.`
 
-1. Generate a 32-byte preimage yourself and compute its SHA-256 hash.
-2. Create the invoice with `"out": false` and `"payment_hash": "<hash>"`, using the invoice or admin key.
+1. Generate a 32-byte preimage yourself and compute its SHA-256 hash:
+
+   ```bash
+   preimage=$(openssl rand -hex 32)
+   hash=$(printf '%s' "$preimage" | xxd -r -p | sha256sum | cut -d' ' -f1)
+   ```
+
+2. Create the invoice with `"out": false` and the hash, using the invoice or admin key:
+
+   ```bash
+   curl -X POST https://lnbits.example.com/api/v1/payments \
+     -H "X-Api-Key: $INVOICE_KEY" -H "Content-Type: application/json" \
+     -d "{\"out\": false, \"amount\": 1000, \"memo\": \"Hold\", \"payment_hash\": \"$hash\"}"
+   ```
+
 3. When the payer has paid, the payment stays pending. Settle it with the admin key:
 
    ```bash
    curl -X POST https://lnbits.example.com/api/v1/payments/settle \
      -H "X-Api-Key: $ADMIN_KEY" -H "Content-Type: application/json" \
-     -d '{"preimage": "<64 hex characters>"}'
+     -d "{\"preimage\": \"$preimage\"}"
    ```
 
-4. Or release the payer's funds with `POST /api/v1/payments/cancel`, body `{"payment_hash": "<hash>"}`, using the admin key.
+4. Or release the payer's funds with `POST /api/v1/payments/cancel`, body `{"payment_hash": "<your hash>"}`, using the admin key.
 
-Keep the preimage secret until you settle. Anyone who has it can settle the invoice.
+Both return 404 `Payment does not exist or does not belong to this wallet.` if the hash isn't an incoming payment of the admin key's wallet.
+
+Keep the preimage secret until you settle. It is the payer's proof of payment, and whoever holds it can claim the funds.
 
 ## Labels {#labels}
 
-`PUT /api/v1/payments/{payment_hash}/labels` with body `{"labels": ["shop", "refund"]}` and the admin key replaces the payment's labels. New label names are added to your account automatically.
+`PUT /api/v1/payments/{payment_hash}/labels` with body `{"labels": ["shop", "refund"]}` and the admin key replaces the payment's labels. It returns `{"success": true, "message": "Payment labels updated."}`. New label names are added to your account automatically, and an invalid name returns 400.
 
 ## Payment status values {#payment-status-values}
 
@@ -268,6 +300,9 @@ while True:
     ).json()
     if status["paid"]:
         print("Paid", status["details"]["amount"] // 1000, "sats")
+        break
+    if status.get("status") == "failed":  # expired or failed
+        print("Not paid")
         break
     time.sleep(2)
 ```

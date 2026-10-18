@@ -66,7 +66,7 @@ Most wallet-key routes also accept the query parameter `?api-key=`. Avoid it, be
 | `POST /api/v1/payments` (receive, `"out": false`) | No | Yes | Yes |
 | `POST /api/v1/payments` (pay, `"out": true`) | No | No (403) | Yes |
 | `GET /api/v1/payments` | No | Yes | Yes |
-| `GET /api/v1/payments/{payment_hash}` | Status (and preimage once paid) | Status and `details` | Status and `details` |
+| `GET /api/v1/payments/{payment_hash}` | Status (and preimage once paid) | Status and `details` for its own wallet's payments, 404 for others | Same as invoice key |
 | `POST /api/v1/payments/decode` | Yes | Yes | Yes |
 | `POST /api/v1/payments/lnurl` | No | No (403) | Yes |
 | `PATCH /api/v1/wallet` | No | No (403) | Yes |
@@ -86,7 +86,9 @@ An unknown key returns 404, not 401. Don't treat 404 as "the route does not exis
 
 ### Rotating keys {#rotating-keys}
 
-`PUT /api/v1/wallet/reset/{wallet_id}` generates a new admin key and invoice key for the wallet. It needs **user** auth as the wallet's owner, not a wallet key. The response is the wallet with its new keys. The old keys stop working at once.
+`PUT /api/v1/wallet/reset/{wallet_id}` generates a new admin key and invoice key for the wallet. It needs **user** auth as the wallet's owner, not a wallet key. The response is the wallet with its new keys. The old keys stop working at once: the route also clears LNbits' key cache.
+
+LNbits caches successful key and token lookups for `AUTH_AUTHENTICATION_CACHE_MINUTES` (10 by default). Key rotation clears that cache, but not every account change does. See [Users API](/docs/api/users).
 
 ## User credentials {#session-authentication}
 
@@ -112,7 +114,9 @@ curl -X POST https://lnbits.example.com/api/v1/auth \
 {"access_token": "eyJhbGciOiJIUzI1NiIs...", "token_type": "bearer"}
 ```
 
-The `username` field also accepts the account's email address. The response also sets the `cookie_access_token` cookie (HTTP-only, `SameSite=Lax`, and `Secure` while `AUTH_HTTPS_ONLY=true`, which is the default). Repeated failed logins are throttled.
+The `username` field also accepts the account's email address. The response also sets the `cookie_access_token` cookie (HTTP-only, `SameSite=Lax`, and `Secure` while `AUTH_HTTPS_ONLY=true`, which is the default).
+
+A wrong username or password returns 401 `Invalid credentials.` After 5 failures for the same account within 15 minutes, logins are refused with 429 `Too many login attempts. Try again later.` for 60 seconds, doubling with each further failure up to 15 minutes.
 
 Use the token as a bearer token:
 
@@ -151,9 +155,12 @@ A user ID used with `?usr=` is a bearer secret that grants the whole account and
 | Situation | Status | `detail` |
 |---|---|---|
 | No token, and `?usr=` not allowed or not sent | 401 | `Missing user ID or access token.` |
+| `?usr=` with an admin's user ID | 403 | `User id only access for admins is forbidden.` |
+| Token for an account that no longer exists | 401 | `User not found.` |
 | Token expired | 401 | `Session expired.` |
 | Token invalid | 401 | `Invalid access token.` |
 | ACL token used on a path or method it does not grant | 403 | `Path not allowed.` or `Method not allowed.` |
+| ACL token that was revoked, or whose ACL was deleted or overwritten | 403 | `Invalid token id.` |
 | Admin route, but the account is not an admin | 403 | `User not authorized. No admin privileges.` |
 | Admin route, but the admin account has no password | 403 | `Admin users must have credentials configured.` |
 
@@ -165,7 +172,7 @@ How an ACL works:
 
 - An ACL is a list of endpoint groups. Each group has a `read` flag (GET, HEAD, OPTIONS) and a `write` flag (POST, PUT, PATCH, DELETE).
 - Groups are the first three path segments, such as `/api/v1/wallets`, `/api/v1/auth` or `/users/api/v1`. One grant covers every route under that prefix.
-- ACLs apply to **user-auth routes only**. Wallet-key routes such as `/api/v1/wallet` and `/api/v1/payments` check the `X-API-KEY` and ignore bearer tokens. To give a service wallet access, give it a wallet key.
+- ACLs apply to **user-auth routes only**. Wallet-key routes such as `GET /api/v1/wallet` and `POST /api/v1/payments` check the `X-API-KEY` and ignore bearer tokens. To give a service wallet access, give it a wallet key.
 - With a token that has `read` but not `write` on the group, `GET /api/v1/auth` and `GET /api/v1/wallets` return the wallets with masked keys (`********************************`). With `write`, they return the real keys.
 
 :::warning
@@ -187,6 +194,8 @@ Over the API, all ACL routes need user auth and your password:
 | `DELETE /api/v1/auth/acl/token` | `{id, acl_id, password}` | Revoke a token |
 
 If the `id` in `PUT /api/v1/auth/acl` doesn't match an existing ACL, LNbits creates a new one with a fresh ID and **every group set to no access**, whatever `endpoints` you sent. Send a second `PUT` with that ID and your `endpoints` to grant access.
+
+`PUT` on an existing ACL **replaces it with the body you send**, including its `token_id_list`. Leave that field out and every token minted from the ACL stops working (`Invalid token id.`). To edit an ACL, take it from `GET /api/v1/auth/acl`, change `endpoints`, add `password`, and send the whole object back.
 
 ```bash
 curl -X POST https://lnbits.example.com/api/v1/auth/acl/token \

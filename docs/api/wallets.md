@@ -97,7 +97,7 @@ curl -X POST https://lnbits.example.com/api/v1/wallet \
 
 The response is the new wallet object, including its `adminkey` and `inkey`. Store the keys from this response.
 
-Shared wallets (v1.4+) let another user view, receive or send from your wallet with permissions you choose. Invitations are handled by the `/api/v1/wallet/share` routes. See [Shared wallets](/docs/guides/shared-wallets) and Swagger at `/docs` for the request shapes.
+Shared wallets let another user view, receive or send from your wallet with permissions you choose. Invitations are handled by the `/api/v1/wallet/share` routes. See [Shared wallets](/docs/guides/shared-wallets) and Swagger at `/docs` for the request shapes.
 
 ## Update a wallet {#update-wallet}
 
@@ -116,9 +116,11 @@ curl -X PATCH https://lnbits.example.com/api/v1/wallet \
 | `icon`, `color` | Display settings |
 | `currency` | Fiat currency shown next to the balance |
 | `pinned` | `true` or `false` |
-| `lightning_address` | The local part of a wallet Lightning address. Refused with 403 unless the admin set `LNBITS_ALLOW_CUSTOM_WALLET_LIGHTNING_ADDRESSES` to true. It may cost a fee when the admin set `LNBITS_CHARGE_WALLET_LIGHTNING_ADDRESSES` |
+| `lightning_address` | The local part of a wallet Lightning address, such as `alice`. Refused with 403 `Users cannot specify Lightning Addresses.` unless the admin set `LNBITS_ALLOW_CUSTOM_WALLET_LIGHTNING_ADDRESSES` to true. It may cost a fee when the admin set `LNBITS_CHARGE_WALLET_LIGHTNING_ADDRESSES` |
 
-The response is the updated wallet object.
+Empty strings for `name`, `icon` and `color` are ignored. An empty `currency` clears it. The response is the updated wallet object.
+
+A Lightning address name is lowercased and must be 1 to 210 characters of `a-z`, `0-9`, `-`, `_` and `.`, with no `+` or `@`. Names containing a reserved word, or already taken by another wallet, are refused with 400.
 
 ### Rename with the older route {#rename-wallet}
 
@@ -134,7 +136,7 @@ curl -X PUT "https://lnbits.example.com/api/v1/wallet/Shop%20till" \
 ```
 
 :::caution
-The path segment is not a wallet ID. `PUT /api/v1/wallet/<wallet_id>` renames the wallet to its own ID.
+The path segment is not a wallet ID. `PUT /api/v1/wallet/<wallet_id>` renames the wallet to its own ID. The name `share` can't be set this way, because `PUT /api/v1/wallet/share` is a different route.
 
 Prefer the `PATCH` route above.
 :::

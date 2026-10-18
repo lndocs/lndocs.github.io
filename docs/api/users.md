@@ -63,11 +63,11 @@ curl -X PATCH https://lnbits.example.com/api/v1/auth \
   -d '{"user_id": "<your user id>", "username": "alice"}'
 ```
 
-`user_id` must be your own ID. `username` (2 to 20 characters) is required. `extra` is optional. You can't change the email here. The response is the updated user object.
+`user_id` must be your own ID, or you get 400 `Invalid user ID.` `username` (2 to 20 characters) must be present, but may be `null` to leave it unchanged. `extra` is optional, and **replaces** the whole profile extras object (including your labels), so send it complete or leave it out. You can't change the email here. The response is the updated user object.
 
 ### Change the password {#change-password}
 
-`PUT /api/v1/auth/password` takes `user_id`, `username`, `password_old` (if a password is already set), `password` and `password_repeat`. Passwords are 8 to 50 characters. The token must come from a **recent** login: the call only works within `AUTH_CREDETIALS_UPDATE_THRESHOLD` seconds of logging in (120 by default, and the setting name is misspelt like that). Otherwise log in again first.
+`PUT /api/v1/auth/password` takes `user_id`, `username`, `password_old` (if a password is already set), `password` and `password_repeat`. Passwords are 8 to 50 characters. It needs a token (bearer or cookie), not `?usr=`, and the token must come from a **recent** login: the call only works within `AUTH_CREDETIALS_UPDATE_THRESHOLD` seconds of logging in (120 by default, and the setting name is misspelt like that). Otherwise you get 400 `You can only update your credentials in the first 120 seconds...`. Log in again and retry.
 
 ### List your wallets {#list-user-wallets}
 
@@ -83,7 +83,7 @@ Enabling an extension switches it on for your account. The admin must already ha
 
 | Method and path | Purpose |
 |---|---|
-| `GET /api/v1/extension` | Extensions you have enabled |
+| `GET /api/v1/extension` | Extensions linked to your account, enabled **or** disabled. Each has `code`, `is_valid`, `is_wasm`, `name`, `short_description` and `tile`, with no active flag. Use `extensions` in `GET /api/v1/auth` for the enabled ones |
 | `GET /api/v1/extension/all` | The extension catalogue, with install status |
 | `PUT /api/v1/extension/{ext_id}/enable` | Enable one for your account |
 | `PUT /api/v1/extension/{ext_id}/disable` | Disable one for your account |
@@ -97,7 +97,7 @@ curl -X PUT https://lnbits.example.com/api/v1/extension/lnurlp/enable \
 {"success": true, "message": "Extension 'lnurlp' enabled."}
 ```
 
-A paid extension returns HTTP 402 `Extension '<id>' requires payment.` until its enable invoice is paid. Admins skip the payment. Installing extensions is an admin task, covered in [Installing extensions](/docs/extensions/installing).
+An unknown ID returns 404. An extension the admin hasn't installed or activated returns 400. A paid extension returns HTTP 402 `Extension '<id>' requires payment.` until its enable invoice is paid. Admins skip the payment. Installing extensions is an admin task, covered in [Installing extensions](/docs/extensions/installing).
 
 ## Creating accounts {#creating-accounts}
 
@@ -121,18 +121,18 @@ These routes can read every user's wallet keys, create and delete accounts, and 
 | `GET /users/api/v1/user` | Admin | Paged list of accounts with wallet count, balance and last payment |
 | `GET /users/api/v1/user/{user_id}` | Admin | One user, with wallets and keys |
 | `POST /users/api/v1/user` | Admin | Create a user |
-| `PUT /users/api/v1/user/{user_id}` | Admin | Update a user's profile and enabled extensions |
+| `PUT /users/api/v1/user/{user_id}` | Admin | Replace a user's profile and enabled extensions (see below) |
 | `DELETE /users/api/v1/user/{user_id}` | Admin | Delete a user |
-| `PUT /users/api/v1/user/{user_id}/activate` | Admin | Toggle activated or deactivated |
+| `PUT /users/api/v1/user/{user_id}/activate` | Admin | Toggle activated or deactivated. Deactivating also removes admin rights |
 | `PUT /users/api/v1/user/{user_id}/admin` | Super User | Toggle admin rights |
-| `PUT /users/api/v1/user/{user_id}/reset_password` | Super User | Generate a password reset key |
+| `PUT /users/api/v1/user/{user_id}/reset_password` | Super User | Generate a password reset key (see below) |
 | `GET /users/api/v1/user/{user_id}/wallet` | Admin | The user's wallets |
-| `POST /users/api/v1/user/{user_id}/wallet` | Admin | Create a wallet for the user (`name`, `currency`) |
-| `PUT /users/api/v1/user/{user_id}/wallet/{wallet}/lightning-address` | Admin | Set a wallet's Lightning address |
+| `POST /users/api/v1/user/{user_id}/wallet` | Admin | Create a wallet for the user. Body `{"name": "...", "currency": "EUR"}`, both optional |
+| `PUT /users/api/v1/user/{user_id}/wallet/{wallet}/lightning-address` | Admin | Set a wallet's Lightning address. Body `{"lightning_address": "alice"}`. Reserved words are allowed here, and no fee is charged |
 | `PUT /users/api/v1/user/{user_id}/wallet/{wallet}/undelete` | Admin | Restore a deleted wallet |
-| `DELETE /users/api/v1/user/{user_id}/wallet/{wallet}` | Admin | Delete one wallet |
-| `DELETE /users/api/v1/user/{user_id}/wallets` | Admin | Delete all of the user's wallets |
-| `PUT /users/api/v1/balance` | Super User | Credit or debit a wallet. Body `{"id": "<wallet id>", "amount": <sats>}`, negative to debit |
+| `DELETE /users/api/v1/user/{user_id}/wallet/{wallet}` | Admin | Soft-delete one wallet |
+| `DELETE /users/api/v1/user/{user_id}/wallets` | Admin | Soft-delete all of the user's wallets |
+| `PUT /users/api/v1/balance` | Super User | Credit or debit a wallet. Body `{"id": "<wallet id>", "amount": <sats>}`, negative to debit. A debit below zero, or `0`, returns 400 |
 
 ### List users {#list-all-users}
 
@@ -152,7 +152,21 @@ curl -X POST https://lnbits.example.com/users/api/v1/user \
   -d '{"username": "bob", "email": "bob@example.com", "extensions": ["lnurlp"]}'
 ```
 
-The body also takes `password` and `password_repeat`. A password needs a username. If you leave the password out, LNbits sets a random one. The response echoes the body with the new `id`.
+The body also takes `password`, `password_repeat`, `pubkey`, `external_id` and `extra`. A password needs a username. The response echoes the body with the new `id`. If you leave the password out, LNbits sets a random one and **returns it in `password` and `password_repeat`**, so treat the response as a secret.
+
+### Update a user {#update-user}
+
+`PUT /users/api/v1/user/{user_id}` takes the same body as create, and `id` in the body must equal `{user_id}`. It **replaces** the profile: fields you leave out are cleared, and `extensions` becomes the user's full list of enabled extensions (an empty or missing list disables them all). It refuses passwords (use reset password), and only the Super User can edit the Super User.
+
+### Reset a password {#reset-password}
+
+`PUT /users/api/v1/user/{user_id}/reset_password` returns a string starting `reset_key_`. Give it to the user, who sets a new password with `PUT /api/v1/auth/reset` and body `{"reset_key": "...", "password": "...", "password_repeat": "..."}`. The key is only valid for `AUTH_CREDETIALS_UPDATE_THRESHOLD` seconds after it was generated (120 by default), so generate it when the user is ready. The Super User's own password can't be reset this way.
+
+### Deactivate a user {#deactivate-user}
+
+`PUT /users/api/v1/user/{user_id}/activate` flips the account between activated and deactivated, and returns `User activated.` or `User deactivated.` You can't deactivate yourself or the Super User. A deactivated user's wallet keys and logins are refused.
+
+From reading the v1.6.2 code (not tested): LNbits caches key and token lookups for `AUTH_AUTHENTICATION_CACHE_MINUTES` (10 by default), and deactivation doesn't seem to clear that cache. Credentials used in the last few minutes may keep working until the cache expires. The cache is in memory, so restarting LNbits clears it.
 
 ### Delete a user {#delete-user-admin}
 
