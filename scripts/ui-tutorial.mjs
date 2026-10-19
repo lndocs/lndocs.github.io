@@ -86,11 +86,20 @@ try {
     await page.getByRole('button', { name: 'Restart server' }).first().click();
     await new Promise((r) => setTimeout(r, 3000));
     await waitHealthy();
-    await page.reload();
-    await page.waitForLoadState('networkidle');
-    await page.getByRole('button', { name: /I understand/i }).waitFor({ timeout: 5000 }).catch(() => {});
-    reminderSeen = (await dismissReminder()) || reminderSeen;
-    await page.getByText('Funding source: FakeWallet').first().waitFor({ timeout: 30000 });
+    const failures = [];
+    const onResp = (r) => { if (r.url().includes('/api/') && r.status() >= 400) failures.push(`${r.status()} ${r.url().replace(base, '')}`); };
+    page.on('response', onResp);
+    let ok = false;
+    for (let attempt = 1; attempt <= 5 && !ok; attempt++) {
+      await page.reload();
+      await page.waitForLoadState('networkidle');
+      await page.getByRole('button', { name: /I understand/i }).waitFor({ timeout: 5000 }).catch(() => {});
+      reminderSeen = (await dismissReminder()) || reminderSeen;
+      ok = await page.getByText('Funding source: FakeWallet').first().waitFor({ timeout: 10000 }).then(() => true, () => false);
+      if (!ok) await waitHealthy();
+    }
+    page.off('response', onResp);
+    if (!ok) throw new Error('settings never showed FakeWallet; failed API calls: ' + failures.slice(-5).join(', '));
     return reminderSeen ? 'an "Important!" save-your-credentials dialog appeared first (I understand)' : '';
   });
 
