@@ -124,6 +124,7 @@ try {
     const input = page.locator('input[type=number]:visible').last();
     await input.fill('10000');
     const credited = page.waitForResponse((r) => r.url().includes('/balance') && r.request().method() === 'PUT');
+    credited.catch(() => {});
     await input.press('Enter');
     const r = await credited;
     if (r.status() !== 200) throw new Error(`credit returned ${r.status()}`);
@@ -138,6 +139,7 @@ try {
     await dialog().getByLabel(/Amount/).fill('1000');
     await dialog().getByLabel(/Memo/).fill('Quick Start');
     const created = page.waitForResponse((r) => r.url().endsWith('/api/v1/payments') && r.request().method() === 'POST');
+    created.catch(() => {});
     await dialog().getByRole('button', { name: 'Create Invoice' }).click();
     const r = await created;
     const body = await r.json();
@@ -146,7 +148,7 @@ try {
     await page.keyboard.press('Escape');
   });
 
-  await step('create-an-invoice', 'In the first wallet: Send, paste the invoice, Read, then Send pays it', async () => {
+  await step('create-an-invoice', 'In the first wallet: Send, paste the invoice, Read, then Pay', async () => {
     await page.goto(firstWalletUrl);
     await page.waitForLoadState('networkidle');
     await dismissReminder();
@@ -154,7 +156,8 @@ try {
     await dialog().locator('textarea').first().fill(bolt11);
     await dialog().getByRole('button', { name: 'Read' }).click();
     const paid = page.waitForResponse((r) => r.url().endsWith('/api/v1/payments') && r.request().method() === 'POST');
-    await dialog().getByRole('button', { name: /^send$/i }).click();
+    paid.catch(() => {});
+    await dialog().getByRole('button', { name: 'Pay', exact: true }).click();
     const r = await paid;
     const body = await r.json();
     if (r.status() !== 201 || body.status !== 'success') throw new Error(`pay: ${r.status()} ${JSON.stringify(body).slice(0, 200)}`);
