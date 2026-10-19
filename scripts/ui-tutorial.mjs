@@ -14,7 +14,7 @@ const results = [];
 const password = 'ui-' + Math.random().toString(36).slice(2) + 'X9';
 
 const browser = await chromium.launch();
-const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
+const page = await browser.newPage({ viewport: { width: 1600, height: 1000 } });
 page.setDefaultTimeout(15000);
 let n = 0;
 
