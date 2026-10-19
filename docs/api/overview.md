@@ -3,11 +3,15 @@ sidebar_position: 1
 title: API Overview
 description: How the LNbits REST API is organised, where the authoritative reference lives, and the conventions every endpoint shares
 last_update:
-  date: 2026-10-18
+  date: 2026-10-19
 verified_with: v1.6.2
 ---
 
 # API Overview
+
+:::note Checked against a running LNbits
+Some statements on this page are tested against `lnbits/lnbits:v1.6.2` with FakeWallet, on every change to this site and weekly ([API claims workflow](https://github.com/lndocs/lndocs.github.io/actions/workflows/claims.yml)).
+:::
 
 LNbits is a FastAPI application. Everything the web UI does goes through the same REST API, so anything you can click you can also script.
 

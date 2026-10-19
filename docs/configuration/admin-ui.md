@@ -3,11 +3,15 @@ sidebar_position: 4
 title: Admin UI
 description: The LNbits v1.6.2 Admin UI, first-install flow, Super User and admin roles, and what the UI controls
 last_update:
-  date: 2026-10-18
+  date: 2026-10-19
 verified_with: v1.6.2
 ---
 
 # Admin UI
+
+:::note Checked against a running LNbits
+Some statements on this page are tested against `lnbits/lnbits:v1.6.2` with FakeWallet, on every change to this site and weekly ([API claims workflow](https://github.com/lndocs/lndocs.github.io/actions/workflows/claims.yml)).
+:::
 
 The Admin UI is the browser interface for running an LNbits instance. It's **on by default** (`LNBITS_ADMIN_UI=true`, [settings.py L1285](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/settings.py#L1285)). While it's on, most settings live in the database, and the database overrides `.env` (see [Settings precedence](/docs/configuration/environment)).
 
@@ -142,7 +146,7 @@ In the UI only the Super User sees the funding-source picker. Any admin can stil
 
 1. Download a backup (**Download database backup**).
 2. Open **Settings → Funding** and scroll to **Funding Sources**.
-3. Pick the class in the **Funding Source** drop-down and fill in its fields. Only the classes in `LNBITS_ALLOWED_FUNDING_SOURCES` are offered.
+3. Pick the backend in the drop-down under **Funding Sources** (it shows display names, such as **Fake Wallet** or **Lightning Network Daemon (LND Rest)**, not class names) and fill in its fields. Only the classes in `LNBITS_ALLOWED_FUNDING_SOURCES` are offered.
 4. Click **Save**. The notice ends with "Restart required!".
 5. Click **Restart server**.
 
@@ -178,7 +182,7 @@ Related settings:
 
 ### Credit or debit a wallet (Super User only) {#creditdebit-account-super-user-only}
 
-The Super User sees a **Credit / Debit** button by the balance on the wallet page and on the Users page. Type an amount and press **Enter**; a negative amount debits. It calls `PUT /users/api/v1/balance` with `{id, amount}` ([user_api.py L398-418](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/user_api.py#L398-L418)). There is no reason field, but an admin notification is sent when notifications are configured.
+The Super User sees a **Credit / Debit** button under the balance on the wallet page (a small **+** in windows narrower than 1440 px) and on the Users page. Type an amount and press **Enter**; a negative amount debits. It calls `PUT /users/api/v1/balance` with `{id, amount}` ([user_api.py L398-418](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/user_api.py#L398-L418)). There is no reason field, but an admin notification is sent when notifications are configured.
 
 :::caution
 Crediting creates balance that isn't backed by your node. On a real funding source, credit only to correct errors.

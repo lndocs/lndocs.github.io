@@ -3,11 +3,15 @@ sidebar_position: 3
 title: Quick Start
 description: Run LNbits v1.6.2, create the Super User, switch from VoidWallet to FakeWallet, and make a test payment
 last_update:
-  date: 2026-10-18
+  date: 2026-10-19
 verified_with: v1.6.2
 ---
 
 # Quick Start
+
+:::tip Tested in a browser
+Steps 1 to 6 run in a real browser against `lnbits/lnbits:v1.6.2` on every change to this site and weekly, clicking the labels shown here ([tutorial workflow](https://github.com/lndocs/lndocs.github.io/actions/workflows/tutorial.yml)). If LNbits renames a button, that run fails. The API behaviour in Step 6 is checked by the [API claims workflow](https://github.com/lndocs/lndocs.github.io/actions/workflows/claims.yml).
+:::
 
 From a fresh LNbits v1.6.2 to a test payment between two wallets, on your own machine. It runs over plain `http://localhost` and uses **FakeWallet**, so no real funds are involved.
 
@@ -48,7 +52,7 @@ Open **http://localhost:5000**. A fresh install redirects every page to **`/firs
 2. If the server has `FIRST_INSTALL_TOKEN` set, a **First Install Token** field appears. Enter the token.
 3. Click **Login**.
 
-You're now logged in as the **Super User**, the account that controls the instance, with one empty wallet ([first-install.vue](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/templates/pages/first-install.vue), [auth_api.py L601-633](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/auth_api.py#L601-L633)).
+You're now logged in as the **Super User**, the account that controls the instance, and LNbits opens the **Settings** page (`/admin`). Your account has one empty wallet, "LNbits wallet", in the sidebar ([first-install.vue](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/templates/pages/first-install.vue), [auth_api.py L601-633](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/core/views/auth_api.py#L601-L633)).
 
 :::warning Keep these credentials safe
 The Super User can change the funding source and credit any wallet. It can only log in with this username and password, never with a user ID. To read its ID later, run `lnbits-cli superuser`, or look in `.super_user` in the data folder. See [Admin UI](/docs/configuration/admin-ui).
@@ -63,11 +67,11 @@ A fresh install runs on **VoidWallet** (`LNBITS_BACKEND_WALLET_CLASS` defaults t
 The Admin UI is on by default. The funding source is stored in the database, so you change it in the browser, not in `.env`:
 
 1. Open **Settings** in the sidebar (`/admin`). It opens on the **Funding** tab.
-2. Scroll to **Funding Sources** and pick **FakeWallet** in the **Funding Source** drop-down.
+2. Scroll to **Funding Sources**. The drop-down there shows **Void Wallet**; change it to **Fake Wallet**.
 3. Click **Save**. The notice ends with "Restart required!".
-4. Click **Restart server**, then reload the page.
+4. Click **Restart server**, wait a few seconds, then reload the page. If the settings come up empty, the server is still restarting: reload again.
 
-After the restart, the Funding tab shows `Funding source: FakeWallet`.
+After the restart, an **Important!** dialog reminds you to save your login credentials. Click **I understand**. The Funding tab now shows `Funding source: FakeWallet`.
 
 :::info What FakeWallet does
 FakeWallet creates real-looking BOLT11 invoices, but it can only pay invoices created by this same LNbits instance. Paying any other invoice fails with "Only internal invoices can be used!" ([wallets/fake.py](https://github.com/lnbits/lnbits/blob/v1.6.2/lnbits/wallets/fake.py)). That makes it good for UI, API and extension testing, and useless for real payments.
@@ -76,9 +80,9 @@ FakeWallet creates real-looking BOLT11 invoices, but it can only pay invoices cr
 ## Step 5: Make a test payment {#create-an-invoice}
 
 1. **Create a second wallet:** click **Add a new wallet** in the sidebar and name it, for example "Shop".
-2. **Fund the first wallet:** open it. As the Super User you see a **Credit / Debit** button by the balance. Click it, type `10000` and press **Enter**. (Crediting creates sats from nothing, so only do it on a test instance.)
+2. **Fund the first wallet:** open it. As the Super User you see a **Credit / Debit** button under the balance (in a window narrower than 1440 px, it's a small **+** next to the balance instead). Click it, type `10000` and press **Enter**. (Crediting creates sats from nothing, so only do it on a test instance.)
 3. **Create an invoice:** in the "Shop" wallet, click **Receive**, enter 1000 sats and a memo, then click **Create Invoice**. Copy the invoice.
-4. **Pay it:** switch to the first wallet, click **Send**, paste the invoice into the text box, click **Read**, check the amount and click **Send**.
+4. **Pay it:** switch to the first wallet, click **Send**, paste the invoice into the text box, click **Read**, check the amount and click **Pay**.
 
 Both balances update, and both wallets list the payment.
 

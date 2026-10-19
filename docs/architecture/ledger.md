@@ -3,11 +3,15 @@ sidebar_position: 6
 title: Ledger System
 description: How LNbits records payments and computes wallet balances (v1.6.2)
 last_update:
-  date: 2026-10-18
+  date: 2026-10-19
 verified_with: v1.6.2
 ---
 
 # Ledger System
+
+:::note Checked against a running LNbits
+Some statements on this page are tested against `lnbits/lnbits:v1.6.2` with FakeWallet, on every change to this site and weekly ([API claims workflow](https://github.com/lndocs/lndocs.github.io/actions/workflows/claims.yml)).
+:::
 
 LNbits has no accounts table and no stored balances. Every invoice and payment is one row in `apipayments`, and a wallet's balance is a SQL view over those rows. This page explains the rules that turn rows into balances, and where they bend. It describes v1.6.2 (`lnbits/core/migrations.py`, `lnbits/core/services/payments.py`, `lnbits/core/crud/payments.py`). For how rows are created, see [Payments](/docs/architecture/payments).
 

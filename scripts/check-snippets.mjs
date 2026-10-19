@@ -162,6 +162,18 @@ for (const file of walk(path.join(root, 'docs'))) {
   });
 }
 
+// ---- ci: pages that CI checks say so ---------------------------------------
+// Every page named in scripts/ci-claims.mjs must link the workflow that tests it.
+{
+  const claimsSrc = fs.readFileSync(new URL('./ci-claims.mjs', import.meta.url), 'utf8');
+  const pages = new Set([...claimsSrc.matchAll(/claim\('([a-z0-9/-]+)'/g)].map((m) => m[1]));
+  for (const pg of pages) {
+    const file = path.join('docs', pg + '.md');
+    if (!fs.existsSync(file)) { add(file, 1, 'ci', pg, 'named in ci-claims.mjs but the page does not exist'); continue; }
+    if (!/actions\/workflows\/(claims|tutorial)\.yml/.test(fs.readFileSync(file, 'utf8'))) add(file, 1, 'ci', pg, 'checked by ci-claims.mjs but has no link to the workflow');
+  }
+}
+
 // ---- report ---------------------------------------------------------------
 const byKind = findings.reduce((a, f) => ((a[f.kind] = (a[f.kind] || 0) + 1), a), {});
 if (args.has('--json')) {
