@@ -51,23 +51,25 @@ try {
     await page.waitForURL(/first_install/);
   });
 
-  await step('step-2-open-the-web-interface', 'Username, Password, Password repeat, then Login creates the Super User', async () => {
+  await step('step-2-open-the-web-interface', 'Username, Password, Password repeat, then Login creates the Super User and opens Settings (/admin)', async () => {
     await page.getByLabel('Username').fill('tutorial');
     await page.getByLabel('Password', { exact: true }).fill(password);
     await page.getByLabel('Password repeat').fill(password);
     await page.getByRole('button', { name: 'Login' }).click();
-    await page.waitForURL(/\/wallet/);
+    await page.waitForURL(/\/admin/);
+    return page.url().replace(base, '');
   });
 
-  await step('step-4-explore-your-wallet', 'Settings in the sidebar opens /admin on the Funding tab', async () => {
+  await step('step-4-explore-your-wallet', 'Settings in the sidebar opens /admin on the Funding tab, showing "Funding source: VoidWallet"', async () => {
     await page.getByText('Settings', { exact: true }).first().click();
     await page.waitForURL(/\/admin/);
     await page.getByText('Funding Sources', { exact: true }).first().waitFor();
+    await page.getByText('Funding source: VoidWallet').first().waitFor();
   });
 
-  await step('step-4-explore-your-wallet', 'Pick FakeWallet in the Funding Source drop-down; Save says "Restart required!"', async () => {
-    await page.getByLabel('Funding Source', { exact: true }).click();
-    await page.getByRole('option', { name: /FakeWallet|Fake Wallet/ }).first().click();
+  await step('step-4-explore-your-wallet', 'Under Funding Sources, change the drop-down from "Void Wallet" to "Fake Wallet"; Save says "Restart required!"', async () => {
+    await page.locator('.q-select').filter({ hasText: 'Void Wallet' }).first().click();
+    await page.getByRole('option', { name: 'Fake Wallet', exact: true }).click();
     await page.getByRole('button', { name: 'Save' }).first().click();
     await page.getByText(/Restart required!/).first().waitFor();
   });
