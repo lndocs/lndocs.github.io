@@ -45,6 +45,14 @@ async function waitHealthy() {
 
 const dialog = () => page.locator('.q-dialog').last();
 
+// LNbits shows an "Important!" reminder to save your login credentials.
+async function dismissReminder() {
+  const btn = page.getByRole('button', { name: /I understand/i });
+  if (await btn.isVisible().catch(() => false)) { await btn.click(); return true; }
+  return false;
+}
+let reminderSeen = false;
+
 try {
   await step('step-2-open-the-web-interface', 'A fresh install redirects to /first_install', async () => {
     await page.goto(base);
@@ -79,13 +87,19 @@ try {
     await new Promise((r) => setTimeout(r, 3000));
     await waitHealthy();
     await page.reload();
-    await page.getByText('Funding source: FakeWallet').first().waitFor();
+    await page.waitForLoadState('networkidle');
+    await page.getByRole('button', { name: /I understand/i }).waitFor({ timeout: 5000 }).catch(() => {});
+    reminderSeen = (await dismissReminder()) || reminderSeen;
+    await page.getByText('Funding source: FakeWallet').first().waitFor({ timeout: 30000 });
+    return reminderSeen ? 'an "Important!" save-your-credentials dialog appeared first (I understand)' : '';
   });
 
   let firstWalletUrl;
   await step('create-an-invoice', 'Add a new wallet in the sidebar creates a wallet named "Shop"', async () => {
     await page.goto(base + '/wallet');
     await page.waitForURL(/\/wallet/);
+    await page.waitForLoadState('networkidle');
+    await dismissReminder();
     firstWalletUrl = page.url();
     await page.getByText('Add a new wallet').first().click();
     await dialog().locator('input').first().fill('Shop');
@@ -95,6 +109,8 @@ try {
 
   await step('create-an-invoice', 'The Super User sees Credit / Debit on the first wallet; 10000 + Enter credits it', async () => {
     await page.goto(firstWalletUrl);
+    await page.waitForLoadState('networkidle');
+    await dismissReminder();
     await page.getByRole('button', { name: 'Credit / Debit' }).first().click();
     const input = page.locator('input[type=number]:visible').last();
     await input.fill('10000');
@@ -108,6 +124,7 @@ try {
   await step('create-an-invoice', 'In "Shop": Receive, 1000 sats and a memo, Create Invoice', async () => {
     await page.getByText('Shop').first().click();
     await page.waitForLoadState('networkidle');
+    await dismissReminder();
     await page.getByRole('button', { name: /receive/i }).first().click();
     await dialog().getByLabel(/Amount/).fill('1000');
     await dialog().getByLabel(/Memo/).fill('Quick Start');
@@ -123,6 +140,7 @@ try {
   await step('create-an-invoice', 'In the first wallet: Send, paste the invoice, Read, then Send pays it', async () => {
     await page.goto(firstWalletUrl);
     await page.waitForLoadState('networkidle');
+    await dismissReminder();
     await page.getByRole('button', { name: /^send$/i }).first().click();
     await dialog().locator('textarea').first().fill(bolt11);
     await dialog().getByRole('button', { name: 'Read' }).click();
