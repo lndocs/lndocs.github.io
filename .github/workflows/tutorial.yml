@@ -1,0 +1,56 @@
+name: Tutorial in a browser
+
+# Starts the pinned LNbits image exactly as Quick Start step 1 shows and walks
+# the tutorial's clicks with Playwright. Nothing here touches a real node.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quick-start:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Start LNbits as in Quick Start step 1
+        run: |
+          V=$(cat scripts/lnbits-version.txt)
+          echo "LNBITS_VERSION=$V" >> "$GITHUB_ENV"
+          mkdir -p lnbits-data
+          docker run -d --name lnbits \
+            -p 127.0.0.1:5000:5000 \
+            -v "$PWD/lnbits-data:/app/data" \
+            -e AUTH_HTTPS_ONLY=false \
+            -e LNBITS_EXTENSIONS_PATH=/app/data/extensions \
+            "lnbits/lnbits:$V"
+          for i in $(seq 1 60); do
+            curl -s -o /dev/null http://localhost:5000/api/v1/health && exit 0
+            sleep 2
+          done
+          docker logs lnbits | tail -50
+          exit 1
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright@1.48.2
+          npx playwright install --with-deps chromium
+      - name: Walk the Quick Start
+        run: node scripts/ui-tutorial.mjs
+        env:
+          UI_OUT: ${{ runner.temp }}/ui
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tutorial-screenshots
+          path: ${{ runner.temp }}/ui
+      - name: LNbits logs
+        if: failure()
+        run: docker logs lnbits | tail -100
