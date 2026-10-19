@@ -3,11 +3,15 @@ sidebar_position: 4
 title: Payments API
 description: Create invoices, pay invoices, list and check payments, and use hold invoices with the LNbits API
 last_update:
-  date: 2026-10-18
+  date: 2026-10-19
 verified_with: v1.6.2
 ---
 
 # Payments API
+
+:::note Checked against a running LNbits
+Some statements on this page are tested against `lnbits/lnbits:v1.6.2` with FakeWallet, on every change to this site and weekly ([API claims workflow](https://github.com/lndocs/lndocs.github.io/actions/workflows/claims.yml)).
+:::
 
 All payment routes are under `/api/v1/payments`. They act on the wallet whose key you send in `X-API-KEY`. See [Authentication](/docs/api/authentication).
 

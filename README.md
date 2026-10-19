@@ -38,6 +38,11 @@ last_update:
 verified_with: v1.6.2
 ```
 
+## Tested against a running LNbits
+
+- **API claims** (`.github/workflows/claims.yml`, `scripts/ci-claims.mjs`): start the pinned image with FakeWallet and check what the API pages say. Every page named in a `claim(...)` must link that workflow (the gate enforces this); use the `:::note Checked against a running LNbits` box.
+- **Tutorial in a browser** (`.github/workflows/tutorial.yml`, `scripts/ui-tutorial.mjs`): start the image exactly as Quick Start step 1 shows and click through the Quick Start with Playwright, using the labels on the page. Screenshots of every step are uploaded as the `tutorial-screenshots` artifact. If you change a click path in `getting-started/quick-start.md`, change the script too.
+
 ## Generated reference pages
 
 `docs/configuration/env-reference.md` and `docs/api/endpoint-reference.md` are generated; don't edit them by hand. The API claims workflow dumps every setting (`scripts/reference/dump_settings.py`, run inside the image) and `/openapi.json` from the pinned image. It then runs `node scripts/gen-reference.mjs` and fails if the committed pages differ. To regenerate, download the `lnbits-reference` artifact from that run into `scripts/reference/` and run the script.

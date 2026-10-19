@@ -3,11 +3,15 @@ sidebar_position: 5
 title: Users API
 description: Account routes under /api/v1/auth and admin user management under /users/api/v1
 last_update:
-  date: 2026-10-18
+  date: 2026-10-19
 verified_with: v1.6.2
 ---
 
 # Users API
+
+:::note Checked against a running LNbits
+Some statements on this page are tested against `lnbits/lnbits:v1.6.2` with FakeWallet, on every change to this site and weekly ([API claims workflow](https://github.com/lndocs/lndocs.github.io/actions/workflows/claims.yml)).
+:::
 
 These routes act on **user accounts**, not on single wallets. They never accept wallet keys. Send one of these instead:
 

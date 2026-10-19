@@ -3,11 +3,15 @@ sidebar_position: 100
 title: FAQ
 description: Frequently asked questions about LNbits
 last_update:
-  date: 2026-10-18
+  date: 2026-10-19
 verified_with: v1.6.2
 ---
 
 # Frequently Asked Questions
+
+:::note Checked against a running LNbits
+Some statements on this page are tested against `lnbits/lnbits:v1.6.2` with FakeWallet, on every change to this site and weekly ([API claims workflow](https://github.com/lndocs/lndocs.github.io/actions/workflows/claims.yml)).
+:::
 
 The official FAQ is at [docs.lnbits.com](https://docs.lnbits.com). This page answers the questions operators ask most, checked against LNbits v1.6.2.
 

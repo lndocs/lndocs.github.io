@@ -101,7 +101,7 @@ The **Auth** column comes from the schema. Two limits:
 - The schema doesn't say *which* wallet key a route needs. Routes that spend or change things need the **admin key**, while reads and creating invoices accept the **invoice key**. See [Authentication](/docs/api/authentication).
 - An account token is a bearer token or the login cookie. Routes under \`/admin\`, \`/users\`, \`/audit\` and \`/node/api\` are marked **(admin)**: they need an admin account, and some of them need the Super User. Other routes may check roles too (for example, installing extensions needs an admin), so treat the column as a minimum. See [Users](/docs/api/users).
 
-Routes that installed extensions add are not listed.
+Routes that installed extensions add are not listed. The [API claims workflow](https://github.com/lndocs/lndocs.github.io/actions/workflows/claims.yml) regenerates this page from the image and fails if it is out of date.
 
 `;
 for (const [tag, rows] of [...byTag].sort(([a], [b]) => a.localeCompare(b))) {

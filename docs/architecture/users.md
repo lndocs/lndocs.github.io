@@ -3,11 +3,15 @@ sidebar_position: 4
 title: Users & Accounts
 description: Accounts, roles, login methods and sessions in LNbits v1.6.2
 last_update:
-  date: 2026-10-18
+  date: 2026-10-19
 verified_with: v1.6.2
 ---
 
 # Users & Accounts
+
+:::note Checked against a running LNbits
+Some statements on this page are tested against `lnbits/lnbits:v1.6.2` with FakeWallet, on every change to this site and weekly ([API claims workflow](https://github.com/lndocs/lndocs.github.io/actions/workflows/claims.yml)).
+:::
 
 Every LNbits user is an **account**. An account owns wallets, logs in with one of the enabled login methods, and has one of three roles: Super User, admin or regular user.
 

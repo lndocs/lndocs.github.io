@@ -3,7 +3,7 @@ sidebar_position: 4
 title: Create Your First Wallet
 description: Wallets, API keys, receiving, sending, sharing and key rotation in LNbits v1.6.2
 last_update:
-  date: 2026-10-18
+  date: 2026-10-19
 verified_with: v1.6.2
 ---
 
@@ -117,7 +117,7 @@ curl -X POST https://lnbits.example.com/api/v1/payments \
 1. Click **Send**.
 2. Paste the BOLT11 invoice into the text box (or scan a QR code), then click **Read**.
 3. Check the amount and description.
-4. Click **Send**.
+4. Click **Pay**.
 
 ### Pay an LNURL or Lightning Address {#pay-via-lnurl}
 
