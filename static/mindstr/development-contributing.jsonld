@@ -1,0 +1,233 @@
+{
+  "@context": {
+    "@vocab": "https://mindstr.org/ns#",
+    "link": {
+      "@type": "@id"
+    },
+    "parent": {
+      "@type": "@id"
+    }
+  },
+  "version": "0.2",
+  "nodes": [
+    {
+      "@id": "#this",
+      "name": "Contributing",
+      "x": 0,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/development/contributing",
+      "bgColor": "#ebc573"
+    },
+    {
+      "@id": "#anqkfm",
+      "name": "Ways to Contribute",
+      "x": -241,
+      "y": -56,
+      "link": "https://lndocs.github.io/docs/development/contributing#ways-to-contribute",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#t8ekhx",
+      "name": "Getting Started",
+      "x": -131,
+      "y": -181,
+      "link": "https://lndocs.github.io/docs/development/contributing#getting-started",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#shrabj",
+      "name": "Fork & Clone",
+      "x": -347,
+      "y": -306,
+      "link": "https://lndocs.github.io/docs/development/contributing#fork-clone",
+      "bgColor": "#efe6ff",
+      "parent": "#t8ekhx"
+    },
+    {
+      "@id": "#4kvy3s",
+      "name": "Development Setup",
+      "x": -208,
+      "y": -469,
+      "link": "https://lndocs.github.io/docs/development/contributing#development-setup",
+      "bgColor": "#efe6ff",
+      "parent": "#t8ekhx"
+    },
+    {
+      "@id": "#4jdhn8",
+      "name": "Making Changes",
+      "x": 146,
+      "y": -173,
+      "link": "https://lndocs.github.io/docs/development/contributing#making-changes",
+      "bgColor": "#f9bdd5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#k2zmgq",
+      "name": "Create a Branch",
+      "x": 117,
+      "y": -413,
+      "link": "https://lndocs.github.io/docs/development/contributing#create-a-branch",
+      "bgColor": "#ffe2ed",
+      "parent": "#4jdhn8"
+    },
+    {
+      "@id": "#skcg46",
+      "name": "Code Quality",
+      "x": 345,
+      "y": -407,
+      "link": "https://lndocs.github.io/docs/development/contributing#code-quality",
+      "bgColor": "#ffe2ed",
+      "parent": "#4jdhn8"
+    },
+    {
+      "@id": "#7weq86",
+      "name": "Testing",
+      "x": 423,
+      "y": -226,
+      "link": "https://lndocs.github.io/docs/development/contributing#testing",
+      "bgColor": "#ffe2ed",
+      "parent": "#4jdhn8"
+    },
+    {
+      "@id": "#fi3gc5",
+      "name": "Pull Request Process",
+      "x": 250,
+      "y": -6,
+      "link": "https://lndocs.github.io/docs/development/contributing#pull-request-process",
+      "bgColor": "#fcc2a9",
+      "parent": "#this"
+    },
+    {
+      "@id": "#6pcqhm",
+      "name": "PR Guidelines",
+      "x": 500,
+      "y": -13,
+      "link": "https://lndocs.github.io/docs/development/contributing#pr-guidelines",
+      "bgColor": "#ffe4d9",
+      "parent": "#fi3gc5"
+    },
+    {
+      "@id": "#xabtvt",
+      "name": "Commit Messages",
+      "x": 227,
+      "y": 89,
+      "link": "https://lndocs.github.io/docs/development/contributing#commit-messages",
+      "bgColor": "#e0d199",
+      "parent": "#this"
+    },
+    {
+      "@id": "#5i939p",
+      "name": "Code Style",
+      "x": 157,
+      "y": 165,
+      "link": "https://lndocs.github.io/docs/development/contributing#code-style",
+      "bgColor": "#b1dfb5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#r6k6jg",
+      "name": "Extension Contributions",
+      "x": 47,
+      "y": 211,
+      "link": "https://lndocs.github.io/docs/development/contributing#extension-contributions",
+      "bgColor": "#95e1e3",
+      "parent": "#this"
+    },
+    {
+      "@id": "#tjbqv9",
+      "name": "Community",
+      "x": -113,
+      "y": 193,
+      "link": "https://lndocs.github.io/docs/development/contributing#community",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#jdaec9",
+      "name": "License",
+      "x": -193,
+      "y": 135,
+      "link": "https://lndocs.github.io/docs/development/contributing#license",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#kczsjy",
+      "name": "← Development",
+      "x": -243,
+      "y": 48,
+      "link": "./development.jsonld",
+      "bgColor": "#ececec",
+      "parent": "#this"
+    }
+  ],
+  "connections": [
+    {
+      "start": 0,
+      "end": 1
+    },
+    {
+      "start": 0,
+      "end": 2
+    },
+    {
+      "start": 2,
+      "end": 3
+    },
+    {
+      "start": 2,
+      "end": 4
+    },
+    {
+      "start": 0,
+      "end": 5
+    },
+    {
+      "start": 5,
+      "end": 6
+    },
+    {
+      "start": 5,
+      "end": 7
+    },
+    {
+      "start": 5,
+      "end": 8
+    },
+    {
+      "start": 0,
+      "end": 9
+    },
+    {
+      "start": 9,
+      "end": 10
+    },
+    {
+      "start": 0,
+      "end": 11
+    },
+    {
+      "start": 0,
+      "end": 12
+    },
+    {
+      "start": 0,
+      "end": 13
+    },
+    {
+      "start": 0,
+      "end": 14
+    },
+    {
+      "start": 0,
+      "end": 15
+    },
+    {
+      "start": 0,
+      "end": 16
+    }
+  ],
+  "selectedNode": 0
+}

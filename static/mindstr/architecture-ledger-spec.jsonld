@@ -1,0 +1,259 @@
+{
+  "@context": {
+    "@vocab": "https://mindstr.org/ns#",
+    "link": {
+      "@type": "@id"
+    },
+    "parent": {
+      "@type": "@id"
+    }
+  },
+  "version": "0.2",
+  "nodes": [
+    {
+      "@id": "#this",
+      "name": "Ledger Specification",
+      "x": 0,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/architecture/ledger-spec",
+      "bgColor": "#ebc573"
+    },
+    {
+      "@id": "#f6qx4w",
+      "name": "Abstract",
+      "x": -247,
+      "y": -31,
+      "link": "https://lndocs.github.io/docs/architecture/ledger-spec#abstract",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#su9mmy",
+      "name": "Motivation",
+      "x": -226,
+      "y": -90,
+      "link": "https://lndocs.github.io/docs/architecture/ledger-spec#motivation",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#puabcz",
+      "name": "Specification",
+      "x": 183,
+      "y": -213,
+      "link": "https://lndocs.github.io/docs/architecture/ledger-spec#specification",
+      "bgColor": "#f9bdd5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#pggewd",
+      "name": "Core Concepts",
+      "x": -284,
+      "y": -350,
+      "link": "https://lndocs.github.io/docs/architecture/ledger-spec#1-core-concepts",
+      "bgColor": "#ffe2ed",
+      "parent": "#puabcz"
+    },
+    {
+      "@id": "#7cv7qa",
+      "name": "Balance Calculation",
+      "x": -192,
+      "y": -474,
+      "link": "https://lndocs.github.io/docs/architecture/ledger-spec#2-balance-calculation",
+      "bgColor": "#ffe2ed",
+      "parent": "#puabcz"
+    },
+    {
+      "@id": "#4evz5w",
+      "name": "Internal Transfers",
+      "x": -19,
+      "y": -425,
+      "link": "https://lndocs.github.io/docs/architecture/ledger-spec#3-internal-transfers",
+      "bgColor": "#ffe2ed",
+      "parent": "#puabcz"
+    },
+    {
+      "@id": "#vh32g5",
+      "name": "Fee Handling",
+      "x": 134,
+      "y": -488,
+      "link": "https://lndocs.github.io/docs/architecture/ledger-spec#4-fee-handling",
+      "bgColor": "#ffe2ed",
+      "parent": "#puabcz"
+    },
+    {
+      "@id": "#6ktxue",
+      "name": "Entry Lifecycle",
+      "x": 230,
+      "y": -378,
+      "link": "https://lndocs.github.io/docs/architecture/ledger-spec#5-entry-lifecycle",
+      "bgColor": "#ffe2ed",
+      "parent": "#puabcz"
+    },
+    {
+      "@id": "#qrakrq",
+      "name": "Extensibility",
+      "x": 391,
+      "y": -375,
+      "link": "https://lndocs.github.io/docs/architecture/ledger-spec#6-extensibility",
+      "bgColor": "#ffe2ed",
+      "parent": "#puabcz"
+    },
+    {
+      "@id": "#ppuaac",
+      "name": "Serialization",
+      "x": 413,
+      "y": -240,
+      "link": "https://lndocs.github.io/docs/architecture/ledger-spec#7-serialization",
+      "bgColor": "#ffe2ed",
+      "parent": "#puabcz"
+    },
+    {
+      "@id": "#f77hg7",
+      "name": "Audit Requirements",
+      "x": 558,
+      "y": -164,
+      "link": "https://lndocs.github.io/docs/architecture/ledger-spec#8-audit-requirements",
+      "bgColor": "#ffe2ed",
+      "parent": "#puabcz"
+    },
+    {
+      "@id": "#kpihvt",
+      "name": "Reference Implementation",
+      "x": 500,
+      "y": -4,
+      "link": "https://lndocs.github.io/docs/architecture/ledger-spec#9-reference-implementation",
+      "bgColor": "#ffe2ed",
+      "parent": "#puabcz"
+    },
+    {
+      "@id": "#k58b5b",
+      "name": "Compatibility",
+      "x": 565,
+      "y": 146,
+      "link": "https://lndocs.github.io/docs/architecture/ledger-spec#10-compatibility",
+      "bgColor": "#ffe2ed",
+      "parent": "#puabcz"
+    },
+    {
+      "@id": "#htircd",
+      "name": "Security Considerations",
+      "x": 159,
+      "y": 138,
+      "link": "https://lndocs.github.io/docs/architecture/ledger-spec#security-considerations",
+      "bgColor": "#fcc2a9",
+      "parent": "#this"
+    },
+    {
+      "@id": "#sixamq",
+      "name": "Appendix A: SQL Schema",
+      "x": 69,
+      "y": 183,
+      "link": "https://lndocs.github.io/docs/architecture/ledger-spec#appendix-a-sql-schema",
+      "bgColor": "#e0d199",
+      "parent": "#this"
+    },
+    {
+      "@id": "#j99zi5",
+      "name": "Appendix B: Balance Verification",
+      "x": -48,
+      "y": 228,
+      "link": "https://lndocs.github.io/docs/architecture/ledger-spec#appendix-b-balance-verification",
+      "bgColor": "#b1dfb5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#kwrapz",
+      "name": "Appendix C: Comparison with Traditional Accounting",
+      "x": -192,
+      "y": 137,
+      "link": "https://lndocs.github.io/docs/architecture/ledger-spec#appendix-c-comparison-with-traditional-accounting",
+      "bgColor": "#95e1e3",
+      "parent": "#this"
+    },
+    {
+      "@id": "#n3epze",
+      "name": "← Architecture",
+      "x": -247,
+      "y": 31,
+      "link": "./architecture.jsonld",
+      "bgColor": "#ececec",
+      "parent": "#this"
+    }
+  ],
+  "connections": [
+    {
+      "start": 0,
+      "end": 1
+    },
+    {
+      "start": 0,
+      "end": 2
+    },
+    {
+      "start": 0,
+      "end": 3
+    },
+    {
+      "start": 3,
+      "end": 4
+    },
+    {
+      "start": 3,
+      "end": 5
+    },
+    {
+      "start": 3,
+      "end": 6
+    },
+    {
+      "start": 3,
+      "end": 7
+    },
+    {
+      "start": 3,
+      "end": 8
+    },
+    {
+      "start": 3,
+      "end": 9
+    },
+    {
+      "start": 3,
+      "end": 10
+    },
+    {
+      "start": 3,
+      "end": 11
+    },
+    {
+      "start": 3,
+      "end": 12
+    },
+    {
+      "start": 3,
+      "end": 13
+    },
+    {
+      "start": 0,
+      "end": 14
+    },
+    {
+      "start": 0,
+      "end": 15
+    },
+    {
+      "start": 0,
+      "end": 16
+    },
+    {
+      "start": 0,
+      "end": 17
+    },
+    {
+      "start": 0,
+      "end": 18
+    }
+  ],
+  "selectedNode": 0
+}

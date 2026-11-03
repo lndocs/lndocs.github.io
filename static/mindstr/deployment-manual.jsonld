@@ -1,0 +1,207 @@
+{
+  "@context": {
+    "@vocab": "https://mindstr.org/ns#",
+    "link": {
+      "@type": "@id"
+    },
+    "parent": {
+      "@type": "@id"
+    }
+  },
+  "version": "0.2",
+  "nodes": [
+    {
+      "@id": "#this",
+      "name": "Manual Deployment",
+      "x": 0,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/deployment/manual",
+      "bgColor": "#ebc573"
+    },
+    {
+      "@id": "#8vejzr",
+      "name": "Prerequisites",
+      "x": -243,
+      "y": -48,
+      "link": "https://lndocs.github.io/docs/deployment/manual#prerequisites",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#2wpawm",
+      "name": "Installation with UV",
+      "x": -183,
+      "y": -145,
+      "link": "https://lndocs.github.io/docs/deployment/manual#installation-with-uv-recommended",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#vhrqun",
+      "name": "Installation with Poetry",
+      "x": -74,
+      "y": -209,
+      "link": "https://lndocs.github.io/docs/deployment/manual#installation-with-poetry",
+      "bgColor": "#f9bdd5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#u8fjrm",
+      "name": "Configuration",
+      "x": 106,
+      "y": -198,
+      "link": "https://lndocs.github.io/docs/deployment/manual#configuration",
+      "bgColor": "#fcc2a9",
+      "parent": "#this"
+    },
+    {
+      "@id": "#k8pnp6",
+      "name": "Running as a Service",
+      "x": 195,
+      "y": -133,
+      "link": "https://lndocs.github.io/docs/deployment/manual#running-as-a-service",
+      "bgColor": "#e0d199",
+      "parent": "#this"
+    },
+    {
+      "@id": "#p7yi8y",
+      "name": "Production Considerations",
+      "x": 234,
+      "y": 75,
+      "link": "https://lndocs.github.io/docs/deployment/manual#production-considerations",
+      "bgColor": "#b1dfb5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#mu3vnx",
+      "name": "Use PostgreSQL",
+      "x": 499,
+      "y": -30,
+      "link": "https://lndocs.github.io/docs/deployment/manual#use-postgresql",
+      "bgColor": "#ddf2de",
+      "parent": "#p7yi8y"
+    },
+    {
+      "@id": "#yshrhk",
+      "name": "Use a Reverse Proxy",
+      "x": 553,
+      "y": 175,
+      "link": "https://lndocs.github.io/docs/deployment/manual#use-a-reverse-proxy",
+      "bgColor": "#ddf2de",
+      "parent": "#p7yi8y"
+    },
+    {
+      "@id": "#mmbzgb",
+      "name": "Process Manager",
+      "x": 353,
+      "y": 301,
+      "link": "https://lndocs.github.io/docs/deployment/manual#process-manager",
+      "bgColor": "#ddf2de",
+      "parent": "#p7yi8y"
+    },
+    {
+      "@id": "#pfyzxs",
+      "name": "Updating",
+      "x": 59,
+      "y": 207,
+      "link": "https://lndocs.github.io/docs/deployment/manual#updating",
+      "bgColor": "#95e1e3",
+      "parent": "#this"
+    },
+    {
+      "@id": "#ezzp3f",
+      "name": "Troubleshooting",
+      "x": -131,
+      "y": 181,
+      "link": "https://lndocs.github.io/docs/deployment/manual#troubleshooting",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#vpe5jw",
+      "name": "Python Version Issues",
+      "x": -165,
+      "y": 401,
+      "link": "https://lndocs.github.io/docs/deployment/manual#python-version-issues",
+      "bgColor": "#daeeff",
+      "parent": "#ezzp3f"
+    },
+    {
+      "@id": "#iista7",
+      "name": "Permission Denied",
+      "x": -426,
+      "y": 347,
+      "link": "https://lndocs.github.io/docs/deployment/manual#permission-denied",
+      "bgColor": "#daeeff",
+      "parent": "#ezzp3f"
+    },
+    {
+      "@id": "#7tqy9e",
+      "name": "← Deployment",
+      "x": -243,
+      "y": 48,
+      "link": "./deployment.jsonld",
+      "bgColor": "#ececec",
+      "parent": "#this"
+    }
+  ],
+  "connections": [
+    {
+      "start": 0,
+      "end": 1
+    },
+    {
+      "start": 0,
+      "end": 2
+    },
+    {
+      "start": 0,
+      "end": 3
+    },
+    {
+      "start": 0,
+      "end": 4
+    },
+    {
+      "start": 0,
+      "end": 5
+    },
+    {
+      "start": 0,
+      "end": 6
+    },
+    {
+      "start": 6,
+      "end": 7
+    },
+    {
+      "start": 6,
+      "end": 8
+    },
+    {
+      "start": 6,
+      "end": 9
+    },
+    {
+      "start": 0,
+      "end": 10
+    },
+    {
+      "start": 0,
+      "end": 11
+    },
+    {
+      "start": 11,
+      "end": 12
+    },
+    {
+      "start": 11,
+      "end": 13
+    },
+    {
+      "start": 0,
+      "end": 14
+    }
+  ],
+  "selectedNode": 0
+}

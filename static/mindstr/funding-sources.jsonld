@@ -1,0 +1,115 @@
+{
+  "@context": {
+    "@vocab": "https://mindstr.org/ns#",
+    "link": {
+      "@type": "@id"
+    },
+    "parent": {
+      "@type": "@id"
+    }
+  },
+  "version": "0.2",
+  "nodes": [
+    {
+      "@id": "#this",
+      "name": "Funding Sources",
+      "x": 0,
+      "y": 0,
+      "bgColor": "#ebc573"
+    },
+    {
+      "@id": "#mczqgg",
+      "name": "Funding Sources Overview",
+      "x": -207,
+      "y": -120,
+      "link": "./funding-sources-overview.jsonld",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#rp2kdh",
+      "name": "LND",
+      "x": 8,
+      "y": -212,
+      "link": "./funding-sources-lnd.jsonld",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#6c8mfm",
+      "name": "Core Lightning",
+      "x": 188,
+      "y": -140,
+      "link": "./funding-sources-cln.jsonld",
+      "bgColor": "#f9bdd5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#uhqyuf",
+      "name": "Phoenixd",
+      "x": 249,
+      "y": 20,
+      "link": "./funding-sources-phoenixd.jsonld",
+      "bgColor": "#fcc2a9",
+      "parent": "#this"
+    },
+    {
+      "@id": "#gkdxt6",
+      "name": "Custodial Services",
+      "x": 139,
+      "y": 176,
+      "link": "./funding-sources-custodial.jsonld",
+      "bgColor": "#e0d199",
+      "parent": "#this"
+    },
+    {
+      "@id": "#ujfctz",
+      "name": "Fake Wallet",
+      "x": -72,
+      "y": 203,
+      "link": "./funding-sources-fake-wallet.jsonld",
+      "bgColor": "#b1dfb5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#5if5dv",
+      "name": "← Lightning docs",
+      "x": -227,
+      "y": 90,
+      "link": "./index.jsonld",
+      "bgColor": "#ececec",
+      "parent": "#this"
+    }
+  ],
+  "connections": [
+    {
+      "start": 0,
+      "end": 1
+    },
+    {
+      "start": 0,
+      "end": 2
+    },
+    {
+      "start": 0,
+      "end": 3
+    },
+    {
+      "start": 0,
+      "end": 4
+    },
+    {
+      "start": 0,
+      "end": 5
+    },
+    {
+      "start": 0,
+      "end": 6
+    },
+    {
+      "start": 0,
+      "end": 7
+    }
+  ],
+  "selectedNode": 0
+}

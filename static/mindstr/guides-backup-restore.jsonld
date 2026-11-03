@@ -1,0 +1,129 @@
+{
+  "@context": {
+    "@vocab": "https://mindstr.org/ns#",
+    "link": {
+      "@type": "@id"
+    },
+    "parent": {
+      "@type": "@id"
+    }
+  },
+  "version": "0.2",
+  "nodes": [
+    {
+      "@id": "#this",
+      "name": "Backup & Restore",
+      "x": 0,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/guides/backup-restore",
+      "bgColor": "#ebc573"
+    },
+    {
+      "@id": "#espuc3",
+      "name": "What to Backup",
+      "x": -227,
+      "y": -89,
+      "link": "https://lndocs.github.io/docs/guides/backup-restore#what-to-backup",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#auikny",
+      "name": "SQLite Backup",
+      "x": -66,
+      "y": -205,
+      "link": "https://lndocs.github.io/docs/guides/backup-restore#sqlite-backup",
+      "bgColor": "#e0c4f6",
+      "parent": "#this"
+    },
+    {
+      "@id": "#vkn9ke",
+      "name": "PostgreSQL Backup",
+      "x": 152,
+      "y": -169,
+      "link": "https://lndocs.github.io/docs/guides/backup-restore#postgresql-backup",
+      "bgColor": "#febdc6",
+      "parent": "#this"
+    },
+    {
+      "@id": "#q2zjub",
+      "name": "Restore",
+      "x": 227,
+      "y": 89,
+      "link": "https://lndocs.github.io/docs/guides/backup-restore#restore",
+      "bgColor": "#f1c99c",
+      "parent": "#this"
+    },
+    {
+      "@id": "#6p8j2c",
+      "name": "SQLite",
+      "x": 499,
+      "y": 30,
+      "link": "https://lndocs.github.io/docs/guides/backup-restore#sqlite",
+      "bgColor": "#fbe8d3",
+      "parent": "#q2zjub"
+    },
+    {
+      "@id": "#2e3bf7",
+      "name": "PostgreSQL",
+      "x": 411,
+      "y": 359,
+      "link": "https://lndocs.github.io/docs/guides/backup-restore#postgresql",
+      "bgColor": "#fbe8d3",
+      "parent": "#q2zjub"
+    },
+    {
+      "@id": "#4vgvse",
+      "name": "Automated Backups",
+      "x": -54,
+      "y": 208,
+      "link": "https://lndocs.github.io/docs/guides/backup-restore#automated-backups",
+      "bgColor": "#c1dba8",
+      "parent": "#this"
+    },
+    {
+      "@id": "#i68n7t",
+      "name": "← Guides",
+      "x": -227,
+      "y": 89,
+      "link": "./guides.jsonld",
+      "bgColor": "#ececec",
+      "parent": "#this"
+    }
+  ],
+  "connections": [
+    {
+      "start": 0,
+      "end": 1
+    },
+    {
+      "start": 0,
+      "end": 2
+    },
+    {
+      "start": 0,
+      "end": 3
+    },
+    {
+      "start": 0,
+      "end": 4
+    },
+    {
+      "start": 4,
+      "end": 5
+    },
+    {
+      "start": 4,
+      "end": 6
+    },
+    {
+      "start": 0,
+      "end": 7
+    },
+    {
+      "start": 0,
+      "end": 8
+    }
+  ],
+  "selectedNode": 0
+}

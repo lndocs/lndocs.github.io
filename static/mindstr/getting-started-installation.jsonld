@@ -1,0 +1,259 @@
+{
+  "@context": {
+    "@vocab": "https://mindstr.org/ns#",
+    "link": {
+      "@type": "@id"
+    },
+    "parent": {
+      "@type": "@id"
+    }
+  },
+  "version": "0.2",
+  "nodes": [
+    {
+      "@id": "#this",
+      "name": "Installation",
+      "x": 0,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/getting-started/installation",
+      "bgColor": "#ebc573"
+    },
+    {
+      "@id": "#fkywkd",
+      "name": "Quick Install Options",
+      "x": -243,
+      "y": -50,
+      "link": "https://lndocs.github.io/docs/getting-started/installation#quick-install-options",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#j8deiz",
+      "name": "Docker Installation",
+      "x": -125,
+      "y": -184,
+      "link": "https://lndocs.github.io/docs/getting-started/installation#docker-installation-recommended",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#aya9s9",
+      "name": "Prerequisites",
+      "x": -378,
+      "y": -278,
+      "link": "https://lndocs.github.io/docs/getting-started/installation#prerequisites",
+      "bgColor": "#efe6ff",
+      "parent": "#j8deiz"
+    },
+    {
+      "@id": "#vn2imx",
+      "name": "Quick Start",
+      "x": -311,
+      "y": -426,
+      "link": "https://lndocs.github.io/docs/getting-started/installation#quick-start",
+      "bgColor": "#efe6ff",
+      "parent": "#j8deiz"
+    },
+    {
+      "@id": "#2tznvh",
+      "name": "With Docker Compose",
+      "x": -111,
+      "y": -414,
+      "link": "https://lndocs.github.io/docs/getting-started/installation#with-docker-compose",
+      "bgColor": "#efe6ff",
+      "parent": "#j8deiz"
+    },
+    {
+      "@id": "#cnh2fk",
+      "name": "UV Installation",
+      "x": 100,
+      "y": -195,
+      "link": "https://lndocs.github.io/docs/getting-started/installation#uv-installation-development",
+      "bgColor": "#f9bdd5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#dk76uz",
+      "name": "Prerequisites",
+      "x": 128,
+      "y": -411,
+      "link": "https://lndocs.github.io/docs/getting-started/installation#prerequisites",
+      "bgColor": "#ffe2ed",
+      "parent": "#cnh2fk"
+    },
+    {
+      "@id": "#5aggpq",
+      "name": "Steps",
+      "x": 314,
+      "y": -425,
+      "link": "https://lndocs.github.io/docs/getting-started/installation#steps",
+      "bgColor": "#ffe2ed",
+      "parent": "#cnh2fk"
+    },
+    {
+      "@id": "#eqmaaw",
+      "name": "AppImage",
+      "x": 203,
+      "y": -124,
+      "link": "https://lndocs.github.io/docs/getting-started/installation#appimage-linux",
+      "bgColor": "#fcc2a9",
+      "parent": "#this"
+    },
+    {
+      "@id": "#pjbq25",
+      "name": "Poetry Installation",
+      "x": 244,
+      "y": -48,
+      "link": "https://lndocs.github.io/docs/getting-started/installation#poetry-installation-legacy",
+      "bgColor": "#e0d199",
+      "parent": "#this"
+    },
+    {
+      "@id": "#tz98k5",
+      "name": "Install Script",
+      "x": 246,
+      "y": 36,
+      "link": "https://lndocs.github.io/docs/getting-started/installation#install-script-debianubuntu",
+      "bgColor": "#b1dfb5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#437yyk",
+      "name": "Nix Installation",
+      "x": 214,
+      "y": 109,
+      "link": "https://lndocs.github.io/docs/getting-started/installation#nix-installation",
+      "bgColor": "#95e1e3",
+      "parent": "#this"
+    },
+    {
+      "@id": "#j3k2bu",
+      "name": "Verify Installation",
+      "x": 146,
+      "y": 173,
+      "link": "https://lndocs.github.io/docs/getting-started/installation#verify-installation",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#uhqx6j",
+      "name": "Troubleshooting",
+      "x": -94,
+      "y": 197,
+      "link": "https://lndocs.github.io/docs/getting-started/installation#troubleshooting",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#aurbbn",
+      "name": "Port Already in Use",
+      "x": 48,
+      "y": 423,
+      "link": "https://lndocs.github.io/docs/getting-started/installation#port-already-in-use",
+      "bgColor": "#efe6ff",
+      "parent": "#uhqx6j"
+    },
+    {
+      "@id": "#fxz322",
+      "name": "Permission Denied on Data Folder",
+      "x": -212,
+      "y": 468,
+      "link": "https://lndocs.github.io/docs/getting-started/installation#permission-denied-on-data-folder",
+      "bgColor": "#efe6ff",
+      "parent": "#uhqx6j"
+    },
+    {
+      "@id": "#s77s87",
+      "name": "Python Version Issues",
+      "x": -375,
+      "y": 281,
+      "link": "https://lndocs.github.io/docs/getting-started/installation#python-version-issues",
+      "bgColor": "#efe6ff",
+      "parent": "#uhqx6j"
+    },
+    {
+      "@id": "#k73rni",
+      "name": "← Getting Started",
+      "x": -245,
+      "y": 42,
+      "link": "./getting-started.jsonld",
+      "bgColor": "#ececec",
+      "parent": "#this"
+    }
+  ],
+  "connections": [
+    {
+      "start": 0,
+      "end": 1
+    },
+    {
+      "start": 0,
+      "end": 2
+    },
+    {
+      "start": 2,
+      "end": 3
+    },
+    {
+      "start": 2,
+      "end": 4
+    },
+    {
+      "start": 2,
+      "end": 5
+    },
+    {
+      "start": 0,
+      "end": 6
+    },
+    {
+      "start": 6,
+      "end": 7
+    },
+    {
+      "start": 6,
+      "end": 8
+    },
+    {
+      "start": 0,
+      "end": 9
+    },
+    {
+      "start": 0,
+      "end": 10
+    },
+    {
+      "start": 0,
+      "end": 11
+    },
+    {
+      "start": 0,
+      "end": 12
+    },
+    {
+      "start": 0,
+      "end": 13
+    },
+    {
+      "start": 0,
+      "end": 14
+    },
+    {
+      "start": 14,
+      "end": 15
+    },
+    {
+      "start": 14,
+      "end": 16
+    },
+    {
+      "start": 14,
+      "end": 17
+    },
+    {
+      "start": 0,
+      "end": 18
+    }
+  ],
+  "selectedNode": 0
+}

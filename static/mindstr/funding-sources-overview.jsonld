@@ -1,0 +1,298 @@
+{
+  "@context": {
+    "@vocab": "https://mindstr.org/ns#",
+    "link": {
+      "@type": "@id"
+    },
+    "parent": {
+      "@type": "@id"
+    }
+  },
+  "version": "0.2",
+  "nodes": [
+    {
+      "@id": "#this",
+      "name": "Funding Sources Overview",
+      "x": 0,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/funding-sources/overview",
+      "bgColor": "#ebc573"
+    },
+    {
+      "@id": "#7xg3ip",
+      "name": "What is a Funding Source?",
+      "x": -242,
+      "y": -64,
+      "link": "https://lndocs.github.io/docs/funding-sources/overview#what-is-a-funding-source",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#y43huz",
+      "name": "Available Funding Sources",
+      "x": -127,
+      "y": -183,
+      "link": "https://lndocs.github.io/docs/funding-sources/overview#available-funding-sources",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#4j26c6",
+      "name": "Self-Hosted Nodes",
+      "x": -370,
+      "y": -286,
+      "link": "https://lndocs.github.io/docs/funding-sources/overview#self-hosted-nodes",
+      "bgColor": "#efe6ff",
+      "parent": "#y43huz"
+    },
+    {
+      "@id": "#uaafj4",
+      "name": "Custodial Services",
+      "x": -292,
+      "y": -436,
+      "link": "https://lndocs.github.io/docs/funding-sources/overview#custodial-services",
+      "bgColor": "#efe6ff",
+      "parent": "#y43huz"
+    },
+    {
+      "@id": "#v8kw9g",
+      "name": "Special Purpose",
+      "x": -107,
+      "y": -415,
+      "link": "https://lndocs.github.io/docs/funding-sources/overview#special-purpose",
+      "bgColor": "#efe6ff",
+      "parent": "#y43huz"
+    },
+    {
+      "@id": "#ah8myn",
+      "name": "Choosing a Funding Source",
+      "x": 102,
+      "y": -194,
+      "link": "https://lndocs.github.io/docs/funding-sources/overview#choosing-a-funding-source",
+      "bgColor": "#f9bdd5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#5z6jht",
+      "name": "Decision Matrix",
+      "x": 107,
+      "y": -415,
+      "link": "https://lndocs.github.io/docs/funding-sources/overview#decision-matrix",
+      "bgColor": "#ffe2ed",
+      "parent": "#ah8myn"
+    },
+    {
+      "@id": "#wmw2zs",
+      "name": "Self-Hosted vs Custodial",
+      "x": 313,
+      "y": -425,
+      "link": "https://lndocs.github.io/docs/funding-sources/overview#self-hosted-vs-custodial",
+      "bgColor": "#ffe2ed",
+      "parent": "#ah8myn"
+    },
+    {
+      "@id": "#vfmmq5",
+      "name": "Configuration Basics",
+      "x": 239,
+      "y": -65,
+      "link": "https://lndocs.github.io/docs/funding-sources/overview#configuration-basics",
+      "bgColor": "#fcc2a9",
+      "parent": "#this"
+    },
+    {
+      "@id": "#pcr96u",
+      "name": "Setting the Backend",
+      "x": 438,
+      "y": -206,
+      "link": "https://lndocs.github.io/docs/funding-sources/overview#setting-the-backend",
+      "bgColor": "#ffe4d9",
+      "parent": "#vfmmq5"
+    },
+    {
+      "@id": "#9b7nqt",
+      "name": "Backend-Specific Settings",
+      "x": 585,
+      "y": -64,
+      "link": "https://lndocs.github.io/docs/funding-sources/overview#backend-specific-settings",
+      "bgColor": "#ffe4d9",
+      "parent": "#vfmmq5"
+    },
+    {
+      "@id": "#tznyhy",
+      "name": "Testing Your Connection",
+      "x": 232,
+      "y": 80,
+      "link": "https://lndocs.github.io/docs/funding-sources/overview#testing-your-connection",
+      "bgColor": "#e0d199",
+      "parent": "#this"
+    },
+    {
+      "@id": "#uwwb48",
+      "name": "Switching Funding Sources",
+      "x": 146,
+      "y": 170,
+      "link": "https://lndocs.github.io/docs/funding-sources/overview#switching-funding-sources",
+      "bgColor": "#b1dfb5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#bkdx9m",
+      "name": "Via Environment",
+      "x": 344,
+      "y": 308,
+      "link": "https://lndocs.github.io/docs/funding-sources/overview#via-environment",
+      "bgColor": "#ddf2de",
+      "parent": "#uwwb48"
+    },
+    {
+      "@id": "#uyi44v",
+      "name": "Via Admin UI",
+      "x": 273,
+      "y": 445,
+      "link": "https://lndocs.github.io/docs/funding-sources/overview#via-admin-ui-super-user",
+      "bgColor": "#ddf2de",
+      "parent": "#uwwb48"
+    },
+    {
+      "@id": "#pepean",
+      "name": "Balance Reconciliation",
+      "x": 16,
+      "y": 214,
+      "link": "https://lndocs.github.io/docs/funding-sources/overview#balance-reconciliation",
+      "bgColor": "#95e1e3",
+      "parent": "#this"
+    },
+    {
+      "@id": "#uxyq6b",
+      "name": "Common Issues",
+      "x": -157,
+      "y": 165,
+      "link": "https://lndocs.github.io/docs/funding-sources/overview#common-issues",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#pms64g",
+      "name": "Connection Failed",
+      "x": -193,
+      "y": 392,
+      "link": "https://lndocs.github.io/docs/funding-sources/overview#connection-failed",
+      "bgColor": "#daeeff",
+      "parent": "#uxyq6b"
+    },
+    {
+      "@id": "#cywvmh",
+      "name": "Payments Failing",
+      "x": -379,
+      "y": 384,
+      "link": "https://lndocs.github.io/docs/funding-sources/overview#payments-failing",
+      "bgColor": "#daeeff",
+      "parent": "#uxyq6b"
+    },
+    {
+      "@id": "#mmmrka",
+      "name": "Slow Payments",
+      "x": -416,
+      "y": 236,
+      "link": "https://lndocs.github.io/docs/funding-sources/overview#slow-payments",
+      "bgColor": "#daeeff",
+      "parent": "#uxyq6b"
+    },
+    {
+      "@id": "#u2r43v",
+      "name": "← Funding Sources",
+      "x": -246,
+      "y": 39,
+      "link": "./funding-sources.jsonld",
+      "bgColor": "#ececec",
+      "parent": "#this"
+    }
+  ],
+  "connections": [
+    {
+      "start": 0,
+      "end": 1
+    },
+    {
+      "start": 0,
+      "end": 2
+    },
+    {
+      "start": 2,
+      "end": 3
+    },
+    {
+      "start": 2,
+      "end": 4
+    },
+    {
+      "start": 2,
+      "end": 5
+    },
+    {
+      "start": 0,
+      "end": 6
+    },
+    {
+      "start": 6,
+      "end": 7
+    },
+    {
+      "start": 6,
+      "end": 8
+    },
+    {
+      "start": 0,
+      "end": 9
+    },
+    {
+      "start": 9,
+      "end": 10
+    },
+    {
+      "start": 9,
+      "end": 11
+    },
+    {
+      "start": 0,
+      "end": 12
+    },
+    {
+      "start": 0,
+      "end": 13
+    },
+    {
+      "start": 13,
+      "end": 14
+    },
+    {
+      "start": 13,
+      "end": 15
+    },
+    {
+      "start": 0,
+      "end": 16
+    },
+    {
+      "start": 0,
+      "end": 17
+    },
+    {
+      "start": 17,
+      "end": 18
+    },
+    {
+      "start": 17,
+      "end": 19
+    },
+    {
+      "start": 17,
+      "end": 20
+    },
+    {
+      "start": 0,
+      "end": 21
+    }
+  ],
+  "selectedNode": 0
+}

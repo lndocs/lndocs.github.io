@@ -1,0 +1,350 @@
+{
+  "@context": {
+    "@vocab": "https://mindstr.org/ns#",
+    "link": {
+      "@type": "@id"
+    },
+    "parent": {
+      "@type": "@id"
+    }
+  },
+  "version": "0.2",
+  "nodes": [
+    {
+      "@id": "#this",
+      "name": "Extension Manifest",
+      "x": 0,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/extensions/manifest",
+      "bgColor": "#ebc573"
+    },
+    {
+      "@id": "#i9n2qa",
+      "name": "Manifest Schema",
+      "x": -247,
+      "y": -30,
+      "link": "https://lndocs.github.io/docs/extensions/manifest#manifest-schema",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#wvr5de",
+      "name": "Required Fields",
+      "x": -165,
+      "y": -159,
+      "link": "https://lndocs.github.io/docs/extensions/manifest#required-fields",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#gbn8c4",
+      "name": "name",
+      "x": -440,
+      "y": -202,
+      "link": "https://lndocs.github.io/docs/extensions/manifest#name",
+      "bgColor": "#efe6ff",
+      "parent": "#wvr5de"
+    },
+    {
+      "@id": "#sfmbqd",
+      "name": "id",
+      "x": -439,
+      "y": -335,
+      "link": "https://lndocs.github.io/docs/extensions/manifest#id",
+      "bgColor": "#efe6ff",
+      "parent": "#wvr5de"
+    },
+    {
+      "@id": "#k6gbtk",
+      "name": "version",
+      "x": -284,
+      "y": -350,
+      "link": "https://lndocs.github.io/docs/extensions/manifest#version",
+      "bgColor": "#efe6ff",
+      "parent": "#wvr5de"
+    },
+    {
+      "@id": "#bsvecc",
+      "name": "description",
+      "x": -212,
+      "y": -468,
+      "link": "https://lndocs.github.io/docs/extensions/manifest#description",
+      "bgColor": "#efe6ff",
+      "parent": "#wvr5de"
+    },
+    {
+      "@id": "#nqwhp5",
+      "name": "Optional Fields",
+      "x": 232,
+      "y": -175,
+      "link": "https://lndocs.github.io/docs/extensions/manifest#optional-fields",
+      "bgColor": "#f9bdd5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#4ddtfz",
+      "name": "icon",
+      "x": 60,
+      "y": -422,
+      "link": "https://lndocs.github.io/docs/extensions/manifest#icon",
+      "bgColor": "#ffe2ed",
+      "parent": "#nqwhp5"
+    },
+    {
+      "@id": "#kg5gyc",
+      "name": "author",
+      "x": 205,
+      "y": -470,
+      "link": "https://lndocs.github.io/docs/extensions/manifest#author",
+      "bgColor": "#ffe2ed",
+      "parent": "#nqwhp5"
+    },
+    {
+      "@id": "#wm3jqn",
+      "name": "repo",
+      "x": 279,
+      "y": -353,
+      "link": "https://lndocs.github.io/docs/extensions/manifest#repo",
+      "bgColor": "#ffe2ed",
+      "parent": "#nqwhp5"
+    },
+    {
+      "@id": "#dk3qrv",
+      "name": "minlnbitsversion",
+      "x": 438,
+      "y": -336,
+      "link": "https://lndocs.github.io/docs/extensions/manifest#minlnbitsversion",
+      "bgColor": "#ffe2ed",
+      "parent": "#nqwhp5"
+    },
+    {
+      "@id": "#42e9f9",
+      "name": "maxlnbitsversion",
+      "x": 443,
+      "y": -197,
+      "link": "https://lndocs.github.io/docs/extensions/manifest#maxlnbitsversion",
+      "bgColor": "#ffe2ed",
+      "parent": "#nqwhp5"
+    },
+    {
+      "@id": "#67im5f",
+      "name": "adminonly",
+      "x": 573,
+      "y": -118,
+      "link": "https://lndocs.github.io/docs/extensions/manifest#adminonly",
+      "bgColor": "#ffe2ed",
+      "parent": "#nqwhp5"
+    },
+    {
+      "@id": "#2s3p2q",
+      "name": "archive",
+      "x": 500,
+      "y": -1,
+      "link": "https://lndocs.github.io/docs/extensions/manifest#archive",
+      "bgColor": "#ffe2ed",
+      "parent": "#nqwhp5"
+    },
+    {
+      "@id": "#3iptbx",
+      "name": "Extension Registry Manifest",
+      "x": 219,
+      "y": 103,
+      "link": "https://lndocs.github.io/docs/extensions/manifest#extension-registry-manifest",
+      "bgColor": "#fcc2a9",
+      "parent": "#this"
+    },
+    {
+      "@id": "#t582wt",
+      "name": "Version Updates",
+      "x": 152,
+      "y": 162,
+      "link": "https://lndocs.github.io/docs/extensions/manifest#version-updates",
+      "bgColor": "#e0d199",
+      "parent": "#this"
+    },
+    {
+      "@id": "#8feax3",
+      "name": "Versioning Guidelines",
+      "x": 304,
+      "y": 337,
+      "link": "https://lndocs.github.io/docs/extensions/manifest#versioning-guidelines",
+      "bgColor": "#f2ecd2",
+      "parent": "#t582wt"
+    },
+    {
+      "@id": "#86megc",
+      "name": "Archive Structure",
+      "x": 89,
+      "y": 206,
+      "link": "https://lndocs.github.io/docs/extensions/manifest#archive-structure",
+      "bgColor": "#b1dfb5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#jzaxer",
+      "name": "Hosting Options",
+      "x": -73,
+      "y": 205,
+      "link": "https://lndocs.github.io/docs/extensions/manifest#hosting-options",
+      "bgColor": "#95e1e3",
+      "parent": "#this"
+    },
+    {
+      "@id": "#9mz5yc",
+      "name": "GitHub Releases",
+      "x": -17,
+      "y": 425,
+      "link": "https://lndocs.github.io/docs/extensions/manifest#github-releases",
+      "bgColor": "#d1f3f4",
+      "parent": "#jzaxer"
+    },
+    {
+      "@id": "#2vy2cx",
+      "name": "Raw GitHub",
+      "x": -158,
+      "y": 483,
+      "link": "https://lndocs.github.io/docs/extensions/manifest#raw-github",
+      "bgColor": "#d1f3f4",
+      "parent": "#jzaxer"
+    },
+    {
+      "@id": "#vih7v4",
+      "name": "Self-Hosted",
+      "x": -243,
+      "y": 371,
+      "link": "https://lndocs.github.io/docs/extensions/manifest#self-hosted",
+      "bgColor": "#d1f3f4",
+      "parent": "#jzaxer"
+    },
+    {
+      "@id": "#wmzib5",
+      "name": "Validation",
+      "x": -185,
+      "y": 143,
+      "link": "https://lndocs.github.io/docs/extensions/manifest#validation",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#5ypcqw",
+      "name": "Example Manifests",
+      "x": -226,
+      "y": 90,
+      "link": "https://lndocs.github.io/docs/extensions/manifest#example-manifests",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#7dsgy2",
+      "name": "← Extensions",
+      "x": -248,
+      "y": 30,
+      "link": "./extensions.jsonld",
+      "bgColor": "#ececec",
+      "parent": "#this"
+    }
+  ],
+  "connections": [
+    {
+      "start": 0,
+      "end": 1
+    },
+    {
+      "start": 0,
+      "end": 2
+    },
+    {
+      "start": 2,
+      "end": 3
+    },
+    {
+      "start": 2,
+      "end": 4
+    },
+    {
+      "start": 2,
+      "end": 5
+    },
+    {
+      "start": 2,
+      "end": 6
+    },
+    {
+      "start": 0,
+      "end": 7
+    },
+    {
+      "start": 7,
+      "end": 8
+    },
+    {
+      "start": 7,
+      "end": 9
+    },
+    {
+      "start": 7,
+      "end": 10
+    },
+    {
+      "start": 7,
+      "end": 11
+    },
+    {
+      "start": 7,
+      "end": 12
+    },
+    {
+      "start": 7,
+      "end": 13
+    },
+    {
+      "start": 7,
+      "end": 14
+    },
+    {
+      "start": 0,
+      "end": 15
+    },
+    {
+      "start": 0,
+      "end": 16
+    },
+    {
+      "start": 16,
+      "end": 17
+    },
+    {
+      "start": 0,
+      "end": 18
+    },
+    {
+      "start": 0,
+      "end": 19
+    },
+    {
+      "start": 19,
+      "end": 20
+    },
+    {
+      "start": 19,
+      "end": 21
+    },
+    {
+      "start": 19,
+      "end": 22
+    },
+    {
+      "start": 0,
+      "end": 23
+    },
+    {
+      "start": 0,
+      "end": 24
+    },
+    {
+      "start": 0,
+      "end": 25
+    }
+  ],
+  "selectedNode": 0
+}

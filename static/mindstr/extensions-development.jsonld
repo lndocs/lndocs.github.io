@@ -1,0 +1,246 @@
+{
+  "@context": {
+    "@vocab": "https://mindstr.org/ns#",
+    "link": {
+      "@type": "@id"
+    },
+    "parent": {
+      "@type": "@id"
+    }
+  },
+  "version": "0.2",
+  "nodes": [
+    {
+      "@id": "#this",
+      "name": "Extension Development",
+      "x": 0,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/extensions/development",
+      "bgColor": "#ebc573"
+    },
+    {
+      "@id": "#4dijv5",
+      "name": "Getting Started",
+      "x": -239,
+      "y": -62,
+      "link": "https://lndocs.github.io/docs/extensions/development#getting-started",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#ievj7v",
+      "name": "Clone the Example Extension",
+      "x": -478,
+      "y": -124,
+      "link": "https://lndocs.github.io/docs/extensions/development#clone-the-example-extension",
+      "bgColor": "#daeeff",
+      "parent": "#4dijv5"
+    },
+    {
+      "@id": "#ak9asq",
+      "name": "Extension Structure",
+      "x": -171,
+      "y": -155,
+      "link": "https://lndocs.github.io/docs/extensions/development#extension-structure",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#8vzryr",
+      "name": "Manifest File",
+      "x": -127,
+      "y": -200,
+      "link": "https://lndocs.github.io/docs/extensions/development#manifest-file",
+      "bgColor": "#f9bdd5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#wsjdx6",
+      "name": "Manifest Fields",
+      "x": -169,
+      "y": -400,
+      "link": "https://lndocs.github.io/docs/extensions/development#manifest-fields",
+      "bgColor": "#ffe2ed",
+      "parent": "#8vzryr"
+    },
+    {
+      "@id": "#ukqvr4",
+      "name": "Extension Registration",
+      "x": 46,
+      "y": -222,
+      "link": "https://lndocs.github.io/docs/extensions/development#extension-registration",
+      "bgColor": "#fcc2a9",
+      "parent": "#this"
+    },
+    {
+      "@id": "#ixkv7h",
+      "name": "Web Routes",
+      "x": 125,
+      "y": -178,
+      "link": "https://lndocs.github.io/docs/extensions/development#web-routes-viewspy",
+      "bgColor": "#e0d199",
+      "parent": "#this"
+    },
+    {
+      "@id": "#yq8nzx",
+      "name": "API Endpoints",
+      "x": 195,
+      "y": -133,
+      "link": "https://lndocs.github.io/docs/extensions/development#api-endpoints-viewsapipy",
+      "bgColor": "#b1dfb5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#rh653j",
+      "name": "Data Models",
+      "x": 238,
+      "y": -65,
+      "link": "https://lndocs.github.io/docs/extensions/development#data-models-modelspy",
+      "bgColor": "#95e1e3",
+      "parent": "#this"
+    },
+    {
+      "@id": "#9h4kpt",
+      "name": "Database Operations",
+      "x": 249,
+      "y": 20,
+      "link": "https://lndocs.github.io/docs/extensions/development#database-operations-crudpy",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#7vtshd",
+      "name": "Database Migrations",
+      "x": 214,
+      "y": 109,
+      "link": "https://lndocs.github.io/docs/extensions/development#database-migrations-migrationspy",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#zp376s",
+      "name": "Templates",
+      "x": 146,
+      "y": 166,
+      "link": "https://lndocs.github.io/docs/extensions/development#templates",
+      "bgColor": "#f9bdd5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#fttzmy",
+      "name": "Creating Payments",
+      "x": 106,
+      "y": 210,
+      "link": "https://lndocs.github.io/docs/extensions/development#creating-payments",
+      "bgColor": "#fcc2a9",
+      "parent": "#this"
+    },
+    {
+      "@id": "#xdbbqx",
+      "name": "Testing Your Extension",
+      "x": -82,
+      "y": 212,
+      "link": "https://lndocs.github.io/docs/extensions/development#testing-your-extension",
+      "bgColor": "#e0d199",
+      "parent": "#this"
+    },
+    {
+      "@id": "#bdpfdm",
+      "name": "Publishing",
+      "x": -152,
+      "y": 166,
+      "link": "https://lndocs.github.io/docs/extensions/development#publishing",
+      "bgColor": "#b1dfb5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#jxrv7z",
+      "name": "Best Practices",
+      "x": -213,
+      "y": 111,
+      "link": "https://lndocs.github.io/docs/extensions/development#best-practices",
+      "bgColor": "#95e1e3",
+      "parent": "#this"
+    },
+    {
+      "@id": "#eg4hex",
+      "name": "← Extensions",
+      "x": -246,
+      "y": 39,
+      "link": "./extensions.jsonld",
+      "bgColor": "#ececec",
+      "parent": "#this"
+    }
+  ],
+  "connections": [
+    {
+      "start": 0,
+      "end": 1
+    },
+    {
+      "start": 1,
+      "end": 2
+    },
+    {
+      "start": 0,
+      "end": 3
+    },
+    {
+      "start": 0,
+      "end": 4
+    },
+    {
+      "start": 4,
+      "end": 5
+    },
+    {
+      "start": 0,
+      "end": 6
+    },
+    {
+      "start": 0,
+      "end": 7
+    },
+    {
+      "start": 0,
+      "end": 8
+    },
+    {
+      "start": 0,
+      "end": 9
+    },
+    {
+      "start": 0,
+      "end": 10
+    },
+    {
+      "start": 0,
+      "end": 11
+    },
+    {
+      "start": 0,
+      "end": 12
+    },
+    {
+      "start": 0,
+      "end": 13
+    },
+    {
+      "start": 0,
+      "end": 14
+    },
+    {
+      "start": 0,
+      "end": 15
+    },
+    {
+      "start": 0,
+      "end": 16
+    },
+    {
+      "start": 0,
+      "end": 17
+    }
+  ],
+  "selectedNode": 0
+}

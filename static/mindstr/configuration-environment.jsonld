@@ -1,0 +1,337 @@
+{
+  "@context": {
+    "@vocab": "https://mindstr.org/ns#",
+    "link": {
+      "@type": "@id"
+    },
+    "parent": {
+      "@type": "@id"
+    }
+  },
+  "version": "0.2",
+  "nodes": [
+    {
+      "@id": "#this",
+      "name": "Environment Variables",
+      "x": 0,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/configuration/environment",
+      "bgColor": "#ebc573"
+    },
+    {
+      "@id": "#yyu7jz",
+      "name": "Server Configuration",
+      "x": -241,
+      "y": -61,
+      "link": "https://lndocs.github.io/docs/configuration/environment#server-configuration",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#wkrebf",
+      "name": "Basic Settings",
+      "x": -493,
+      "y": -72,
+      "link": "https://lndocs.github.io/docs/configuration/environment#basic-settings",
+      "bgColor": "#daeeff",
+      "parent": "#yyu7jz"
+    },
+    {
+      "@id": "#bu5bte",
+      "name": "Data Directory",
+      "x": -540,
+      "y": -202,
+      "link": "https://lndocs.github.io/docs/configuration/environment#data-directory",
+      "bgColor": "#daeeff",
+      "parent": "#yyu7jz"
+    },
+    {
+      "@id": "#4hakzu",
+      "name": "Funding Source",
+      "x": -93,
+      "y": -197,
+      "link": "https://lndocs.github.io/docs/configuration/environment#funding-source",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#yhcpjw",
+      "name": "LND Configuration",
+      "x": -342,
+      "y": -310,
+      "link": "https://lndocs.github.io/docs/configuration/environment#lnd-configuration",
+      "bgColor": "#efe6ff",
+      "parent": "#4hakzu"
+    },
+    {
+      "@id": "#m7mgcv",
+      "name": "Core Lightning Configuration",
+      "x": -244,
+      "y": -459,
+      "link": "https://lndocs.github.io/docs/configuration/environment#core-lightning-configuration",
+      "bgColor": "#efe6ff",
+      "parent": "#4hakzu"
+    },
+    {
+      "@id": "#gekznt",
+      "name": "Phoenixd Configuration",
+      "x": -15,
+      "y": -425,
+      "link": "https://lndocs.github.io/docs/configuration/environment#phoenixd-configuration",
+      "bgColor": "#efe6ff",
+      "parent": "#4hakzu"
+    },
+    {
+      "@id": "#beqq5j",
+      "name": "Admin & Security",
+      "x": 154,
+      "y": -168,
+      "link": "https://lndocs.github.io/docs/configuration/environment#admin-security",
+      "bgColor": "#f9bdd5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#6r28st",
+      "name": "Admin UI",
+      "x": 202,
+      "y": -389,
+      "link": "https://lndocs.github.io/docs/configuration/environment#admin-ui",
+      "bgColor": "#ffe2ed",
+      "parent": "#beqq5j"
+    },
+    {
+      "@id": "#d5e2jv",
+      "name": "Access Control",
+      "x": 362,
+      "y": -396,
+      "link": "https://lndocs.github.io/docs/configuration/environment#access-control",
+      "bgColor": "#ffe2ed",
+      "parent": "#beqq5j"
+    },
+    {
+      "@id": "#3g77sx",
+      "name": "Rate Limiting",
+      "x": 394,
+      "y": -262,
+      "link": "https://lndocs.github.io/docs/configuration/environment#rate-limiting",
+      "bgColor": "#ffe2ed",
+      "parent": "#beqq5j"
+    },
+    {
+      "@id": "#ucs9ug",
+      "name": "Authentication",
+      "x": 237,
+      "y": -68,
+      "link": "https://lndocs.github.io/docs/configuration/environment#authentication",
+      "bgColor": "#fcc2a9",
+      "parent": "#this"
+    },
+    {
+      "@id": "#tse2je",
+      "name": "OAuth Providers",
+      "x": 474,
+      "y": -135,
+      "link": "https://lndocs.github.io/docs/configuration/environment#oauth-providers",
+      "bgColor": "#ffe4d9",
+      "parent": "#ucs9ug"
+    },
+    {
+      "@id": "#cvh8ee",
+      "name": "Extensions",
+      "x": 250,
+      "y": -6,
+      "link": "https://lndocs.github.io/docs/configuration/environment#extensions",
+      "bgColor": "#e0d199",
+      "parent": "#this"
+    },
+    {
+      "@id": "#3xd5xn",
+      "name": "Fees",
+      "x": 241,
+      "y": 55,
+      "link": "https://lndocs.github.io/docs/configuration/environment#fees",
+      "bgColor": "#b1dfb5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#jingvu",
+      "name": "Site Customization",
+      "x": 209,
+      "y": 114,
+      "link": "https://lndocs.github.io/docs/configuration/environment#site-customization",
+      "bgColor": "#95e1e3",
+      "parent": "#this"
+    },
+    {
+      "@id": "#u9rrt3",
+      "name": "Invoice Settings",
+      "x": 155,
+      "y": 158,
+      "link": "https://lndocs.github.io/docs/configuration/environment#invoice-settings",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#kgvapt",
+      "name": "Logging",
+      "x": 133,
+      "y": 204,
+      "link": "https://lndocs.github.io/docs/configuration/environment#logging",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#6yp854",
+      "name": "Node UI",
+      "x": 39,
+      "y": 212,
+      "link": "https://lndocs.github.io/docs/configuration/environment#node-ui",
+      "bgColor": "#f9bdd5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#g8htk4",
+      "name": "Notifications",
+      "x": -77,
+      "y": 229,
+      "link": "https://lndocs.github.io/docs/configuration/environment#notifications",
+      "bgColor": "#fcc2a9",
+      "parent": "#this"
+    },
+    {
+      "@id": "#iq664j",
+      "name": "Exchange Rates",
+      "x": -122,
+      "y": 184,
+      "link": "https://lndocs.github.io/docs/configuration/environment#exchange-rates",
+      "bgColor": "#e0d199",
+      "parent": "#this"
+    },
+    {
+      "@id": "#gz4cvb",
+      "name": "Example .env File",
+      "x": -183,
+      "y": 139,
+      "link": "https://lndocs.github.io/docs/configuration/environment#example-env-file",
+      "bgColor": "#b1dfb5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#itdh4e",
+      "name": "Validation",
+      "x": -226,
+      "y": 91,
+      "link": "https://lndocs.github.io/docs/configuration/environment#validation",
+      "bgColor": "#95e1e3",
+      "parent": "#this"
+    },
+    {
+      "@id": "#wymkpw",
+      "name": "← Configuration",
+      "x": -247,
+      "y": 31,
+      "link": "./configuration.jsonld",
+      "bgColor": "#ececec",
+      "parent": "#this"
+    }
+  ],
+  "connections": [
+    {
+      "start": 0,
+      "end": 1
+    },
+    {
+      "start": 1,
+      "end": 2
+    },
+    {
+      "start": 1,
+      "end": 3
+    },
+    {
+      "start": 0,
+      "end": 4
+    },
+    {
+      "start": 4,
+      "end": 5
+    },
+    {
+      "start": 4,
+      "end": 6
+    },
+    {
+      "start": 4,
+      "end": 7
+    },
+    {
+      "start": 0,
+      "end": 8
+    },
+    {
+      "start": 8,
+      "end": 9
+    },
+    {
+      "start": 8,
+      "end": 10
+    },
+    {
+      "start": 8,
+      "end": 11
+    },
+    {
+      "start": 0,
+      "end": 12
+    },
+    {
+      "start": 12,
+      "end": 13
+    },
+    {
+      "start": 0,
+      "end": 14
+    },
+    {
+      "start": 0,
+      "end": 15
+    },
+    {
+      "start": 0,
+      "end": 16
+    },
+    {
+      "start": 0,
+      "end": 17
+    },
+    {
+      "start": 0,
+      "end": 18
+    },
+    {
+      "start": 0,
+      "end": 19
+    },
+    {
+      "start": 0,
+      "end": 20
+    },
+    {
+      "start": 0,
+      "end": 21
+    },
+    {
+      "start": 0,
+      "end": 22
+    },
+    {
+      "start": 0,
+      "end": 23
+    },
+    {
+      "start": 0,
+      "end": 24
+    }
+  ],
+  "selectedNode": 0
+}

@@ -1,0 +1,77 @@
+{
+  "@context": {
+    "@vocab": "https://mindstr.org/ns#",
+    "link": {
+      "@type": "@id"
+    },
+    "parent": {
+      "@type": "@id"
+    }
+  },
+  "version": "0.2",
+  "nodes": [
+    {
+      "@id": "#this",
+      "name": "Migration",
+      "x": 0,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/guides/migration",
+      "bgColor": "#ebc573"
+    },
+    {
+      "@id": "#64akma",
+      "name": "SQLite to PostgreSQL",
+      "x": -157,
+      "y": -166,
+      "link": "https://lndocs.github.io/docs/guides/migration#sqlite-to-postgresql",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#pa7vig",
+      "name": "Between Instances",
+      "x": 211,
+      "y": -114,
+      "link": "https://lndocs.github.io/docs/guides/migration#between-instances",
+      "bgColor": "#f3bee1",
+      "parent": "#this"
+    },
+    {
+      "@id": "#7jhy3x",
+      "name": "Version Upgrades",
+      "x": 140,
+      "y": 176,
+      "link": "https://lndocs.github.io/docs/guides/migration#version-upgrades",
+      "bgColor": "#f1c99c",
+      "parent": "#this"
+    },
+    {
+      "@id": "#y3292y",
+      "name": "← Guides",
+      "x": -190,
+      "y": 138,
+      "link": "./guides.jsonld",
+      "bgColor": "#ececec",
+      "parent": "#this"
+    }
+  ],
+  "connections": [
+    {
+      "start": 0,
+      "end": 1
+    },
+    {
+      "start": 0,
+      "end": 2
+    },
+    {
+      "start": 0,
+      "end": 3
+    },
+    {
+      "start": 0,
+      "end": 4
+    }
+  ],
+  "selectedNode": 0
+}

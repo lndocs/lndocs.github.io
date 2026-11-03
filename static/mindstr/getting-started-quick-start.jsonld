@@ -1,0 +1,272 @@
+{
+  "@context": {
+    "@vocab": "https://mindstr.org/ns#",
+    "link": {
+      "@type": "@id"
+    },
+    "parent": {
+      "@type": "@id"
+    }
+  },
+  "version": "0.2",
+  "nodes": [
+    {
+      "@id": "#this",
+      "name": "Quick Start",
+      "x": 0,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/getting-started/quick-start",
+      "bgColor": "#ebc573"
+    },
+    {
+      "@id": "#r8zm2z",
+      "name": "Step 1: Start LNbits",
+      "x": -244,
+      "y": -45,
+      "link": "https://lndocs.github.io/docs/getting-started/quick-start#step-1-start-lnbits",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#wzv4c3",
+      "name": "Step 2: Open the Web Interface",
+      "x": -186,
+      "y": -142,
+      "link": "https://lndocs.github.io/docs/getting-started/quick-start#step-2-open-the-web-interface",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#7fnz2s",
+      "name": "Step 3: Create an Account",
+      "x": -98,
+      "y": -204,
+      "link": "https://lndocs.github.io/docs/getting-started/quick-start#step-3-create-an-account",
+      "bgColor": "#f9bdd5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#p89exh",
+      "name": "Step 4: Explore Your Wallet",
+      "x": 139,
+      "y": -185,
+      "link": "https://lndocs.github.io/docs/getting-started/quick-start#step-4-explore-your-wallet",
+      "bgColor": "#fcc2a9",
+      "parent": "#this"
+    },
+    {
+      "@id": "#urtpxv",
+      "name": "Wallet Dashboard",
+      "x": 107,
+      "y": -415,
+      "link": "https://lndocs.github.io/docs/getting-started/quick-start#wallet-dashboard",
+      "bgColor": "#ffe4d9",
+      "parent": "#p89exh"
+    },
+    {
+      "@id": "#4dg5c4",
+      "name": "Create an Invoice",
+      "x": 296,
+      "y": -434,
+      "link": "https://lndocs.github.io/docs/getting-started/quick-start#create-an-invoice",
+      "bgColor": "#ffe4d9",
+      "parent": "#p89exh"
+    },
+    {
+      "@id": "#kwm3he",
+      "name": "Pay an Invoice",
+      "x": 369,
+      "y": -287,
+      "link": "https://lndocs.github.io/docs/getting-started/quick-start#pay-an-invoice",
+      "bgColor": "#ffe4d9",
+      "parent": "#p89exh"
+    },
+    {
+      "@id": "#qvd9cw",
+      "name": "Step 5: Enable Extensions",
+      "x": 238,
+      "y": -66,
+      "link": "https://lndocs.github.io/docs/getting-started/quick-start#step-5-enable-extensions",
+      "bgColor": "#e0d199",
+      "parent": "#this"
+    },
+    {
+      "@id": "#sf37xb",
+      "name": "Popular Extensions",
+      "x": 475,
+      "y": -131,
+      "link": "https://lndocs.github.io/docs/getting-started/quick-start#popular-extensions",
+      "bgColor": "#f2ecd2",
+      "parent": "#qvd9cw"
+    },
+    {
+      "@id": "#fuhjpf",
+      "name": "Step 6: Connect a Real Funding Source",
+      "x": 209,
+      "y": 116,
+      "link": "https://lndocs.github.io/docs/getting-started/quick-start#step-6-connect-a-real-funding-source",
+      "bgColor": "#b1dfb5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#dry8wx",
+      "name": "Option A: LND",
+      "x": 495,
+      "y": 58,
+      "link": "https://lndocs.github.io/docs/getting-started/quick-start#option-a-lnd",
+      "bgColor": "#ddf2de",
+      "parent": "#fuhjpf"
+    },
+    {
+      "@id": "#rmckuv",
+      "name": "Option B: Core Lightning",
+      "x": 521,
+      "y": 236,
+      "link": "https://lndocs.github.io/docs/getting-started/quick-start#option-b-core-lightning",
+      "bgColor": "#ddf2de",
+      "parent": "#fuhjpf"
+    },
+    {
+      "@id": "#6cicry",
+      "name": "Option C: Custodial Service",
+      "x": 299,
+      "y": 341,
+      "link": "https://lndocs.github.io/docs/getting-started/quick-start#option-c-custodial-service",
+      "bgColor": "#ddf2de",
+      "parent": "#fuhjpf"
+    },
+    {
+      "@id": "#7c28q6",
+      "name": "Quick Reference",
+      "x": -68,
+      "y": 204,
+      "link": "https://lndocs.github.io/docs/getting-started/quick-start#quick-reference",
+      "bgColor": "#95e1e3",
+      "parent": "#this"
+    },
+    {
+      "@id": "#4qbh3e",
+      "name": "API Endpoints",
+      "x": 32,
+      "y": 424,
+      "link": "https://lndocs.github.io/docs/getting-started/quick-start#api-endpoints",
+      "bgColor": "#d1f3f4",
+      "parent": "#7c28q6"
+    },
+    {
+      "@id": "#m3xps2",
+      "name": "Example API Call",
+      "x": -135,
+      "y": 488,
+      "link": "https://lndocs.github.io/docs/getting-started/quick-start#example-api-call",
+      "bgColor": "#d1f3f4",
+      "parent": "#7c28q6"
+    },
+    {
+      "@id": "#yxjf84",
+      "name": "Environment Variables",
+      "x": -270,
+      "y": 358,
+      "link": "https://lndocs.github.io/docs/getting-started/quick-start#environment-variables",
+      "bgColor": "#d1f3f4",
+      "parent": "#7c28q6"
+    },
+    {
+      "@id": "#mrv4db",
+      "name": "Getting Help",
+      "x": -213,
+      "y": 111,
+      "link": "https://lndocs.github.io/docs/getting-started/quick-start#getting-help",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#i6483q",
+      "name": "← Getting Started",
+      "x": -246,
+      "y": 40,
+      "link": "./getting-started.jsonld",
+      "bgColor": "#ececec",
+      "parent": "#this"
+    }
+  ],
+  "connections": [
+    {
+      "start": 0,
+      "end": 1
+    },
+    {
+      "start": 0,
+      "end": 2
+    },
+    {
+      "start": 0,
+      "end": 3
+    },
+    {
+      "start": 0,
+      "end": 4
+    },
+    {
+      "start": 4,
+      "end": 5
+    },
+    {
+      "start": 4,
+      "end": 6
+    },
+    {
+      "start": 4,
+      "end": 7
+    },
+    {
+      "start": 0,
+      "end": 8
+    },
+    {
+      "start": 8,
+      "end": 9
+    },
+    {
+      "start": 0,
+      "end": 10
+    },
+    {
+      "start": 10,
+      "end": 11
+    },
+    {
+      "start": 10,
+      "end": 12
+    },
+    {
+      "start": 10,
+      "end": 13
+    },
+    {
+      "start": 0,
+      "end": 14
+    },
+    {
+      "start": 14,
+      "end": 15
+    },
+    {
+      "start": 14,
+      "end": 16
+    },
+    {
+      "start": 14,
+      "end": 17
+    },
+    {
+      "start": 0,
+      "end": 18
+    },
+    {
+      "start": 0,
+      "end": 19
+    }
+  ],
+  "selectedNode": 0
+}

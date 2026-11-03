@@ -1,0 +1,350 @@
+{
+  "@context": {
+    "@vocab": "https://mindstr.org/ns#",
+    "link": {
+      "@type": "@id"
+    },
+    "parent": {
+      "@type": "@id"
+    }
+  },
+  "version": "0.2",
+  "nodes": [
+    {
+      "@id": "#this",
+      "name": "Wallets",
+      "x": 0,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/architecture/wallets",
+      "bgColor": "#ebc573"
+    },
+    {
+      "@id": "#gksydt",
+      "name": "Wallet Model",
+      "x": -247,
+      "y": -34,
+      "link": "https://lndocs.github.io/docs/architecture/wallets#wallet-model",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#8su7v6",
+      "name": "Wallet Types",
+      "x": -199,
+      "y": -129,
+      "link": "https://lndocs.github.io/docs/architecture/wallets#wallet-types",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#2da7xj",
+      "name": "Standard Wallet",
+      "x": -435,
+      "y": -209,
+      "link": "https://lndocs.github.io/docs/architecture/wallets#standard-wallet-lightning",
+      "bgColor": "#efe6ff",
+      "parent": "#8su7v6"
+    },
+    {
+      "@id": "#9e878e",
+      "name": "Shared Wallet",
+      "x": -415,
+      "y": -356,
+      "link": "https://lndocs.github.io/docs/architecture/wallets#shared-wallet-lightningshared",
+      "bgColor": "#efe6ff",
+      "parent": "#8su7v6"
+    },
+    {
+      "@id": "#cp2str",
+      "name": "Balance Tracking",
+      "x": -96,
+      "y": -196,
+      "link": "https://lndocs.github.io/docs/architecture/wallets#balance-tracking",
+      "bgColor": "#f9bdd5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#swzzzt",
+      "name": "Internal Accounting",
+      "x": -192,
+      "y": -392,
+      "link": "https://lndocs.github.io/docs/architecture/wallets#internal-accounting",
+      "bgColor": "#ffe2ed",
+      "parent": "#cp2str"
+    },
+    {
+      "@id": "#pj9sd5",
+      "name": "API Keys",
+      "x": 71,
+      "y": -204,
+      "link": "https://lndocs.github.io/docs/architecture/wallets#api-keys",
+      "bgColor": "#fcc2a9",
+      "parent": "#this"
+    },
+    {
+      "@id": "#9incsq",
+      "name": "Admin Key",
+      "x": 8,
+      "y": -425,
+      "link": "https://lndocs.github.io/docs/architecture/wallets#admin-key",
+      "bgColor": "#ffe4d9",
+      "parent": "#pj9sd5"
+    },
+    {
+      "@id": "#gwp9qx",
+      "name": "Invoice Key",
+      "x": 168,
+      "y": -481,
+      "link": "https://lndocs.github.io/docs/architecture/wallets#invoice-key",
+      "bgColor": "#ffe4d9",
+      "parent": "#pj9sd5"
+    },
+    {
+      "@id": "#7csjb6",
+      "name": "Key Security",
+      "x": 266,
+      "y": -360,
+      "link": "https://lndocs.github.io/docs/architecture/wallets#key-security",
+      "bgColor": "#ffe4d9",
+      "parent": "#pj9sd5"
+    },
+    {
+      "@id": "#cyfvb8",
+      "name": "Wallet Permissions",
+      "x": 235,
+      "y": -72,
+      "link": "https://lndocs.github.io/docs/architecture/wallets#wallet-permissions",
+      "bgColor": "#e0d199",
+      "parent": "#this"
+    },
+    {
+      "@id": "#ngjuhg",
+      "name": "Standard Permissions",
+      "x": 426,
+      "y": -222,
+      "link": "https://lndocs.github.io/docs/architecture/wallets#standard-permissions",
+      "bgColor": "#f2ecd2",
+      "parent": "#cyfvb8"
+    },
+    {
+      "@id": "#ad25k5",
+      "name": "Shared Wallet Permissions",
+      "x": 581,
+      "y": -85,
+      "link": "https://lndocs.github.io/docs/architecture/wallets#shared-wallet-permissions",
+      "bgColor": "#f2ecd2",
+      "parent": "#cyfvb8"
+    },
+    {
+      "@id": "#6zhwac",
+      "name": "Wallet Sharing",
+      "x": 227,
+      "y": 89,
+      "link": "https://lndocs.github.io/docs/architecture/wallets#wallet-sharing",
+      "bgColor": "#b1dfb5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#sigj2h",
+      "name": "Invite Flow",
+      "x": 478,
+      "y": 124,
+      "link": "https://lndocs.github.io/docs/architecture/wallets#invite-flow",
+      "bgColor": "#ddf2de",
+      "parent": "#6zhwac"
+    },
+    {
+      "@id": "#2gvkzt",
+      "name": "Share Model",
+      "x": 497,
+      "y": 270,
+      "link": "https://lndocs.github.io/docs/architecture/wallets#share-model",
+      "bgColor": "#ddf2de",
+      "parent": "#6zhwac"
+    },
+    {
+      "@id": "#5gpqg5",
+      "name": "Wallet Extra Data",
+      "x": 148,
+      "y": 168,
+      "link": "https://lndocs.github.io/docs/architecture/wallets#wallet-extra-data",
+      "bgColor": "#95e1e3",
+      "parent": "#this"
+    },
+    {
+      "@id": "#wzta82",
+      "name": "Wallet Operations",
+      "x": 54,
+      "y": 212,
+      "link": "https://lndocs.github.io/docs/architecture/wallets#wallet-operations",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#jw3kjf",
+      "name": "Create Wallet",
+      "x": 130,
+      "y": 410,
+      "link": "https://lndocs.github.io/docs/architecture/wallets#create-wallet",
+      "bgColor": "#daeeff",
+      "parent": "#wzta82"
+    },
+    {
+      "@id": "#r76gtv",
+      "name": "Delete Wallet",
+      "x": -5,
+      "y": 501,
+      "link": "https://lndocs.github.io/docs/architecture/wallets#delete-wallet",
+      "bgColor": "#daeeff",
+      "parent": "#wzta82"
+    },
+    {
+      "@id": "#qmk4u7",
+      "name": "Wallet Events",
+      "x": -100,
+      "y": 199,
+      "link": "https://lndocs.github.io/docs/architecture/wallets#wallet-events",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#ysvez3",
+      "name": "Performance Considerations",
+      "x": -193,
+      "y": 135,
+      "link": "https://lndocs.github.io/docs/architecture/wallets#performance-considerations",
+      "bgColor": "#f9bdd5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#83zuf9",
+      "name": "Balance Queries",
+      "x": -329,
+      "y": 320,
+      "link": "https://lndocs.github.io/docs/architecture/wallets#balance-queries",
+      "bgColor": "#ffe2ed",
+      "parent": "#ysvez3"
+    },
+    {
+      "@id": "#vrzefk",
+      "name": "Connection Handling",
+      "x": -504,
+      "y": 261,
+      "link": "https://lndocs.github.io/docs/architecture/wallets#connection-handling",
+      "bgColor": "#ffe2ed",
+      "parent": "#ysvez3"
+    },
+    {
+      "@id": "#hvyxxr",
+      "name": "← Architecture",
+      "x": -247,
+      "y": 34,
+      "link": "./architecture.jsonld",
+      "bgColor": "#ececec",
+      "parent": "#this"
+    }
+  ],
+  "connections": [
+    {
+      "start": 0,
+      "end": 1
+    },
+    {
+      "start": 0,
+      "end": 2
+    },
+    {
+      "start": 2,
+      "end": 3
+    },
+    {
+      "start": 2,
+      "end": 4
+    },
+    {
+      "start": 0,
+      "end": 5
+    },
+    {
+      "start": 5,
+      "end": 6
+    },
+    {
+      "start": 0,
+      "end": 7
+    },
+    {
+      "start": 7,
+      "end": 8
+    },
+    {
+      "start": 7,
+      "end": 9
+    },
+    {
+      "start": 7,
+      "end": 10
+    },
+    {
+      "start": 0,
+      "end": 11
+    },
+    {
+      "start": 11,
+      "end": 12
+    },
+    {
+      "start": 11,
+      "end": 13
+    },
+    {
+      "start": 0,
+      "end": 14
+    },
+    {
+      "start": 14,
+      "end": 15
+    },
+    {
+      "start": 14,
+      "end": 16
+    },
+    {
+      "start": 0,
+      "end": 17
+    },
+    {
+      "start": 0,
+      "end": 18
+    },
+    {
+      "start": 18,
+      "end": 19
+    },
+    {
+      "start": 18,
+      "end": 20
+    },
+    {
+      "start": 0,
+      "end": 21
+    },
+    {
+      "start": 0,
+      "end": 22
+    },
+    {
+      "start": 22,
+      "end": 23
+    },
+    {
+      "start": 22,
+      "end": 24
+    },
+    {
+      "start": 0,
+      "end": 25
+    }
+  ],
+  "selectedNode": 0
+}

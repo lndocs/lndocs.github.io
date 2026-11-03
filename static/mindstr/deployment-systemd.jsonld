@@ -1,0 +1,129 @@
+{
+  "@context": {
+    "@vocab": "https://mindstr.org/ns#",
+    "link": {
+      "@type": "@id"
+    },
+    "parent": {
+      "@type": "@id"
+    }
+  },
+  "version": "0.2",
+  "nodes": [
+    {
+      "@id": "#this",
+      "name": "Systemd Service",
+      "x": 0,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/deployment/systemd",
+      "bgColor": "#ebc573"
+    },
+    {
+      "@id": "#n9bvq7",
+      "name": "Create Service File",
+      "x": -228,
+      "y": -88,
+      "link": "https://lndocs.github.io/docs/deployment/systemd#create-service-file",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#cqw46h",
+      "name": "Create User",
+      "x": -90,
+      "y": -198,
+      "link": "https://lndocs.github.io/docs/deployment/systemd#create-user",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#w6734b",
+      "name": "Enable Service",
+      "x": 82,
+      "y": -201,
+      "link": "https://lndocs.github.io/docs/deployment/systemd#enable-service",
+      "bgColor": "#f9bdd5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#whg83u",
+      "name": "Management Commands",
+      "x": 224,
+      "y": -95,
+      "link": "https://lndocs.github.io/docs/deployment/systemd#management-commands",
+      "bgColor": "#fcc2a9",
+      "parent": "#this"
+    },
+    {
+      "@id": "#ryeahv",
+      "name": "With Poetry",
+      "x": 238,
+      "y": 66,
+      "link": "https://lndocs.github.io/docs/deployment/systemd#with-poetry",
+      "bgColor": "#e0d199",
+      "parent": "#this"
+    },
+    {
+      "@id": "#c4zr3w",
+      "name": "With Virtual Environment",
+      "x": 95,
+      "y": 196,
+      "link": "https://lndocs.github.io/docs/deployment/systemd#with-virtual-environment",
+      "bgColor": "#b1dfb5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#jgcv5z",
+      "name": "Environment File",
+      "x": -119,
+      "y": 187,
+      "link": "https://lndocs.github.io/docs/deployment/systemd#environment-file",
+      "bgColor": "#95e1e3",
+      "parent": "#this"
+    },
+    {
+      "@id": "#bs5qn2",
+      "name": "← Deployment",
+      "x": -235,
+      "y": 73,
+      "link": "./deployment.jsonld",
+      "bgColor": "#ececec",
+      "parent": "#this"
+    }
+  ],
+  "connections": [
+    {
+      "start": 0,
+      "end": 1
+    },
+    {
+      "start": 0,
+      "end": 2
+    },
+    {
+      "start": 0,
+      "end": 3
+    },
+    {
+      "start": 0,
+      "end": 4
+    },
+    {
+      "start": 0,
+      "end": 5
+    },
+    {
+      "start": 0,
+      "end": 6
+    },
+    {
+      "start": 0,
+      "end": 7
+    },
+    {
+      "start": 0,
+      "end": 8
+    }
+  ],
+  "selectedNode": 0
+}

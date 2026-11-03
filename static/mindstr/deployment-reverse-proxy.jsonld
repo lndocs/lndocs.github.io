@@ -1,0 +1,194 @@
+{
+  "@context": {
+    "@vocab": "https://mindstr.org/ns#",
+    "link": {
+      "@type": "@id"
+    },
+    "parent": {
+      "@type": "@id"
+    }
+  },
+  "version": "0.2",
+  "nodes": [
+    {
+      "@id": "#this",
+      "name": "Reverse Proxy",
+      "x": 0,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/deployment/reverse-proxy",
+      "bgColor": "#ebc573"
+    },
+    {
+      "@id": "#im7js4",
+      "name": "Caddy",
+      "x": -165,
+      "y": -160,
+      "link": "https://lndocs.github.io/docs/deployment/reverse-proxy#caddy-recommended",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#p55sa6",
+      "name": "Installation",
+      "x": -465,
+      "y": -155,
+      "link": "https://lndocs.github.io/docs/deployment/reverse-proxy#installation",
+      "bgColor": "#daeeff",
+      "parent": "#im7js4"
+    },
+    {
+      "@id": "#znzi88",
+      "name": "Configuration",
+      "x": -389,
+      "y": -377,
+      "link": "https://lndocs.github.io/docs/deployment/reverse-proxy#configuration",
+      "bgColor": "#daeeff",
+      "parent": "#im7js4"
+    },
+    {
+      "@id": "#qnbgsz",
+      "name": "Reload",
+      "x": -121,
+      "y": -412,
+      "link": "https://lndocs.github.io/docs/deployment/reverse-proxy#reload",
+      "bgColor": "#daeeff",
+      "parent": "#im7js4"
+    },
+    {
+      "@id": "#hv53w5",
+      "name": "Nginx",
+      "x": 239,
+      "y": -63,
+      "link": "https://lndocs.github.io/docs/deployment/reverse-proxy#nginx",
+      "bgColor": "#e0c4f6",
+      "parent": "#this"
+    },
+    {
+      "@id": "#djsnf9",
+      "name": "Installation",
+      "x": 261,
+      "y": -362,
+      "link": "https://lndocs.github.io/docs/deployment/reverse-proxy#installation",
+      "bgColor": "#f2e5fd",
+      "parent": "#hv53w5"
+    },
+    {
+      "@id": "#wwtbyq",
+      "name": "Configuration",
+      "x": 505,
+      "y": -260,
+      "link": "https://lndocs.github.io/docs/deployment/reverse-proxy#configuration",
+      "bgColor": "#f2e5fd",
+      "parent": "#hv53w5"
+    },
+    {
+      "@id": "#zfit6k",
+      "name": "Enable Site",
+      "x": 499,
+      "y": -29,
+      "link": "https://lndocs.github.io/docs/deployment/reverse-proxy#enable-site",
+      "bgColor": "#f2e5fd",
+      "parent": "#hv53w5"
+    },
+    {
+      "@id": "#5ckad9",
+      "name": "Get Certificate",
+      "x": 541,
+      "y": 201,
+      "link": "https://lndocs.github.io/docs/deployment/reverse-proxy#get-certificate",
+      "bgColor": "#f2e5fd",
+      "parent": "#hv53w5"
+    },
+    {
+      "@id": "#um2tqa",
+      "name": "Apache",
+      "x": 109,
+      "y": 191,
+      "link": "https://lndocs.github.io/docs/deployment/reverse-proxy#apache",
+      "bgColor": "#febdc6",
+      "parent": "#this"
+    },
+    {
+      "@id": "#27jhza",
+      "name": "Security Headers",
+      "x": -34,
+      "y": 211,
+      "link": "https://lndocs.github.io/docs/deployment/reverse-proxy#security-headers",
+      "bgColor": "#f1c99c",
+      "parent": "#this"
+    },
+    {
+      "@id": "#9brwfk",
+      "name": "Rate Limiting",
+      "x": -165,
+      "y": 160,
+      "link": "https://lndocs.github.io/docs/deployment/reverse-proxy#rate-limiting",
+      "bgColor": "#c1dba8",
+      "parent": "#this"
+    },
+    {
+      "@id": "#3q5x4d",
+      "name": "← Deployment",
+      "x": -240,
+      "y": 59,
+      "link": "./deployment.jsonld",
+      "bgColor": "#ececec",
+      "parent": "#this"
+    }
+  ],
+  "connections": [
+    {
+      "start": 0,
+      "end": 1
+    },
+    {
+      "start": 1,
+      "end": 2
+    },
+    {
+      "start": 1,
+      "end": 3
+    },
+    {
+      "start": 1,
+      "end": 4
+    },
+    {
+      "start": 0,
+      "end": 5
+    },
+    {
+      "start": 5,
+      "end": 6
+    },
+    {
+      "start": 5,
+      "end": 7
+    },
+    {
+      "start": 5,
+      "end": 8
+    },
+    {
+      "start": 5,
+      "end": 9
+    },
+    {
+      "start": 0,
+      "end": 10
+    },
+    {
+      "start": 0,
+      "end": 11
+    },
+    {
+      "start": 0,
+      "end": 12
+    },
+    {
+      "start": 0,
+      "end": 13
+    }
+  ],
+  "selectedNode": 0
+}

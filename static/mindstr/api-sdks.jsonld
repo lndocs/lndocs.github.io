@@ -1,0 +1,259 @@
+{
+  "@context": {
+    "@vocab": "https://mindstr.org/ns#",
+    "link": {
+      "@type": "@id"
+    },
+    "parent": {
+      "@type": "@id"
+    }
+  },
+  "version": "0.2",
+  "nodes": [
+    {
+      "@id": "#this",
+      "name": "SDKs & Libraries",
+      "x": 0,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/api/sdks",
+      "bgColor": "#ebc573"
+    },
+    {
+      "@id": "#hupuw5",
+      "name": "JavaScript / TypeScript",
+      "x": -244,
+      "y": -48,
+      "link": "https://lndocs.github.io/docs/api/sdks#javascript-typescript",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#ay8irx",
+      "name": "lnbits",
+      "x": -487,
+      "y": -96,
+      "link": "https://lndocs.github.io/docs/api/sdks#lnbits-npm",
+      "bgColor": "#daeeff",
+      "parent": "#hupuw5"
+    },
+    {
+      "@id": "#mteddy",
+      "name": "Python",
+      "x": -194,
+      "y": -134,
+      "link": "https://lndocs.github.io/docs/api/sdks#python",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#nrasrm",
+      "name": "pylnbits",
+      "x": -387,
+      "y": -269,
+      "link": "https://lndocs.github.io/docs/api/sdks#pylnbits",
+      "bgColor": "#efe6ff",
+      "parent": "#mteddy"
+    },
+    {
+      "@id": "#fb86u4",
+      "name": "cURL / REST API",
+      "x": 63,
+      "y": -206,
+      "link": "https://lndocs.github.io/docs/api/sdks#curl-rest-api",
+      "bgColor": "#f9bdd5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#dakc74",
+      "name": "Authentication",
+      "x": -157,
+      "y": -403,
+      "link": "https://lndocs.github.io/docs/api/sdks#authentication",
+      "bgColor": "#ffe2ed",
+      "parent": "#fb86u4"
+    },
+    {
+      "@id": "#qj69rc",
+      "name": "Create Invoice",
+      "x": 37,
+      "y": -501,
+      "link": "https://lndocs.github.io/docs/api/sdks#create-invoice",
+      "bgColor": "#ffe2ed",
+      "parent": "#fb86u4"
+    },
+    {
+      "@id": "#frxya7",
+      "name": "Pay Invoice",
+      "x": 216,
+      "y": -383,
+      "link": "https://lndocs.github.io/docs/api/sdks#pay-invoice",
+      "bgColor": "#ffe2ed",
+      "parent": "#fb86u4"
+    },
+    {
+      "@id": "#ejuftf",
+      "name": "Check Payment",
+      "x": 435,
+      "y": -338,
+      "link": "https://lndocs.github.io/docs/api/sdks#check-payment",
+      "bgColor": "#ffe2ed",
+      "parent": "#fb86u4"
+    },
+    {
+      "@id": "#dzex9b",
+      "name": "WebSocket Payments",
+      "x": 250,
+      "y": 11,
+      "link": "https://lndocs.github.io/docs/api/sdks#websocket-payments",
+      "bgColor": "#fcc2a9",
+      "parent": "#this"
+    },
+    {
+      "@id": "#hbg45x",
+      "name": "JavaScript",
+      "x": 495,
+      "y": -59,
+      "link": "https://lndocs.github.io/docs/api/sdks#javascript",
+      "bgColor": "#ffe4d9",
+      "parent": "#dzex9b"
+    },
+    {
+      "@id": "#68p697",
+      "name": "Python",
+      "x": 572,
+      "y": 122,
+      "link": "https://lndocs.github.io/docs/api/sdks#python",
+      "bgColor": "#ffe4d9",
+      "parent": "#dzex9b"
+    },
+    {
+      "@id": "#fqgcwx",
+      "name": "Webhooks",
+      "x": 51,
+      "y": 208,
+      "link": "https://lndocs.github.io/docs/api/sdks#webhooks",
+      "bgColor": "#e0d199",
+      "parent": "#this"
+    },
+    {
+      "@id": "#29fnhd",
+      "name": "Creating Invoice with Webhook",
+      "x": 280,
+      "y": 352,
+      "link": "https://lndocs.github.io/docs/api/sdks#creating-invoice-with-webhook",
+      "bgColor": "#f2ecd2",
+      "parent": "#fqgcwx"
+    },
+    {
+      "@id": "#v7itah",
+      "name": "Webhook Payload",
+      "x": 42,
+      "y": 500,
+      "link": "https://lndocs.github.io/docs/api/sdks#webhook-payload",
+      "bgColor": "#f2ecd2",
+      "parent": "#fqgcwx"
+    },
+    {
+      "@id": "#xa32i4",
+      "name": "Webhook Handler",
+      "x": -157,
+      "y": 404,
+      "link": "https://lndocs.github.io/docs/api/sdks#webhook-handler-nodejs",
+      "bgColor": "#f2ecd2",
+      "parent": "#fqgcwx"
+    },
+    {
+      "@id": "#jr9j9p",
+      "name": "API Reference",
+      "x": -192,
+      "y": 136,
+      "link": "https://lndocs.github.io/docs/api/sdks#api-reference",
+      "bgColor": "#b1dfb5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#4tr2n9",
+      "name": "← API Reference",
+      "x": -243,
+      "y": 49,
+      "link": "./api-reference.jsonld",
+      "bgColor": "#ececec",
+      "parent": "#this"
+    }
+  ],
+  "connections": [
+    {
+      "start": 0,
+      "end": 1
+    },
+    {
+      "start": 1,
+      "end": 2
+    },
+    {
+      "start": 0,
+      "end": 3
+    },
+    {
+      "start": 3,
+      "end": 4
+    },
+    {
+      "start": 0,
+      "end": 5
+    },
+    {
+      "start": 5,
+      "end": 6
+    },
+    {
+      "start": 5,
+      "end": 7
+    },
+    {
+      "start": 5,
+      "end": 8
+    },
+    {
+      "start": 5,
+      "end": 9
+    },
+    {
+      "start": 0,
+      "end": 10
+    },
+    {
+      "start": 10,
+      "end": 11
+    },
+    {
+      "start": 10,
+      "end": 12
+    },
+    {
+      "start": 0,
+      "end": 13
+    },
+    {
+      "start": 13,
+      "end": 14
+    },
+    {
+      "start": 13,
+      "end": 15
+    },
+    {
+      "start": 13,
+      "end": 16
+    },
+    {
+      "start": 0,
+      "end": 17
+    },
+    {
+      "start": 0,
+      "end": 18
+    }
+  ],
+  "selectedNode": 0
+}

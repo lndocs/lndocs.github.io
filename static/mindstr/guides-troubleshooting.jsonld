@@ -1,0 +1,207 @@
+{
+  "@context": {
+    "@vocab": "https://mindstr.org/ns#",
+    "link": {
+      "@type": "@id"
+    },
+    "parent": {
+      "@type": "@id"
+    }
+  },
+  "version": "0.2",
+  "nodes": [
+    {
+      "@id": "#this",
+      "name": "Troubleshooting",
+      "x": 0,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/guides/troubleshooting",
+      "bgColor": "#ebc573"
+    },
+    {
+      "@id": "#jbw4mz",
+      "name": "Connection Issues",
+      "x": -171,
+      "y": -155,
+      "link": "https://lndocs.github.io/docs/guides/troubleshooting#connection-issues",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#kx9emz",
+      "name": "Funding Source Not Connecting",
+      "x": -441,
+      "y": -200,
+      "link": "https://lndocs.github.io/docs/guides/troubleshooting#funding-source-not-connecting",
+      "bgColor": "#daeeff",
+      "parent": "#jbw4mz"
+    },
+    {
+      "@id": "#2gg6te",
+      "name": "Database Connection Failed",
+      "x": -227,
+      "y": -463,
+      "link": "https://lndocs.github.io/docs/guides/troubleshooting#database-connection-failed",
+      "bgColor": "#daeeff",
+      "parent": "#jbw4mz"
+    },
+    {
+      "@id": "#qc7art",
+      "name": "Payment Issues",
+      "x": 150,
+      "y": -170,
+      "link": "https://lndocs.github.io/docs/guides/troubleshooting#payment-issues",
+      "bgColor": "#e0c4f6",
+      "parent": "#this"
+    },
+    {
+      "@id": "#q274mi",
+      "name": "Payments Failing",
+      "x": 184,
+      "y": -395,
+      "link": "https://lndocs.github.io/docs/guides/troubleshooting#payments-failing",
+      "bgColor": "#f2e5fd",
+      "parent": "#qc7art"
+    },
+    {
+      "@id": "#z4qvzf",
+      "name": "Invoice Not Received",
+      "x": 449,
+      "y": -325,
+      "link": "https://lndocs.github.io/docs/guides/troubleshooting#invoice-not-received",
+      "bgColor": "#f2e5fd",
+      "parent": "#qc7art"
+    },
+    {
+      "@id": "#nwriyh",
+      "name": "Performance Issues",
+      "x": 250,
+      "y": -10,
+      "link": "https://lndocs.github.io/docs/guides/troubleshooting#performance-issues",
+      "bgColor": "#febdc6",
+      "parent": "#this"
+    },
+    {
+      "@id": "#igx8e6",
+      "name": "Slow Response Times",
+      "x": 499,
+      "y": -19,
+      "link": "https://lndocs.github.io/docs/guides/troubleshooting#slow-response-times",
+      "bgColor": "#ffe2e6",
+      "parent": "#nwriyh"
+    },
+    {
+      "@id": "#yuz5fu",
+      "name": "Common Errors",
+      "x": 90,
+      "y": 198,
+      "link": "https://lndocs.github.io/docs/guides/troubleshooting#common-errors",
+      "bgColor": "#f1c99c",
+      "parent": "#this"
+    },
+    {
+      "@id": "#td6k3a",
+      "name": "\"Invalid API Key\"",
+      "x": 401,
+      "y": 254,
+      "link": "https://lndocs.github.io/docs/guides/troubleshooting#invalid-api-key",
+      "bgColor": "#fbe8d3",
+      "parent": "#yuz5fu"
+    },
+    {
+      "@id": "#psssnm",
+      "name": "\"Insufficient Balance\"",
+      "x": 236,
+      "y": 460,
+      "link": "https://lndocs.github.io/docs/guides/troubleshooting#insufficient-balance",
+      "bgColor": "#fbe8d3",
+      "parent": "#yuz5fu"
+    },
+    {
+      "@id": "#2j4ca7",
+      "name": "\"Extension Not Found\"",
+      "x": -75,
+      "y": 420,
+      "link": "https://lndocs.github.io/docs/guides/troubleshooting#extension-not-found",
+      "bgColor": "#fbe8d3",
+      "parent": "#yuz5fu"
+    },
+    {
+      "@id": "#r2hw89",
+      "name": "Getting Help",
+      "x": -184,
+      "y": 144,
+      "link": "https://lndocs.github.io/docs/guides/troubleshooting#getting-help",
+      "bgColor": "#c1dba8",
+      "parent": "#this"
+    },
+    {
+      "@id": "#va8sd8",
+      "name": "← Guides",
+      "x": -242,
+      "y": 52,
+      "link": "./guides.jsonld",
+      "bgColor": "#ececec",
+      "parent": "#this"
+    }
+  ],
+  "connections": [
+    {
+      "start": 0,
+      "end": 1
+    },
+    {
+      "start": 1,
+      "end": 2
+    },
+    {
+      "start": 1,
+      "end": 3
+    },
+    {
+      "start": 0,
+      "end": 4
+    },
+    {
+      "start": 4,
+      "end": 5
+    },
+    {
+      "start": 4,
+      "end": 6
+    },
+    {
+      "start": 0,
+      "end": 7
+    },
+    {
+      "start": 7,
+      "end": 8
+    },
+    {
+      "start": 0,
+      "end": 9
+    },
+    {
+      "start": 9,
+      "end": 10
+    },
+    {
+      "start": 9,
+      "end": 11
+    },
+    {
+      "start": 9,
+      "end": 12
+    },
+    {
+      "start": 0,
+      "end": 13
+    },
+    {
+      "start": 0,
+      "end": 14
+    }
+  ],
+  "selectedNode": 0
+}

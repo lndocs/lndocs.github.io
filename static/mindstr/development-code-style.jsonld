@@ -1,0 +1,116 @@
+{
+  "@context": {
+    "@vocab": "https://mindstr.org/ns#",
+    "link": {
+      "@type": "@id"
+    },
+    "parent": {
+      "@type": "@id"
+    }
+  },
+  "version": "0.2",
+  "nodes": [
+    {
+      "@id": "#this",
+      "name": "Code Style",
+      "x": 0,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/development/code-style",
+      "bgColor": "#ebc573"
+    },
+    {
+      "@id": "#uejjqf",
+      "name": "Formatting",
+      "x": -225,
+      "y": -92,
+      "link": "https://lndocs.github.io/docs/development/code-style#formatting",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#vbj3uf",
+      "name": "Linting",
+      "x": -56,
+      "y": -207,
+      "link": "https://lndocs.github.io/docs/development/code-style#linting",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#mdrkcw",
+      "name": "Type Hints",
+      "x": 156,
+      "y": -166,
+      "link": "https://lndocs.github.io/docs/development/code-style#type-hints",
+      "bgColor": "#f9bdd5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#jc7q9p",
+      "name": "Docstrings",
+      "x": 250,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/development/code-style#docstrings",
+      "bgColor": "#fcc2a9",
+      "parent": "#this"
+    },
+    {
+      "@id": "#8vdzgd",
+      "name": "Async/Await",
+      "x": 156,
+      "y": 166,
+      "link": "https://lndocs.github.io/docs/development/code-style#asyncawait",
+      "bgColor": "#e0d199",
+      "parent": "#this"
+    },
+    {
+      "@id": "#5jwgsg",
+      "name": "Import Order",
+      "x": -56,
+      "y": 207,
+      "link": "https://lndocs.github.io/docs/development/code-style#import-order",
+      "bgColor": "#b1dfb5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#tc4wnh",
+      "name": "← Development",
+      "x": -225,
+      "y": 92,
+      "link": "./development.jsonld",
+      "bgColor": "#ececec",
+      "parent": "#this"
+    }
+  ],
+  "connections": [
+    {
+      "start": 0,
+      "end": 1
+    },
+    {
+      "start": 0,
+      "end": 2
+    },
+    {
+      "start": 0,
+      "end": 3
+    },
+    {
+      "start": 0,
+      "end": 4
+    },
+    {
+      "start": 0,
+      "end": 5
+    },
+    {
+      "start": 0,
+      "end": 6
+    },
+    {
+      "start": 0,
+      "end": 7
+    }
+  ],
+  "selectedNode": 0
+}

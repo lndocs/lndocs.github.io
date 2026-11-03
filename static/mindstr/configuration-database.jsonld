@@ -1,0 +1,350 @@
+{
+  "@context": {
+    "@vocab": "https://mindstr.org/ns#",
+    "link": {
+      "@type": "@id"
+    },
+    "parent": {
+      "@type": "@id"
+    }
+  },
+  "version": "0.2",
+  "nodes": [
+    {
+      "@id": "#this",
+      "name": "Database",
+      "x": 0,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/configuration/database",
+      "bgColor": "#ebc573"
+    },
+    {
+      "@id": "#qhm56x",
+      "name": "Supported Databases",
+      "x": -246,
+      "y": -38,
+      "link": "https://lndocs.github.io/docs/configuration/database#supported-databases",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#gyahr4",
+      "name": "SQLite",
+      "x": -173,
+      "y": -153,
+      "link": "https://lndocs.github.io/docs/configuration/database#sqlite-default",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#wt6f72",
+      "name": "Configuration",
+      "x": -424,
+      "y": -225,
+      "link": "https://lndocs.github.io/docs/configuration/database#configuration",
+      "bgColor": "#efe6ff",
+      "parent": "#gyahr4"
+    },
+    {
+      "@id": "#zy9np2",
+      "name": "Pros and Cons",
+      "x": -408,
+      "y": -362,
+      "link": "https://lndocs.github.io/docs/configuration/database#pros-and-cons",
+      "bgColor": "#efe6ff",
+      "parent": "#gyahr4"
+    },
+    {
+      "@id": "#3jk3i5",
+      "name": "Best Practices",
+      "x": -246,
+      "y": -370,
+      "link": "https://lndocs.github.io/docs/configuration/database#best-practices",
+      "bgColor": "#efe6ff",
+      "parent": "#gyahr4"
+    },
+    {
+      "@id": "#94asrn",
+      "name": "PostgreSQL",
+      "x": 85,
+      "y": -200,
+      "link": "https://lndocs.github.io/docs/configuration/database#postgresql-recommended-for-production",
+      "bgColor": "#f9bdd5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#kgrwxb",
+      "name": "Installation",
+      "x": -44,
+      "y": -423,
+      "link": "https://lndocs.github.io/docs/configuration/database#installation",
+      "bgColor": "#ffe2ed",
+      "parent": "#94asrn"
+    },
+    {
+      "@id": "#aj9t28",
+      "name": "Configuration",
+      "x": 95,
+      "y": -495,
+      "link": "https://lndocs.github.io/docs/configuration/database#configuration",
+      "bgColor": "#ffe2ed",
+      "parent": "#94asrn"
+    },
+    {
+      "@id": "#vx7khw",
+      "name": "Connection Pool Settings",
+      "x": 226,
+      "y": -379,
+      "link": "https://lndocs.github.io/docs/configuration/database#connection-pool-settings",
+      "bgColor": "#ffe2ed",
+      "parent": "#94asrn"
+    },
+    {
+      "@id": "#34dvu3",
+      "name": "SSL Connections",
+      "x": 414,
+      "y": -357,
+      "link": "https://lndocs.github.io/docs/configuration/database#ssl-connections",
+      "bgColor": "#ffe2ed",
+      "parent": "#94asrn"
+    },
+    {
+      "@id": "#v52rfv",
+      "name": "CockroachDB",
+      "x": 241,
+      "y": -55,
+      "link": "https://lndocs.github.io/docs/configuration/database#cockroachdb",
+      "bgColor": "#fcc2a9",
+      "parent": "#this"
+    },
+    {
+      "@id": "#gitnhm",
+      "name": "Configuration",
+      "x": 463,
+      "y": -160,
+      "link": "https://lndocs.github.io/docs/configuration/database#configuration",
+      "bgColor": "#ffe4d9",
+      "parent": "#v52rfv"
+    },
+    {
+      "@id": "#hzes4u",
+      "name": "Cluster Setup",
+      "x": 584,
+      "y": -69,
+      "link": "https://lndocs.github.io/docs/configuration/database#cluster-setup",
+      "bgColor": "#ffe4d9",
+      "parent": "#v52rfv"
+    },
+    {
+      "@id": "#mciseu",
+      "name": "Migration from SQLite to PostgreSQL",
+      "x": 224,
+      "y": 86,
+      "link": "https://lndocs.github.io/docs/configuration/database#migration-from-sqlite-to-postgresql",
+      "bgColor": "#e0d199",
+      "parent": "#this"
+    },
+    {
+      "@id": "#dm48gj",
+      "name": "Using the Conversion Tool",
+      "x": 489,
+      "y": 120,
+      "link": "https://lndocs.github.io/docs/configuration/database#using-the-conversion-tool",
+      "bgColor": "#f2ecd2",
+      "parent": "#mciseu"
+    },
+    {
+      "@id": "#k6cm7k",
+      "name": "Manual Migration",
+      "x": 485,
+      "y": 286,
+      "link": "https://lndocs.github.io/docs/configuration/database#manual-migration",
+      "bgColor": "#f2ecd2",
+      "parent": "#mciseu"
+    },
+    {
+      "@id": "#djkutb",
+      "name": "Database Schema",
+      "x": 114,
+      "y": 189,
+      "link": "https://lndocs.github.io/docs/configuration/database#database-schema",
+      "bgColor": "#b1dfb5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#pu9sy8",
+      "name": "Core Tables",
+      "x": 281,
+      "y": 351,
+      "link": "https://lndocs.github.io/docs/configuration/database#core-tables",
+      "bgColor": "#ddf2de",
+      "parent": "#djkutb"
+    },
+    {
+      "@id": "#7ppwsy",
+      "name": "Indexes",
+      "x": 201,
+      "y": 471,
+      "link": "https://lndocs.github.io/docs/configuration/database#indexes",
+      "bgColor": "#ddf2de",
+      "parent": "#djkutb"
+    },
+    {
+      "@id": "#c8rxju",
+      "name": "Migrations",
+      "x": -93,
+      "y": 197,
+      "link": "https://lndocs.github.io/docs/configuration/database#migrations",
+      "bgColor": "#95e1e3",
+      "parent": "#this"
+    },
+    {
+      "@id": "#jr3z4p",
+      "name": "How Migrations Work",
+      "x": -33,
+      "y": 424,
+      "link": "https://lndocs.github.io/docs/configuration/database#how-migrations-work",
+      "bgColor": "#d1f3f4",
+      "parent": "#c8rxju"
+    },
+    {
+      "@id": "#hmnpnc",
+      "name": "Migration Tracking",
+      "x": -209,
+      "y": 469,
+      "link": "https://lndocs.github.io/docs/configuration/database#migration-tracking",
+      "bgColor": "#d1f3f4",
+      "parent": "#c8rxju"
+    },
+    {
+      "@id": "#tbf3y4",
+      "name": "Force Re-run Migration",
+      "x": -314,
+      "y": 331,
+      "link": "https://lndocs.github.io/docs/configuration/database#force-re-run-migration",
+      "bgColor": "#d1f3f4",
+      "parent": "#c8rxju"
+    },
+    {
+      "@id": "#z9ubg8",
+      "name": "Backup Strategies",
+      "x": -223,
+      "y": 96,
+      "link": "https://lndocs.github.io/docs/configuration/database#backup-strategies",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#5h5cc9",
+      "name": "← Configuration",
+      "x": -247,
+      "y": 32,
+      "link": "./configuration.jsonld",
+      "bgColor": "#ececec",
+      "parent": "#this"
+    }
+  ],
+  "connections": [
+    {
+      "start": 0,
+      "end": 1
+    },
+    {
+      "start": 0,
+      "end": 2
+    },
+    {
+      "start": 2,
+      "end": 3
+    },
+    {
+      "start": 2,
+      "end": 4
+    },
+    {
+      "start": 2,
+      "end": 5
+    },
+    {
+      "start": 0,
+      "end": 6
+    },
+    {
+      "start": 6,
+      "end": 7
+    },
+    {
+      "start": 6,
+      "end": 8
+    },
+    {
+      "start": 6,
+      "end": 9
+    },
+    {
+      "start": 6,
+      "end": 10
+    },
+    {
+      "start": 0,
+      "end": 11
+    },
+    {
+      "start": 11,
+      "end": 12
+    },
+    {
+      "start": 11,
+      "end": 13
+    },
+    {
+      "start": 0,
+      "end": 14
+    },
+    {
+      "start": 14,
+      "end": 15
+    },
+    {
+      "start": 14,
+      "end": 16
+    },
+    {
+      "start": 0,
+      "end": 17
+    },
+    {
+      "start": 17,
+      "end": 18
+    },
+    {
+      "start": 17,
+      "end": 19
+    },
+    {
+      "start": 0,
+      "end": 20
+    },
+    {
+      "start": 20,
+      "end": 21
+    },
+    {
+      "start": 20,
+      "end": 22
+    },
+    {
+      "start": 20,
+      "end": 23
+    },
+    {
+      "start": 0,
+      "end": 24
+    },
+    {
+      "start": 0,
+      "end": 25
+    }
+  ],
+  "selectedNode": 0
+}

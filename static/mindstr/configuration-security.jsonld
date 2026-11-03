@@ -1,0 +1,350 @@
+{
+  "@context": {
+    "@vocab": "https://mindstr.org/ns#",
+    "link": {
+      "@type": "@id"
+    },
+    "parent": {
+      "@type": "@id"
+    }
+  },
+  "version": "0.2",
+  "nodes": [
+    {
+      "@id": "#this",
+      "name": "Security",
+      "x": 0,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/configuration/security",
+      "bgColor": "#ebc573"
+    },
+    {
+      "@id": "#drrwuk",
+      "name": "Essential Security Checklist",
+      "x": -243,
+      "y": -50,
+      "link": "https://lndocs.github.io/docs/configuration/security#essential-security-checklist",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#nsm2yi",
+      "name": "Authentication Security",
+      "x": -145,
+      "y": -173,
+      "link": "https://lndocs.github.io/docs/configuration/security#authentication-security",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#2xe78q",
+      "name": "Secret Key",
+      "x": -392,
+      "y": -263,
+      "link": "https://lndocs.github.io/docs/configuration/security#secret-key",
+      "bgColor": "#efe6ff",
+      "parent": "#nsm2yi"
+    },
+    {
+      "@id": "#jgw4tz",
+      "name": "Password Requirements",
+      "x": -348,
+      "y": -406,
+      "link": "https://lndocs.github.io/docs/configuration/security#password-requirements",
+      "bgColor": "#efe6ff",
+      "parent": "#nsm2yi"
+    },
+    {
+      "@id": "#bekswu",
+      "name": "Session Security",
+      "x": -167,
+      "y": -400,
+      "link": "https://lndocs.github.io/docs/configuration/security#session-security",
+      "bgColor": "#efe6ff",
+      "parent": "#nsm2yi"
+    },
+    {
+      "@id": "#pxrawa",
+      "name": "Network Security",
+      "x": 111,
+      "y": -190,
+      "link": "https://lndocs.github.io/docs/configuration/security#network-security",
+      "bgColor": "#f9bdd5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#gsrdqa",
+      "name": "HTTPS Configuration",
+      "x": 51,
+      "y": -423,
+      "link": "https://lndocs.github.io/docs/configuration/security#https-configuration",
+      "bgColor": "#ffe2ed",
+      "parent": "#pxrawa"
+    },
+    {
+      "@id": "#ttvgv4",
+      "name": "Rate Limiting",
+      "x": 211,
+      "y": -468,
+      "link": "https://lndocs.github.io/docs/configuration/security#rate-limiting",
+      "bgColor": "#ffe2ed",
+      "parent": "#pxrawa"
+    },
+    {
+      "@id": "#g5xqe3",
+      "name": "IP Restrictions",
+      "x": 285,
+      "y": -349,
+      "link": "https://lndocs.github.io/docs/configuration/security#ip-restrictions",
+      "bgColor": "#ffe2ed",
+      "parent": "#pxrawa"
+    },
+    {
+      "@id": "#cvkstp",
+      "name": "Firewall Rules",
+      "x": 442,
+      "y": -333,
+      "link": "https://lndocs.github.io/docs/configuration/security#firewall-rules",
+      "bgColor": "#ffe2ed",
+      "parent": "#pxrawa"
+    },
+    {
+      "@id": "#jw6hux",
+      "name": "Funding Source Security",
+      "x": 250,
+      "y": 6,
+      "link": "https://lndocs.github.io/docs/configuration/security#funding-source-security",
+      "bgColor": "#fcc2a9",
+      "parent": "#this"
+    },
+    {
+      "@id": "#ueruwd",
+      "name": "LND Security",
+      "x": 477,
+      "y": -128,
+      "link": "https://lndocs.github.io/docs/configuration/security#lnd-security",
+      "bgColor": "#ffe4d9",
+      "parent": "#jw6hux"
+    },
+    {
+      "@id": "#j52mw6",
+      "name": "Core Lightning Security",
+      "x": 590,
+      "y": -9,
+      "link": "https://lndocs.github.io/docs/configuration/security#core-lightning-security",
+      "bgColor": "#ffe4d9",
+      "parent": "#jw6hux"
+    },
+    {
+      "@id": "#gu5n3w",
+      "name": "Certificate Validation",
+      "x": 476,
+      "y": 131,
+      "link": "https://lndocs.github.io/docs/configuration/security#certificate-validation",
+      "bgColor": "#ffe4d9",
+      "parent": "#jw6hux"
+    },
+    {
+      "@id": "#mukqya",
+      "name": "Database Security",
+      "x": 128,
+      "y": 183,
+      "link": "https://lndocs.github.io/docs/configuration/security#database-security",
+      "bgColor": "#e0d199",
+      "parent": "#this"
+    },
+    {
+      "@id": "#rdjmhy",
+      "name": "PostgreSQL",
+      "x": 364,
+      "y": 292,
+      "link": "https://lndocs.github.io/docs/configuration/security#postgresql",
+      "bgColor": "#f2ecd2",
+      "parent": "#mukqya"
+    },
+    {
+      "@id": "#nbjpha",
+      "name": "Connection Security",
+      "x": 310,
+      "y": 428,
+      "link": "https://lndocs.github.io/docs/configuration/security#connection-security",
+      "bgColor": "#f2ecd2",
+      "parent": "#mukqya"
+    },
+    {
+      "@id": "#aypwsg",
+      "name": "Backup Encryption",
+      "x": 133,
+      "y": 409,
+      "link": "https://lndocs.github.io/docs/configuration/security#backup-encryption",
+      "bgColor": "#f2ecd2",
+      "parent": "#mukqya"
+    },
+    {
+      "@id": "#h94qk3",
+      "name": "API Security",
+      "x": -103,
+      "y": 194,
+      "link": "https://lndocs.github.io/docs/configuration/security#api-security",
+      "bgColor": "#b1dfb5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#tupb65",
+      "name": "Key Management",
+      "x": -64,
+      "y": 421,
+      "link": "https://lndocs.github.io/docs/configuration/security#key-management",
+      "bgColor": "#ddf2de",
+      "parent": "#h94qk3"
+    },
+    {
+      "@id": "#5xqpjs",
+      "name": "API Key Best Practices",
+      "x": -239,
+      "y": 459,
+      "link": "https://lndocs.github.io/docs/configuration/security#api-key-best-practices",
+      "bgColor": "#ddf2de",
+      "parent": "#h94qk3"
+    },
+    {
+      "@id": "#k258qh",
+      "name": "Webhook Security",
+      "x": -324,
+      "y": 324,
+      "link": "https://lndocs.github.io/docs/configuration/security#webhook-security",
+      "bgColor": "#ddf2de",
+      "parent": "#h94qk3"
+    },
+    {
+      "@id": "#3nbxqz",
+      "name": "Admin Security",
+      "x": -222,
+      "y": 97,
+      "link": "https://lndocs.github.io/docs/configuration/security#admin-security",
+      "bgColor": "#95e1e3",
+      "parent": "#this"
+    },
+    {
+      "@id": "#6qa3f3",
+      "name": "Super User Protection",
+      "x": -445,
+      "y": 194,
+      "link": "https://lndocs.github.io/docs/configuration/security#super-user-protection",
+      "bgColor": "#d1f3f4",
+      "parent": "#3nbxqz"
+    },
+    {
+      "@id": "#7yk22v",
+      "name": "← Configuration",
+      "x": -247,
+      "y": 31,
+      "link": "./configuration.jsonld",
+      "bgColor": "#ececec",
+      "parent": "#this"
+    }
+  ],
+  "connections": [
+    {
+      "start": 0,
+      "end": 1
+    },
+    {
+      "start": 0,
+      "end": 2
+    },
+    {
+      "start": 2,
+      "end": 3
+    },
+    {
+      "start": 2,
+      "end": 4
+    },
+    {
+      "start": 2,
+      "end": 5
+    },
+    {
+      "start": 0,
+      "end": 6
+    },
+    {
+      "start": 6,
+      "end": 7
+    },
+    {
+      "start": 6,
+      "end": 8
+    },
+    {
+      "start": 6,
+      "end": 9
+    },
+    {
+      "start": 6,
+      "end": 10
+    },
+    {
+      "start": 0,
+      "end": 11
+    },
+    {
+      "start": 11,
+      "end": 12
+    },
+    {
+      "start": 11,
+      "end": 13
+    },
+    {
+      "start": 11,
+      "end": 14
+    },
+    {
+      "start": 0,
+      "end": 15
+    },
+    {
+      "start": 15,
+      "end": 16
+    },
+    {
+      "start": 15,
+      "end": 17
+    },
+    {
+      "start": 15,
+      "end": 18
+    },
+    {
+      "start": 0,
+      "end": 19
+    },
+    {
+      "start": 19,
+      "end": 20
+    },
+    {
+      "start": 19,
+      "end": 21
+    },
+    {
+      "start": 19,
+      "end": 22
+    },
+    {
+      "start": 0,
+      "end": 23
+    },
+    {
+      "start": 23,
+      "end": 24
+    },
+    {
+      "start": 0,
+      "end": 25
+    }
+  ],
+  "selectedNode": 0
+}

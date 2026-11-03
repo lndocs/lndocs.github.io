@@ -1,0 +1,350 @@
+{
+  "@context": {
+    "@vocab": "https://mindstr.org/ns#",
+    "link": {
+      "@type": "@id"
+    },
+    "parent": {
+      "@type": "@id"
+    }
+  },
+  "version": "0.2",
+  "nodes": [
+    {
+      "@id": "#this",
+      "name": "Resources",
+      "x": 0,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/resources",
+      "bgColor": "#ebc573"
+    },
+    {
+      "@id": "#yhtgag",
+      "name": "Official Resources",
+      "x": -246,
+      "y": -37,
+      "link": "https://lndocs.github.io/docs/resources#official-resources",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#e538m2",
+      "name": "Video Tutorials",
+      "x": -189,
+      "y": -139,
+      "link": "https://lndocs.github.io/docs/resources#video-tutorials",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#jtjwb8",
+      "name": "LNbits YouTube Channel",
+      "x": -419,
+      "y": -232,
+      "link": "https://lndocs.github.io/docs/resources#lnbits-youtube-channel",
+      "bgColor": "#efe6ff",
+      "parent": "#e538m2"
+    },
+    {
+      "@id": "#pa7irf",
+      "name": "Podcast Episodes",
+      "x": -375,
+      "y": -387,
+      "link": "https://lndocs.github.io/docs/resources#podcast-episodes",
+      "bgColor": "#efe6ff",
+      "parent": "#e538m2"
+    },
+    {
+      "@id": "#gvm9ha",
+      "name": "Written Guides",
+      "x": 47,
+      "y": -209,
+      "link": "https://lndocs.github.io/docs/resources#written-guides",
+      "bgColor": "#f9bdd5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#k6usfa",
+      "name": "Getting Started",
+      "x": -129,
+      "y": -411,
+      "link": "https://lndocs.github.io/docs/resources#getting-started",
+      "bgColor": "#ffe2ed",
+      "parent": "#gvm9ha"
+    },
+    {
+      "@id": "#tyxsbq",
+      "name": "Business & Merchants",
+      "x": 15,
+      "y": -501,
+      "link": "https://lndocs.github.io/docs/resources#business-merchants",
+      "bgColor": "#ffe2ed",
+      "parent": "#gvm9ha"
+    },
+    {
+      "@id": "#s72u5e",
+      "name": "Extensions & Features",
+      "x": 171,
+      "y": -399,
+      "link": "https://lndocs.github.io/docs/resources#extensions-features",
+      "bgColor": "#ffe2ed",
+      "parent": "#gvm9ha"
+    },
+    {
+      "@id": "#4ba893",
+      "name": "Hardware & NFC",
+      "x": 352,
+      "y": -402,
+      "link": "https://lndocs.github.io/docs/resources#hardware-nfc",
+      "bgColor": "#ffe2ed",
+      "parent": "#gvm9ha"
+    },
+    {
+      "@id": "#f44e2u",
+      "name": "Developer Resources",
+      "x": 246,
+      "y": -37,
+      "link": "https://lndocs.github.io/docs/resources#developer-resources",
+      "bgColor": "#fcc2a9",
+      "parent": "#this"
+    },
+    {
+      "@id": "#m4gnq2",
+      "name": "Libraries & SDKs",
+      "x": 444,
+      "y": -196,
+      "link": "https://lndocs.github.io/docs/resources#libraries-sdks",
+      "bgColor": "#ffe4d9",
+      "parent": "#f44e2u"
+    },
+    {
+      "@id": "#4u6tfw",
+      "name": "API Documentation",
+      "x": 578,
+      "y": -102,
+      "link": "https://lndocs.github.io/docs/resources#api-documentation",
+      "bgColor": "#ffe4d9",
+      "parent": "#f44e2u"
+    },
+    {
+      "@id": "#72ecck",
+      "name": "Extension Development",
+      "x": 498,
+      "y": 42,
+      "link": "https://lndocs.github.io/docs/resources#extension-development",
+      "bgColor": "#ffe4d9",
+      "parent": "#f44e2u"
+    },
+    {
+      "@id": "#vx58jh",
+      "name": "Hardware Projects",
+      "x": 170,
+      "y": 156,
+      "link": "https://lndocs.github.io/docs/resources#hardware-projects",
+      "bgColor": "#e0d199",
+      "parent": "#this"
+    },
+    {
+      "@id": "#zaxnik",
+      "name": "Maker Resources",
+      "x": 426,
+      "y": 223,
+      "link": "https://lndocs.github.io/docs/resources#maker-resources",
+      "bgColor": "#f2ecd2",
+      "parent": "#vx58jh"
+    },
+    {
+      "@id": "#qd248e",
+      "name": "Project Types",
+      "x": 409,
+      "y": 361,
+      "link": "https://lndocs.github.io/docs/resources#project-types",
+      "bgColor": "#f2ecd2",
+      "parent": "#vx58jh"
+    },
+    {
+      "@id": "#493myw",
+      "name": "Hardware Platforms",
+      "x": 238,
+      "y": 374,
+      "link": "https://lndocs.github.io/docs/resources#hardware-platforms",
+      "bgColor": "#f2ecd2",
+      "parent": "#vx58jh"
+    },
+    {
+      "@id": "#4dnng8",
+      "name": "Powered by LNbits",
+      "x": -83,
+      "y": 200,
+      "link": "https://lndocs.github.io/docs/resources#powered-by-lnbits",
+      "bgColor": "#b1dfb5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#ds6mnw",
+      "name": "Wallets & Apps",
+      "x": 25,
+      "y": 424,
+      "link": "https://lndocs.github.io/docs/resources#wallets-apps",
+      "bgColor": "#ddf2de",
+      "parent": "#4dnng8"
+    },
+    {
+      "@id": "#9nsksx",
+      "name": "Services",
+      "x": -118,
+      "y": 491,
+      "link": "https://lndocs.github.io/docs/resources#services",
+      "bgColor": "#ddf2de",
+      "parent": "#4dnng8"
+    },
+    {
+      "@id": "#i5s927",
+      "name": "Bots",
+      "x": -218,
+      "y": 382,
+      "link": "https://lndocs.github.io/docs/resources#bots",
+      "bgColor": "#ddf2de",
+      "parent": "#4dnng8"
+    },
+    {
+      "@id": "#ecc9ps",
+      "name": "WordPress Plugins",
+      "x": -387,
+      "y": 378,
+      "link": "https://lndocs.github.io/docs/resources#wordpress-plugins",
+      "bgColor": "#ddf2de",
+      "parent": "#4dnng8"
+    },
+    {
+      "@id": "#d5uvc5",
+      "name": "Community",
+      "x": -223,
+      "y": 96,
+      "link": "https://lndocs.github.io/docs/resources#community",
+      "bgColor": "#95e1e3",
+      "parent": "#this"
+    },
+    {
+      "@id": "#9e2rcx",
+      "name": "Chat & Support",
+      "x": -446,
+      "y": 191,
+      "link": "https://lndocs.github.io/docs/resources#chat-support",
+      "bgColor": "#d1f3f4",
+      "parent": "#d5uvc5"
+    },
+    {
+      "@id": "#y7aute",
+      "name": "← Lightning docs",
+      "x": -247,
+      "y": 34,
+      "link": "./index.jsonld",
+      "bgColor": "#ececec",
+      "parent": "#this"
+    }
+  ],
+  "connections": [
+    {
+      "start": 0,
+      "end": 1
+    },
+    {
+      "start": 0,
+      "end": 2
+    },
+    {
+      "start": 2,
+      "end": 3
+    },
+    {
+      "start": 2,
+      "end": 4
+    },
+    {
+      "start": 0,
+      "end": 5
+    },
+    {
+      "start": 5,
+      "end": 6
+    },
+    {
+      "start": 5,
+      "end": 7
+    },
+    {
+      "start": 5,
+      "end": 8
+    },
+    {
+      "start": 5,
+      "end": 9
+    },
+    {
+      "start": 0,
+      "end": 10
+    },
+    {
+      "start": 10,
+      "end": 11
+    },
+    {
+      "start": 10,
+      "end": 12
+    },
+    {
+      "start": 10,
+      "end": 13
+    },
+    {
+      "start": 0,
+      "end": 14
+    },
+    {
+      "start": 14,
+      "end": 15
+    },
+    {
+      "start": 14,
+      "end": 16
+    },
+    {
+      "start": 14,
+      "end": 17
+    },
+    {
+      "start": 0,
+      "end": 18
+    },
+    {
+      "start": 18,
+      "end": 19
+    },
+    {
+      "start": 18,
+      "end": 20
+    },
+    {
+      "start": 18,
+      "end": 21
+    },
+    {
+      "start": 18,
+      "end": 22
+    },
+    {
+      "start": 0,
+      "end": 23
+    },
+    {
+      "start": 23,
+      "end": 24
+    },
+    {
+      "start": 0,
+      "end": 25
+    }
+  ],
+  "selectedNode": 0
+}

@@ -1,0 +1,220 @@
+{
+  "@context": {
+    "@vocab": "https://mindstr.org/ns#",
+    "link": {
+      "@type": "@id"
+    },
+    "parent": {
+      "@type": "@id"
+    }
+  },
+  "version": "0.2",
+  "nodes": [
+    {
+      "@id": "#this",
+      "name": "Docker Deployment",
+      "x": 0,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/deployment/docker",
+      "bgColor": "#ebc573"
+    },
+    {
+      "@id": "#ziqaes",
+      "name": "Quick Start",
+      "x": -243,
+      "y": -50,
+      "link": "https://lndocs.github.io/docs/deployment/docker#quick-start",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#mpt24a",
+      "name": "Docker Compose",
+      "x": -189,
+      "y": -139,
+      "link": "https://lndocs.github.io/docs/deployment/docker#docker-compose",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#eu4mwv",
+      "name": "Environment File",
+      "x": -113,
+      "y": -198,
+      "link": "https://lndocs.github.io/docs/deployment/docker#environment-file",
+      "bgColor": "#f9bdd5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#xeqwmb",
+      "name": "With PostgreSQL",
+      "x": 45,
+      "y": -217,
+      "link": "https://lndocs.github.io/docs/deployment/docker#with-postgresql",
+      "bgColor": "#fcc2a9",
+      "parent": "#this"
+    },
+    {
+      "@id": "#veupur",
+      "name": "With LND",
+      "x": 143,
+      "y": -171,
+      "link": "https://lndocs.github.io/docs/deployment/docker#with-lnd",
+      "bgColor": "#e0d199",
+      "parent": "#this"
+    },
+    {
+      "@id": "#4e33t4",
+      "name": "Production Configuration",
+      "x": 242,
+      "y": -52,
+      "link": "https://lndocs.github.io/docs/deployment/docker#production-configuration",
+      "bgColor": "#b1dfb5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#5kr5a2",
+      "name": "Secure Settings",
+      "x": 451,
+      "y": -183,
+      "link": "https://lndocs.github.io/docs/deployment/docker#secure-settings",
+      "bgColor": "#ddf2de",
+      "parent": "#4e33t4"
+    },
+    {
+      "@id": "#h8q6vb",
+      "name": "Health Check",
+      "x": 589,
+      "y": -21,
+      "link": "https://lndocs.github.io/docs/deployment/docker#health-check",
+      "bgColor": "#ddf2de",
+      "parent": "#4e33t4"
+    },
+    {
+      "@id": "#mrdm83",
+      "name": "Updating",
+      "x": 223,
+      "y": 97,
+      "link": "https://lndocs.github.io/docs/deployment/docker#updating",
+      "bgColor": "#95e1e3",
+      "parent": "#this"
+    },
+    {
+      "@id": "#ikfnks",
+      "name": "Backup",
+      "x": 146,
+      "y": 172,
+      "link": "https://lndocs.github.io/docs/deployment/docker#backup",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#bpp6gq",
+      "name": "Troubleshooting",
+      "x": -87,
+      "y": 199,
+      "link": "https://lndocs.github.io/docs/deployment/docker#troubleshooting",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#smrrfn",
+      "name": "View Logs",
+      "x": 34,
+      "y": 424,
+      "link": "https://lndocs.github.io/docs/deployment/docker#view-logs",
+      "bgColor": "#efe6ff",
+      "parent": "#bpp6gq"
+    },
+    {
+      "@id": "#u9ytiq",
+      "name": "Shell Access",
+      "x": -192,
+      "y": 474,
+      "link": "https://lndocs.github.io/docs/deployment/docker#shell-access",
+      "bgColor": "#efe6ff",
+      "parent": "#bpp6gq"
+    },
+    {
+      "@id": "#7zygv8",
+      "name": "Permission Issues",
+      "x": -342,
+      "y": 310,
+      "link": "https://lndocs.github.io/docs/deployment/docker#permission-issues",
+      "bgColor": "#efe6ff",
+      "parent": "#bpp6gq"
+    },
+    {
+      "@id": "#vixu2n",
+      "name": "← Deployment",
+      "x": -243,
+      "y": 50,
+      "link": "./deployment.jsonld",
+      "bgColor": "#ececec",
+      "parent": "#this"
+    }
+  ],
+  "connections": [
+    {
+      "start": 0,
+      "end": 1
+    },
+    {
+      "start": 0,
+      "end": 2
+    },
+    {
+      "start": 0,
+      "end": 3
+    },
+    {
+      "start": 0,
+      "end": 4
+    },
+    {
+      "start": 0,
+      "end": 5
+    },
+    {
+      "start": 0,
+      "end": 6
+    },
+    {
+      "start": 6,
+      "end": 7
+    },
+    {
+      "start": 6,
+      "end": 8
+    },
+    {
+      "start": 0,
+      "end": 9
+    },
+    {
+      "start": 0,
+      "end": 10
+    },
+    {
+      "start": 0,
+      "end": 11
+    },
+    {
+      "start": 11,
+      "end": 12
+    },
+    {
+      "start": 11,
+      "end": 13
+    },
+    {
+      "start": 11,
+      "end": 14
+    },
+    {
+      "start": 0,
+      "end": 15
+    }
+  ],
+  "selectedNode": 0
+}

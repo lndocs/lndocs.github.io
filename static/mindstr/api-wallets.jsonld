@@ -1,0 +1,207 @@
+{
+  "@context": {
+    "@vocab": "https://mindstr.org/ns#",
+    "link": {
+      "@type": "@id"
+    },
+    "parent": {
+      "@type": "@id"
+    }
+  },
+  "version": "0.2",
+  "nodes": [
+    {
+      "@id": "#this",
+      "name": "Wallets API",
+      "x": 0,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/api/wallets",
+      "bgColor": "#ebc573"
+    },
+    {
+      "@id": "#6npnp6",
+      "name": "Get Wallet Info",
+      "x": -242,
+      "y": -53,
+      "link": "https://lndocs.github.io/docs/api/wallets#get-wallet-info",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#abay86",
+      "name": "Get Wallet Details",
+      "x": -176,
+      "y": -151,
+      "link": "https://lndocs.github.io/docs/api/wallets#get-wallet-details",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#ci9c3c",
+      "name": "List User Wallets",
+      "x": -70,
+      "y": -208,
+      "link": "https://lndocs.github.io/docs/api/wallets#list-user-wallets",
+      "bgColor": "#f9bdd5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#c54vbt",
+      "name": "Create Wallet",
+      "x": 84,
+      "y": -203,
+      "link": "https://lndocs.github.io/docs/api/wallets#create-wallet",
+      "bgColor": "#fcc2a9",
+      "parent": "#this"
+    },
+    {
+      "@id": "#e7mcpc",
+      "name": "Rename Wallet",
+      "x": 179,
+      "y": -148,
+      "link": "https://lndocs.github.io/docs/api/wallets#rename-wallet",
+      "bgColor": "#e0d199",
+      "parent": "#this"
+    },
+    {
+      "@id": "#x6r876",
+      "name": "Delete Wallet",
+      "x": 241,
+      "y": -58,
+      "link": "https://lndocs.github.io/docs/api/wallets#delete-wallet",
+      "bgColor": "#b1dfb5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#m5cayp",
+      "name": "Balance Response",
+      "x": 243,
+      "y": 49,
+      "link": "https://lndocs.github.io/docs/api/wallets#balance-response",
+      "bgColor": "#95e1e3",
+      "parent": "#this"
+    },
+    {
+      "@id": "#95hxn6",
+      "name": "Error Responses",
+      "x": 119,
+      "y": 187,
+      "link": "https://lndocs.github.io/docs/api/wallets#error-responses",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#m2z7s3",
+      "name": "Wallet Not Found",
+      "x": 344,
+      "y": 308,
+      "link": "https://lndocs.github.io/docs/api/wallets#wallet-not-found",
+      "bgColor": "#daeeff",
+      "parent": "#95hxn6"
+    },
+    {
+      "@id": "#iznddb",
+      "name": "Insufficient Balance",
+      "x": 160,
+      "y": 483,
+      "link": "https://lndocs.github.io/docs/api/wallets#insufficient-balance",
+      "bgColor": "#daeeff",
+      "parent": "#95hxn6"
+    },
+    {
+      "@id": "#5gmfss",
+      "name": "Code Examples",
+      "x": -136,
+      "y": 178,
+      "link": "https://lndocs.github.io/docs/api/wallets#code-examples",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#3v7g7s",
+      "name": "Python",
+      "x": -179,
+      "y": 397,
+      "link": "https://lndocs.github.io/docs/api/wallets#python",
+      "bgColor": "#efe6ff",
+      "parent": "#5gmfss"
+    },
+    {
+      "@id": "#jjpc9k",
+      "name": "JavaScript",
+      "x": -416,
+      "y": 356,
+      "link": "https://lndocs.github.io/docs/api/wallets#javascript",
+      "bgColor": "#efe6ff",
+      "parent": "#5gmfss"
+    },
+    {
+      "@id": "#vxdvti",
+      "name": "← API Reference",
+      "x": -242,
+      "y": 53,
+      "link": "./api-reference.jsonld",
+      "bgColor": "#ececec",
+      "parent": "#this"
+    }
+  ],
+  "connections": [
+    {
+      "start": 0,
+      "end": 1
+    },
+    {
+      "start": 0,
+      "end": 2
+    },
+    {
+      "start": 0,
+      "end": 3
+    },
+    {
+      "start": 0,
+      "end": 4
+    },
+    {
+      "start": 0,
+      "end": 5
+    },
+    {
+      "start": 0,
+      "end": 6
+    },
+    {
+      "start": 0,
+      "end": 7
+    },
+    {
+      "start": 0,
+      "end": 8
+    },
+    {
+      "start": 8,
+      "end": 9
+    },
+    {
+      "start": 8,
+      "end": 10
+    },
+    {
+      "start": 0,
+      "end": 11
+    },
+    {
+      "start": 11,
+      "end": 12
+    },
+    {
+      "start": 11,
+      "end": 13
+    },
+    {
+      "start": 0,
+      "end": 14
+    }
+  ],
+  "selectedNode": 0
+}

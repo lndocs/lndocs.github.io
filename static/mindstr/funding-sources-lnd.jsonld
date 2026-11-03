@@ -1,0 +1,350 @@
+{
+  "@context": {
+    "@vocab": "https://mindstr.org/ns#",
+    "link": {
+      "@type": "@id"
+    },
+    "parent": {
+      "@type": "@id"
+    }
+  },
+  "version": "0.2",
+  "nodes": [
+    {
+      "@id": "#this",
+      "name": "LND",
+      "x": 0,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/funding-sources/lnd",
+      "bgColor": "#ebc573"
+    },
+    {
+      "@id": "#pnzi2z",
+      "name": "Prerequisites",
+      "x": -247,
+      "y": -32,
+      "link": "https://lndocs.github.io/docs/funding-sources/lnd#prerequisites",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#2yz4j8",
+      "name": "REST API",
+      "x": -178,
+      "y": -149,
+      "link": "https://lndocs.github.io/docs/funding-sources/lnd#rest-api-recommended",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#xgkrrw",
+      "name": "Configuration",
+      "x": -438,
+      "y": -206,
+      "link": "https://lndocs.github.io/docs/funding-sources/lnd#configuration",
+      "bgColor": "#efe6ff",
+      "parent": "#2yz4j8"
+    },
+    {
+      "@id": "#2yqrnt",
+      "name": "Encrypted Macaroon",
+      "x": -420,
+      "y": -353,
+      "link": "https://lndocs.github.io/docs/funding-sources/lnd#encrypted-macaroon",
+      "bgColor": "#efe6ff",
+      "parent": "#2yz4j8"
+    },
+    {
+      "@id": "#igep64",
+      "name": "Remote LND",
+      "x": -247,
+      "y": -370,
+      "link": "https://lndocs.github.io/docs/funding-sources/lnd#remote-lnd",
+      "bgColor": "#efe6ff",
+      "parent": "#2yz4j8"
+    },
+    {
+      "@id": "#hgg764",
+      "name": "gRPC API",
+      "x": -40,
+      "y": -210,
+      "link": "https://lndocs.github.io/docs/funding-sources/lnd#grpc-api",
+      "bgColor": "#f9bdd5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#pqcgpp",
+      "name": "Macaroon Permissions",
+      "x": 130,
+      "y": -181,
+      "link": "https://lndocs.github.io/docs/funding-sources/lnd#macaroon-permissions",
+      "bgColor": "#fcc2a9",
+      "parent": "#this"
+    },
+    {
+      "@id": "#jhj67c",
+      "name": "Full Admin Macaroon",
+      "x": 115,
+      "y": -414,
+      "link": "https://lndocs.github.io/docs/funding-sources/lnd#full-admin-macaroon",
+      "bgColor": "#ffe4d9",
+      "parent": "#pqcgpp"
+    },
+    {
+      "@id": "#mr58qm",
+      "name": "Invoice-Only Macaroon",
+      "x": 310,
+      "y": -427,
+      "link": "https://lndocs.github.io/docs/funding-sources/lnd#invoice-only-macaroon",
+      "bgColor": "#ffe4d9",
+      "parent": "#pqcgpp"
+    },
+    {
+      "@id": "#hawxjn",
+      "name": "Read-Only Macaroon",
+      "x": 382,
+      "y": -275,
+      "link": "https://lndocs.github.io/docs/funding-sources/lnd#read-only-macaroon",
+      "bgColor": "#ffe4d9",
+      "parent": "#pqcgpp"
+    },
+    {
+      "@id": "#y6wpy5",
+      "name": "TLS Certificate",
+      "x": 248,
+      "y": -29,
+      "link": "https://lndocs.github.io/docs/funding-sources/lnd#tls-certificate",
+      "bgColor": "#e0d199",
+      "parent": "#this"
+    },
+    {
+      "@id": "#4q7gbw",
+      "name": "Default Location",
+      "x": 481,
+      "y": -116,
+      "link": "https://lndocs.github.io/docs/funding-sources/lnd#default-location",
+      "bgColor": "#f2ecd2",
+      "parent": "#y6wpy5"
+    },
+    {
+      "@id": "#98geuv",
+      "name": "Skip Verification",
+      "x": 590,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/funding-sources/lnd#skip-verification-not-recommended",
+      "bgColor": "#f2ecd2",
+      "parent": "#y6wpy5"
+    },
+    {
+      "@id": "#x5dcei",
+      "name": "Testing Connection",
+      "x": 211,
+      "y": 114,
+      "link": "https://lndocs.github.io/docs/funding-sources/lnd#testing-connection",
+      "bgColor": "#b1dfb5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#uchvmk",
+      "name": "Check LND Status",
+      "x": 463,
+      "y": 161,
+      "link": "https://lndocs.github.io/docs/funding-sources/lnd#check-lnd-status",
+      "bgColor": "#ddf2de",
+      "parent": "#x5dcei"
+    },
+    {
+      "@id": "#72kqt7",
+      "name": "Check LNbits Connection",
+      "x": 450,
+      "y": 324,
+      "link": "https://lndocs.github.io/docs/funding-sources/lnd#check-lnbits-connection",
+      "bgColor": "#ddf2de",
+      "parent": "#x5dcei"
+    },
+    {
+      "@id": "#vbasu4",
+      "name": "Common LND Setups",
+      "x": -32,
+      "y": 211,
+      "link": "https://lndocs.github.io/docs/funding-sources/lnd#common-lnd-setups",
+      "bgColor": "#95e1e3",
+      "parent": "#this"
+    },
+    {
+      "@id": "#8gars2",
+      "name": "Umbrel",
+      "x": 185,
+      "y": 395,
+      "link": "https://lndocs.github.io/docs/funding-sources/lnd#umbrel",
+      "bgColor": "#d1f3f4",
+      "parent": "#vbasu4"
+    },
+    {
+      "@id": "#ttudn3",
+      "name": "RaspiBlitz",
+      "x": 74,
+      "y": 497,
+      "link": "https://lndocs.github.io/docs/funding-sources/lnd#raspiblitz",
+      "bgColor": "#d1f3f4",
+      "parent": "#vbasu4"
+    },
+    {
+      "@id": "#nm9jmm",
+      "name": "Start9",
+      "x": -63,
+      "y": 422,
+      "link": "https://lndocs.github.io/docs/funding-sources/lnd#start9",
+      "bgColor": "#d1f3f4",
+      "parent": "#vbasu4"
+    },
+    {
+      "@id": "#fcu6nk",
+      "name": "BTCPay Server",
+      "x": -219,
+      "y": 466,
+      "link": "https://lndocs.github.io/docs/funding-sources/lnd#btcpay-server",
+      "bgColor": "#d1f3f4",
+      "parent": "#vbasu4"
+    },
+    {
+      "@id": "#im3caa",
+      "name": "Voltage",
+      "x": -296,
+      "y": 342,
+      "link": "https://lndocs.github.io/docs/funding-sources/lnd#voltage",
+      "bgColor": "#d1f3f4",
+      "parent": "#vbasu4"
+    },
+    {
+      "@id": "#up5tww",
+      "name": "Troubleshooting",
+      "x": -218,
+      "y": 104,
+      "link": "https://lndocs.github.io/docs/funding-sources/lnd#troubleshooting",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#w7nqyt",
+      "name": "Connection Refused",
+      "x": -436,
+      "y": 209,
+      "link": "https://lndocs.github.io/docs/funding-sources/lnd#connection-refused",
+      "bgColor": "#daeeff",
+      "parent": "#up5tww"
+    },
+    {
+      "@id": "#csuere",
+      "name": "← Funding Sources",
+      "x": -246,
+      "y": 36,
+      "link": "./funding-sources.jsonld",
+      "bgColor": "#ececec",
+      "parent": "#this"
+    }
+  ],
+  "connections": [
+    {
+      "start": 0,
+      "end": 1
+    },
+    {
+      "start": 0,
+      "end": 2
+    },
+    {
+      "start": 2,
+      "end": 3
+    },
+    {
+      "start": 2,
+      "end": 4
+    },
+    {
+      "start": 2,
+      "end": 5
+    },
+    {
+      "start": 0,
+      "end": 6
+    },
+    {
+      "start": 0,
+      "end": 7
+    },
+    {
+      "start": 7,
+      "end": 8
+    },
+    {
+      "start": 7,
+      "end": 9
+    },
+    {
+      "start": 7,
+      "end": 10
+    },
+    {
+      "start": 0,
+      "end": 11
+    },
+    {
+      "start": 11,
+      "end": 12
+    },
+    {
+      "start": 11,
+      "end": 13
+    },
+    {
+      "start": 0,
+      "end": 14
+    },
+    {
+      "start": 14,
+      "end": 15
+    },
+    {
+      "start": 14,
+      "end": 16
+    },
+    {
+      "start": 0,
+      "end": 17
+    },
+    {
+      "start": 17,
+      "end": 18
+    },
+    {
+      "start": 17,
+      "end": 19
+    },
+    {
+      "start": 17,
+      "end": 20
+    },
+    {
+      "start": 17,
+      "end": 21
+    },
+    {
+      "start": 17,
+      "end": 22
+    },
+    {
+      "start": 0,
+      "end": 23
+    },
+    {
+      "start": 23,
+      "end": 24
+    },
+    {
+      "start": 0,
+      "end": 25
+    }
+  ],
+  "selectedNode": 0
+}

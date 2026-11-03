@@ -1,0 +1,350 @@
+{
+  "@context": {
+    "@vocab": "https://mindstr.org/ns#",
+    "link": {
+      "@type": "@id"
+    },
+    "parent": {
+      "@type": "@id"
+    }
+  },
+  "version": "0.2",
+  "nodes": [
+    {
+      "@id": "#this",
+      "name": "Installing Extensions",
+      "x": 0,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/extensions/installing",
+      "bgColor": "#ebc573"
+    },
+    {
+      "@id": "#ar4eav",
+      "name": "Enabling Built-in Extensions",
+      "x": -239,
+      "y": -65,
+      "link": "https://lndocs.github.io/docs/extensions/installing#enabling-built-in-extensions",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#zuzczj",
+      "name": "From the Web UI",
+      "x": -493,
+      "y": -72,
+      "link": "https://lndocs.github.io/docs/extensions/installing#from-the-web-ui",
+      "bgColor": "#daeeff",
+      "parent": "#ar4eav"
+    },
+    {
+      "@id": "#56femq",
+      "name": "Setting Defaults",
+      "x": -539,
+      "y": -205,
+      "link": "https://lndocs.github.io/docs/extensions/installing#setting-defaults",
+      "bgColor": "#daeeff",
+      "parent": "#ar4eav"
+    },
+    {
+      "@id": "#7x5wee",
+      "name": "Installing from Manifest",
+      "x": -154,
+      "y": -183,
+      "link": "https://lndocs.github.io/docs/extensions/installing#installing-from-manifest",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#fjarhy",
+      "name": "Adding a Manifest Source",
+      "x": -333,
+      "y": -317,
+      "link": "https://lndocs.github.io/docs/extensions/installing#adding-a-manifest-source",
+      "bgColor": "#efe6ff",
+      "parent": "#7x5wee"
+    },
+    {
+      "@id": "#9ydn44",
+      "name": "Official Extension Registry",
+      "x": -207,
+      "y": -470,
+      "link": "https://lndocs.github.io/docs/extensions/installing#official-extension-registry",
+      "bgColor": "#efe6ff",
+      "parent": "#7x5wee"
+    },
+    {
+      "@id": "#pfi5zk",
+      "name": "Installing Specific Extensions",
+      "x": 90,
+      "y": -203,
+      "link": "https://lndocs.github.io/docs/extensions/installing#installing-specific-extensions",
+      "bgColor": "#f9bdd5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#3rasaj",
+      "name": "From GitHub Releases",
+      "x": 54,
+      "y": -422,
+      "link": "https://lndocs.github.io/docs/extensions/installing#from-github-releases",
+      "bgColor": "#ffe2ed",
+      "parent": "#pfi5zk"
+    },
+    {
+      "@id": "#7inapr",
+      "name": "Example: Custom Extension",
+      "x": 263,
+      "y": -450,
+      "link": "https://lndocs.github.io/docs/extensions/installing#example-custom-extension",
+      "bgColor": "#ffe2ed",
+      "parent": "#pfi5zk"
+    },
+    {
+      "@id": "#iamqvg",
+      "name": "Extension CLI",
+      "x": 187,
+      "y": -141,
+      "link": "https://lndocs.github.io/docs/extensions/installing#extension-cli",
+      "bgColor": "#fcc2a9",
+      "parent": "#this"
+    },
+    {
+      "@id": "#vhdgu3",
+      "name": "Updating Extensions",
+      "x": 248,
+      "y": -29,
+      "link": "https://lndocs.github.io/docs/extensions/installing#updating-extensions",
+      "bgColor": "#e0d199",
+      "parent": "#this"
+    },
+    {
+      "@id": "#vy3tsq",
+      "name": "Auto-Update Check",
+      "x": 465,
+      "y": -156,
+      "link": "https://lndocs.github.io/docs/extensions/installing#auto-update-check",
+      "bgColor": "#f2ecd2",
+      "parent": "#vhdgu3"
+    },
+    {
+      "@id": "#pibigc",
+      "name": "Manual Update",
+      "x": 586,
+      "y": -61,
+      "link": "https://lndocs.github.io/docs/extensions/installing#manual-update",
+      "bgColor": "#f2ecd2",
+      "parent": "#vhdgu3"
+    },
+    {
+      "@id": "#gh56tu",
+      "name": "Via CLI",
+      "x": 496,
+      "y": 50,
+      "link": "https://lndocs.github.io/docs/extensions/installing#via-cli",
+      "bgColor": "#f2ecd2",
+      "parent": "#vhdgu3"
+    },
+    {
+      "@id": "#8vbc5u",
+      "name": "Uninstalling Extensions",
+      "x": 201,
+      "y": 126,
+      "link": "https://lndocs.github.io/docs/extensions/installing#uninstalling-extensions",
+      "bgColor": "#b1dfb5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#qtqg2a",
+      "name": "Disable vs Uninstall",
+      "x": 435,
+      "y": 209,
+      "link": "https://lndocs.github.io/docs/extensions/installing#disable-vs-uninstall",
+      "bgColor": "#ddf2de",
+      "parent": "#8vbc5u"
+    },
+    {
+      "@id": "#5xddae",
+      "name": "From Admin UI",
+      "x": 417,
+      "y": 355,
+      "link": "https://lndocs.github.io/docs/extensions/installing#from-admin-ui",
+      "bgColor": "#ddf2de",
+      "parent": "#8vbc5u"
+    },
+    {
+      "@id": "#g56v86",
+      "name": "Extension Storage",
+      "x": 109,
+      "y": 191,
+      "link": "https://lndocs.github.io/docs/extensions/installing#extension-storage",
+      "bgColor": "#95e1e3",
+      "parent": "#this"
+    },
+    {
+      "@id": "#7ptw38",
+      "name": "Upgrades Location",
+      "x": 219,
+      "y": 382,
+      "link": "https://lndocs.github.io/docs/extensions/installing#upgrades-location",
+      "bgColor": "#d1f3f4",
+      "parent": "#g56v86"
+    },
+    {
+      "@id": "#hkakqp",
+      "name": "Troubleshooting",
+      "x": -119,
+      "y": 187,
+      "link": "https://lndocs.github.io/docs/extensions/installing#troubleshooting",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#cmc5g4",
+      "name": "Extension Not Appearing",
+      "x": -2,
+      "y": 425,
+      "link": "https://lndocs.github.io/docs/extensions/installing#extension-not-appearing",
+      "bgColor": "#daeeff",
+      "parent": "#hkakqp"
+    },
+    {
+      "@id": "#h64kxg",
+      "name": "Installation Failed",
+      "x": -185,
+      "y": 476,
+      "link": "https://lndocs.github.io/docs/extensions/installing#installation-failed",
+      "bgColor": "#daeeff",
+      "parent": "#hkakqp"
+    },
+    {
+      "@id": "#3mw9e8",
+      "name": "Database Migration Failed",
+      "x": -302,
+      "y": 339,
+      "link": "https://lndocs.github.io/docs/extensions/installing#database-migration-failed",
+      "bgColor": "#daeeff",
+      "parent": "#hkakqp"
+    },
+    {
+      "@id": "#3yvsbg",
+      "name": "Extension Won't Enable",
+      "x": -495,
+      "y": 273,
+      "link": "https://lndocs.github.io/docs/extensions/installing#extension-wont-enable",
+      "bgColor": "#daeeff",
+      "parent": "#hkakqp"
+    },
+    {
+      "@id": "#ijvikk",
+      "name": "← Extensions",
+      "x": -247,
+      "y": 30,
+      "link": "./extensions.jsonld",
+      "bgColor": "#ececec",
+      "parent": "#this"
+    }
+  ],
+  "connections": [
+    {
+      "start": 0,
+      "end": 1
+    },
+    {
+      "start": 1,
+      "end": 2
+    },
+    {
+      "start": 1,
+      "end": 3
+    },
+    {
+      "start": 0,
+      "end": 4
+    },
+    {
+      "start": 4,
+      "end": 5
+    },
+    {
+      "start": 4,
+      "end": 6
+    },
+    {
+      "start": 0,
+      "end": 7
+    },
+    {
+      "start": 7,
+      "end": 8
+    },
+    {
+      "start": 7,
+      "end": 9
+    },
+    {
+      "start": 0,
+      "end": 10
+    },
+    {
+      "start": 0,
+      "end": 11
+    },
+    {
+      "start": 11,
+      "end": 12
+    },
+    {
+      "start": 11,
+      "end": 13
+    },
+    {
+      "start": 11,
+      "end": 14
+    },
+    {
+      "start": 0,
+      "end": 15
+    },
+    {
+      "start": 15,
+      "end": 16
+    },
+    {
+      "start": 15,
+      "end": 17
+    },
+    {
+      "start": 0,
+      "end": 18
+    },
+    {
+      "start": 18,
+      "end": 19
+    },
+    {
+      "start": 0,
+      "end": 20
+    },
+    {
+      "start": 20,
+      "end": 21
+    },
+    {
+      "start": 20,
+      "end": 22
+    },
+    {
+      "start": 20,
+      "end": 23
+    },
+    {
+      "start": 20,
+      "end": 24
+    },
+    {
+      "start": 0,
+      "end": 25
+    }
+  ],
+  "selectedNode": 0
+}

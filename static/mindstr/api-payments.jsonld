@@ -1,0 +1,181 @@
+{
+  "@context": {
+    "@vocab": "https://mindstr.org/ns#",
+    "link": {
+      "@type": "@id"
+    },
+    "parent": {
+      "@type": "@id"
+    }
+  },
+  "version": "0.2",
+  "nodes": [
+    {
+      "@id": "#this",
+      "name": "Payments API",
+      "x": 0,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/api/payments",
+      "bgColor": "#ebc573"
+    },
+    {
+      "@id": "#8qyphq",
+      "name": "Create Invoice",
+      "x": -241,
+      "y": -55,
+      "link": "https://lndocs.github.io/docs/api/payments#create-invoice",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#awt4ph",
+      "name": "Pay Invoice",
+      "x": -176,
+      "y": -151,
+      "link": "https://lndocs.github.io/docs/api/payments#pay-invoice",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#j3ffm5",
+      "name": "List Payments",
+      "x": -62,
+      "y": -206,
+      "link": "https://lndocs.github.io/docs/api/payments#list-payments",
+      "bgColor": "#f9bdd5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#s2vv4u",
+      "name": "Get Payment",
+      "x": 68,
+      "y": -205,
+      "link": "https://lndocs.github.io/docs/api/payments#get-payment",
+      "bgColor": "#fcc2a9",
+      "parent": "#this"
+    },
+    {
+      "@id": "#8gx4pf",
+      "name": "Check Payment Status",
+      "x": 191,
+      "y": -137,
+      "link": "https://lndocs.github.io/docs/api/payments#check-payment-status",
+      "bgColor": "#e0d199",
+      "parent": "#this"
+    },
+    {
+      "@id": "#knn5ve",
+      "name": "Decode Invoice",
+      "x": 249,
+      "y": -21,
+      "link": "https://lndocs.github.io/docs/api/payments#decode-invoice",
+      "bgColor": "#b1dfb5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#hgjzm6",
+      "name": "Payment Status Values",
+      "x": 218,
+      "y": 104,
+      "link": "https://lndocs.github.io/docs/api/payments#payment-status-values",
+      "bgColor": "#95e1e3",
+      "parent": "#this"
+    },
+    {
+      "@id": "#hxgis3",
+      "name": "Webhook Notifications",
+      "x": 90,
+      "y": 198,
+      "link": "https://lndocs.github.io/docs/api/payments#webhook-notifications",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#jqxvqz",
+      "name": "Code Examples",
+      "x": -121,
+      "y": 186,
+      "link": "https://lndocs.github.io/docs/api/payments#code-examples",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#3b8m9c",
+      "name": "Python",
+      "x": -141,
+      "y": 408,
+      "link": "https://lndocs.github.io/docs/api/payments#python",
+      "bgColor": "#efe6ff",
+      "parent": "#jqxvqz"
+    },
+    {
+      "@id": "#4wrpia",
+      "name": "JavaScript",
+      "x": -393,
+      "y": 374,
+      "link": "https://lndocs.github.io/docs/api/payments#javascript",
+      "bgColor": "#efe6ff",
+      "parent": "#jqxvqz"
+    },
+    {
+      "@id": "#v2ex7g",
+      "name": "← API Reference",
+      "x": -241,
+      "y": 56,
+      "link": "./api-reference.jsonld",
+      "bgColor": "#ececec",
+      "parent": "#this"
+    }
+  ],
+  "connections": [
+    {
+      "start": 0,
+      "end": 1
+    },
+    {
+      "start": 0,
+      "end": 2
+    },
+    {
+      "start": 0,
+      "end": 3
+    },
+    {
+      "start": 0,
+      "end": 4
+    },
+    {
+      "start": 0,
+      "end": 5
+    },
+    {
+      "start": 0,
+      "end": 6
+    },
+    {
+      "start": 0,
+      "end": 7
+    },
+    {
+      "start": 0,
+      "end": 8
+    },
+    {
+      "start": 0,
+      "end": 9
+    },
+    {
+      "start": 9,
+      "end": 10
+    },
+    {
+      "start": 9,
+      "end": 11
+    },
+    {
+      "start": 0,
+      "end": 12
+    }
+  ],
+  "selectedNode": 0
+}

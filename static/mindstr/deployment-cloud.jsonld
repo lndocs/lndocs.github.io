@@ -1,0 +1,233 @@
+{
+  "@context": {
+    "@vocab": "https://mindstr.org/ns#",
+    "link": {
+      "@type": "@id"
+    },
+    "parent": {
+      "@type": "@id"
+    }
+  },
+  "version": "0.2",
+  "nodes": [
+    {
+      "@id": "#this",
+      "name": "Cloud Deployment",
+      "x": 0,
+      "y": 0,
+      "link": "https://lndocs.github.io/docs/deployment/cloud",
+      "bgColor": "#ebc573"
+    },
+    {
+      "@id": "#nteprv",
+      "name": "Fly.io",
+      "x": -183,
+      "y": -145,
+      "link": "https://lndocs.github.io/docs/deployment/cloud#flyio",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#uk3b6t",
+      "name": "Setup",
+      "x": -473,
+      "y": -137,
+      "link": "https://lndocs.github.io/docs/deployment/cloud#setup",
+      "bgColor": "#daeeff",
+      "parent": "#nteprv"
+    },
+    {
+      "@id": "#vi5yj8",
+      "name": "fly.toml",
+      "x": -433,
+      "y": -341,
+      "link": "https://lndocs.github.io/docs/deployment/cloud#flytoml",
+      "bgColor": "#daeeff",
+      "parent": "#nteprv"
+    },
+    {
+      "@id": "#k3j28m",
+      "name": "Deploy",
+      "x": -197,
+      "y": -391,
+      "link": "https://lndocs.github.io/docs/deployment/cloud#deploy",
+      "bgColor": "#daeeff",
+      "parent": "#nteprv"
+    },
+    {
+      "@id": "#taneds",
+      "name": "Railway",
+      "x": 120,
+      "y": -186,
+      "link": "https://lndocs.github.io/docs/deployment/cloud#railway",
+      "bgColor": "#d9c6fb",
+      "parent": "#this"
+    },
+    {
+      "@id": "#adixp4",
+      "name": "Setup",
+      "x": 113,
+      "y": -414,
+      "link": "https://lndocs.github.io/docs/deployment/cloud#setup",
+      "bgColor": "#efe6ff",
+      "parent": "#taneds"
+    },
+    {
+      "@id": "#mi3s9r",
+      "name": "Environment Variables",
+      "x": 386,
+      "y": -380,
+      "link": "https://lndocs.github.io/docs/deployment/cloud#environment-variables",
+      "bgColor": "#efe6ff",
+      "parent": "#taneds"
+    },
+    {
+      "@id": "#ur72d9",
+      "name": "Render",
+      "x": 243,
+      "y": -51,
+      "link": "https://lndocs.github.io/docs/deployment/cloud#render",
+      "bgColor": "#f9bdd5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#75kp2g",
+      "name": "render.yaml",
+      "x": 486,
+      "y": -101,
+      "link": "https://lndocs.github.io/docs/deployment/cloud#renderyaml",
+      "bgColor": "#ffe2ed",
+      "parent": "#ur72d9"
+    },
+    {
+      "@id": "#e46bzx",
+      "name": "DigitalOcean App Platform",
+      "x": 242,
+      "y": 54,
+      "link": "https://lndocs.github.io/docs/deployment/cloud#digitalocean-app-platform",
+      "bgColor": "#fcc2a9",
+      "parent": "#this"
+    },
+    {
+      "@id": "#mh2w6x",
+      "name": "app.yaml",
+      "x": 483,
+      "y": 108,
+      "link": "https://lndocs.github.io/docs/deployment/cloud#appyaml",
+      "bgColor": "#ffe4d9",
+      "parent": "#e46bzx"
+    },
+    {
+      "@id": "#h78iuj",
+      "name": "Heroku",
+      "x": 182,
+      "y": 146,
+      "link": "https://lndocs.github.io/docs/deployment/cloud#heroku",
+      "bgColor": "#e0d199",
+      "parent": "#this"
+    },
+    {
+      "@id": "#5xbmf8",
+      "name": "AWS",
+      "x": 78,
+      "y": 202,
+      "link": "https://lndocs.github.io/docs/deployment/cloud#aws-ecsfargate",
+      "bgColor": "#b1dfb5",
+      "parent": "#this"
+    },
+    {
+      "@id": "#zn6fhh",
+      "name": "Google Cloud Run",
+      "x": -50,
+      "y": 208,
+      "link": "https://lndocs.github.io/docs/deployment/cloud#google-cloud-run",
+      "bgColor": "#95e1e3",
+      "parent": "#this"
+    },
+    {
+      "@id": "#x39a2c",
+      "name": "Cost Considerations",
+      "x": -174,
+      "y": 153,
+      "link": "https://lndocs.github.io/docs/deployment/cloud#cost-considerations",
+      "bgColor": "#acd5ff",
+      "parent": "#this"
+    },
+    {
+      "@id": "#nyyrcy",
+      "name": "← Deployment",
+      "x": -242,
+      "y": 52,
+      "link": "./deployment.jsonld",
+      "bgColor": "#ececec",
+      "parent": "#this"
+    }
+  ],
+  "connections": [
+    {
+      "start": 0,
+      "end": 1
+    },
+    {
+      "start": 1,
+      "end": 2
+    },
+    {
+      "start": 1,
+      "end": 3
+    },
+    {
+      "start": 1,
+      "end": 4
+    },
+    {
+      "start": 0,
+      "end": 5
+    },
+    {
+      "start": 5,
+      "end": 6
+    },
+    {
+      "start": 5,
+      "end": 7
+    },
+    {
+      "start": 0,
+      "end": 8
+    },
+    {
+      "start": 8,
+      "end": 9
+    },
+    {
+      "start": 0,
+      "end": 10
+    },
+    {
+      "start": 10,
+      "end": 11
+    },
+    {
+      "start": 0,
+      "end": 12
+    },
+    {
+      "start": 0,
+      "end": 13
+    },
+    {
+      "start": 0,
+      "end": 14
+    },
+    {
+      "start": 0,
+      "end": 15
+    },
+    {
+      "start": 0,
+      "end": 16
+    }
+  ],
+  "selectedNode": 0
+}
