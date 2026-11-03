@@ -1,5 +1,7 @@
 # lndocs
 
+[![Mind map](https://mindstr.org/badge.svg)](https://mindstr.org/?uri=https://lndocs.github.io/mindstr/index.jsonld)
+
 Independent documentation for [LNbits](https://github.com/lnbits/lnbits), published at https://lndocs.github.io. The official docs live at https://docs.lnbits.com.
 
 Every page is checked against a pinned LNbits release, set in `scripts/lnbits-version.txt` (currently v1.6.2).
